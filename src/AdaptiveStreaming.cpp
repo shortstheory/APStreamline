@@ -65,8 +65,11 @@ void AdaptiveStreaming::init_element_properties()
     g_object_set(G_OBJECT(rtpbin), "latency", 0, NULL);
     g_object_set(G_OBJECT(h264_encoder), "tune", 0x00000004, "bitrate", h264_bitrate, NULL);
 
-    // causing blocking
     g_object_set(G_OBJECT(video_udp_sink), "host", receiver_ip_addr.c_str(), "port", video_sink_port, NULL);
     g_object_set(G_OBJECT(rtcp_udp_sink), "host", receiver_ip_addr.c_str(), "port", rtcp_sink_port, NULL);
 }
 
+bool link_all_elements()
+{
+    return true;
+}

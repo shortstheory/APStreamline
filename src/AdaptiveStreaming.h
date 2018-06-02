@@ -43,6 +43,7 @@ public:
     bool init_elements();
     bool init_caps(int width, int height, int framerate);
     void init_element_properties();
+    bool link_all_elements();
 };
 
 #endif
