@@ -1,4 +1,4 @@
-project('adaptive-streaming', 'cpp')
+project('adaptive-streaming', 'cpp', default_options : ['cpp_std=c++11'])
 gst_dep = dependency('gstreamer-1.0')
 gst_rtp_dep = dependency('gstreamer-rtp-1.0')
 src = ['src/main.cpp', 'src/AdaptiveStreaming.cpp', 'src/QoSEstimator.cpp']
