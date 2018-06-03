@@ -89,13 +89,14 @@ bool AdaptiveStreaming::link_all_elements()
     // first link all the elements with autoplugging
     if (!(gst_element_link_filtered(v4l2_src, h264_encoder, video_caps) && 
         gst_element_link(h264_encoder, h264_parser) && gst_element_link(h264_parser, rtph264_payloader) &&
-        gst_element_link(rtcp_udp_src, rr_rtcp_identity) && gst_element_link(rtpbin, video_udp_sink))) {
+        gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
         return false;
     }
     if(!gst_pad_link(gst_element_get_static_pad(rr_rtcp_identity,"src"), gst_element_get_request_pad(rtpbin, "recv_rtcp_sink_%u"))
         && !gst_pad_link(gst_element_get_static_pad(rtph264_payloader,"src"), gst_element_get_request_pad(rtpbin, "send_rtp_sink_%u"))
         && !gst_pad_link(gst_element_get_request_pad(rtpbin, "send_rtcp_src_%u"), gst_element_get_static_pad(sr_rtcp_identity,"sink"))
         && !gst_pad_link(gst_element_get_static_pad(sr_rtcp_identity,"src"), gst_element_get_static_pad(rtcp_udp_sink,"sink"))) {
+        gst_element_link(rtpbin, video_udp_sink);
         //setup callbacks here
         return true;
     }
