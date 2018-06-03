@@ -9,13 +9,17 @@ AdaptiveStreaming::AdaptiveStreaming()
     init_caps(1280, 720, 30);
     init_element_properties();
     pipeline_add_elements();
-    link_all_elements();
+    if(link_all_elements()) {
+        g_warning("goodlink");
+    } else {
+        g_warning("bad link");
+    }
 }
 
 //unreffing pointers if not null can be dangerous, check this
 AdaptiveStreaming::~AdaptiveStreaming()
 {
-    gst_object_unref(pipeline);
+    // gst_object_unref(pipeline);
     // gst_object_unref(v4l2_src);
     // gst_object_unref(video_udp_sink);
     // gst_object_unref(h264_encoder);
@@ -57,7 +61,7 @@ bool AdaptiveStreaming::init_caps(int width, int height, int framerate)
                                 "height", G_TYPE_INT, height,
                                 "framerate", GST_TYPE_FRACTION, framerate, 1,
                                 NULL);
-    return (video_caps != NULL) ? true : false;
+    return (video_caps != NULL);
 }
 
 void AdaptiveStreaming::init_element_properties()
@@ -92,7 +96,18 @@ bool AdaptiveStreaming::link_all_elements()
         && !gst_pad_link(gst_element_get_static_pad(rtph264_payloader,"src"), gst_element_get_request_pad(rtpbin, "send_rtp_sink_%u"))
         && !gst_pad_link(gst_element_get_request_pad(rtpbin, "send_rtcp_src_%u"), gst_element_get_static_pad(sr_rtcp_identity,"sink"))
         && !gst_pad_link(gst_element_get_static_pad(sr_rtcp_identity,"src"), gst_element_get_static_pad(rtcp_udp_sink,"sink"))) {
+        //setup callbacks here
         return true;
     }
     return false;
+}
+
+bool AdaptiveStreaming::start_playing()
+{
+    return gst_element_set_state(pipeline, GST_STATE_PLAYING);
+}
+
+GstBus* AdaptiveStreaming::get_pipeline_bus()
+{
+    return gst_element_get_bus(pipeline);
 }

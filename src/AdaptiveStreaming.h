@@ -37,14 +37,16 @@ private:
     string video_caps_string;
     string rtcp_caps_string;
     static const string receiver_ip_addr;
-public:
-    AdaptiveStreaming();
-    ~AdaptiveStreaming();
     bool init_elements();
     bool init_caps(int width, int height, int framerate);
     void init_element_properties();
     void pipeline_add_elements();
     bool link_all_elements();
+public:
+    AdaptiveStreaming();
+    ~AdaptiveStreaming();
+    bool start_playing();
+    GstBus* get_pipeline_bus();
 };
 
 #endif
