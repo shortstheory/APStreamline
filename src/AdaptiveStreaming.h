@@ -29,7 +29,7 @@ private:
     GstElement* sr_rtcp_identity;
     GstElement* video_udp_sink;
     GstElement* rtcp_udp_sink;
-    GstElement* rtcp_src;
+    GstElement* rtcp_udp_src;
 
     GstCaps* video_caps;
     GstCaps* rtcp_caps;
@@ -43,6 +43,7 @@ public:
     bool init_elements();
     bool init_caps(int width, int height, int framerate);
     void init_element_properties();
+    void pipeline_add_elements();
     bool link_all_elements();
 };
 
