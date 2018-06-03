@@ -98,9 +98,8 @@ bool AdaptiveStreaming::link_all_elements()
         && !gst_pad_link(gst_element_get_request_pad(rtpbin, "send_rtcp_src_%u"), gst_element_get_static_pad(sr_rtcp_identity,"sink"))
         && !gst_pad_link(gst_element_get_static_pad(sr_rtcp_identity,"src"), gst_element_get_static_pad(rtcp_udp_sink,"sink"))) {
         gst_element_link(rtpbin, video_udp_sink);
-        auto bound_fxn = bind(callback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        g_signal_connect (rr_rtcp_identity, "handoff", G_CALLBACK(&bound_fxn), NULL);
-        g_signal_connect (sr_rtcp_identity, "handoff", G_CALLBACK(&bound_fxn), NULL);
+        g_signal_connect(rr_rtcp_identity, "handoff", G_CALLBACK(callback), this);
+        g_signal_connect(sr_rtcp_identity, "handoff", G_CALLBACK(callback), this);
 
         //setup callbacks here
         return true;
@@ -118,14 +117,16 @@ GstBus* AdaptiveStreaming::get_pipeline_bus()
     return gst_element_get_bus(pipeline);
 }
 
-void AdaptiveStreaming::callback(AdaptiveStreaming* ptr, GstElement *src, GstBuffer *buf, gpointer data)
+void AdaptiveStreaming::callback(GstElement *src, GstBuffer *buf, gpointer data)
 {
-    ptr->rtcp_callback(src, buf, data);
+    AdaptiveStreaming* ptr = (AdaptiveStreaming*)data;
+    ptr->rtcp_callback(src, buf);
+    // g_warning("Received rtcp");
+    // ptr->rtcp_callback(src, buf, data);
 }
 
-void AdaptiveStreaming::rtcp_callback(GstElement *src, GstBuffer *buf, gpointer data)
+void AdaptiveStreaming::rtcp_callback(GstElement *src, GstBuffer *buf)
 {
-    g_warning("bitrate %d", h264_bitrate);
     // g_warning("rtcp_received %d", gst_rtcp_buffer_get_packet_count(buf));
     // GstRTCPBuffer *rtcpbuf = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
     // rtcpbuf->buffer = NULL;
