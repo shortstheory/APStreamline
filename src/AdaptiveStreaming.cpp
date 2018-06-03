@@ -1,4 +1,5 @@
 #include "AdaptiveStreaming.h" 
+#include <functional>
 
 const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
 
@@ -97,6 +98,10 @@ bool AdaptiveStreaming::link_all_elements()
         && !gst_pad_link(gst_element_get_request_pad(rtpbin, "send_rtcp_src_%u"), gst_element_get_static_pad(sr_rtcp_identity,"sink"))
         && !gst_pad_link(gst_element_get_static_pad(sr_rtcp_identity,"src"), gst_element_get_static_pad(rtcp_udp_sink,"sink"))) {
         gst_element_link(rtpbin, video_udp_sink);
+        auto bound_fxn = bind(callback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        g_signal_connect (rr_rtcp_identity, "handoff", G_CALLBACK(&bound_fxn), NULL);
+        g_signal_connect (sr_rtcp_identity, "handoff", G_CALLBACK(&bound_fxn), NULL);
+
         //setup callbacks here
         return true;
     }
@@ -111,4 +116,47 @@ bool AdaptiveStreaming::start_playing()
 GstBus* AdaptiveStreaming::get_pipeline_bus()
 {
     return gst_element_get_bus(pipeline);
+}
+
+void AdaptiveStreaming::callback(AdaptiveStreaming* ptr, GstElement *src, GstBuffer *buf, gpointer data)
+{
+    ptr->rtcp_callback(src, buf, data);
+}
+
+void AdaptiveStreaming::rtcp_callback(GstElement *src, GstBuffer *buf, gpointer data)
+{
+    g_warning("bitrate %d", h264_bitrate);
+    // g_warning("rtcp_received %d", gst_rtcp_buffer_get_packet_count(buf));
+    // GstRTCPBuffer *rtcpbuf = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
+    // rtcpbuf->buffer = NULL;
+    // // rtcpbuf->map = GST_MAP_INFO_INIT;
+    // gst_rtcp_buffer_map(buf, GST_MAP_READ, rtcpbuf);
+    // GstRTCPPacket *packet = (GstRTCPPacket*)malloc(sizeof(GstRTCPPacket));
+    // gboolean more = gst_rtcp_buffer_get_first_packet(rtcpbuf, packet);
+	// while (more) {
+	// 	GstRTCPType type;
+	// 	type = gst_rtcp_packet_get_type(packet);
+	// 	switch (type) {
+	// 	case GST_RTCP_TYPE_RR:
+    //         process_rtcp_packet(packet);
+    //         // if (switchvalue) {
+    //         //     g_warning("Inc bitrate");
+    //         //     g_object_set(G_OBJECT(enc), "bitrate", bitrate, NULL);
+    //         //     switchvalue = FALSE;
+    //         // } else {
+    //         //     g_warning("dec bitrate");
+    //         //     g_object_set(G_OBJECT(enc), "bitrate", bitrate2, NULL);
+    //         //     switchvalue = TRUE;
+    //         // }
+    //         // send_event_to_encoder(venc, &rtcp_pkt);
+    //         break;
+    //     case GST_RTCP_TYPE_SR:
+    //         process_sender_packet(packet);
+	// 		break;
+	// 	default:
+	// 		g_debug("Other types");
+	// 		break;
+	// 	}
+	// 	more = gst_rtcp_packet_move_to_next(packet);
+	// }
 }

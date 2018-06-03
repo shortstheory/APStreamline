@@ -42,6 +42,8 @@ private:
     void init_element_properties();
     void pipeline_add_elements();
     bool link_all_elements();
+    static void callback(AdaptiveStreaming* ptr, GstElement *src, GstBuffer *buf, gpointer data);
+    void rtcp_callback(GstElement *src, GstBuffer *buf, gpointer data);
 public:
     AdaptiveStreaming();
     ~AdaptiveStreaming();
