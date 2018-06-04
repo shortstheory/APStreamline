@@ -50,14 +50,20 @@ void QoSEstimator::process_sr_packet(GstRTCPPacket* packet)
     guint32 ssrc, rtptime, packet_count, octet_count;
     guint64 ntptime;
     gst_rtcp_packet_sr_get_sender_info(packet, &ssrc, &ntptime, &rtptime, &packet_count, &octet_count);
+    timeval tv;
+    gettimeofday(&tv, NULL);
+    ntp_time_t t1 = ntp_time_t::convert_from_unix_time(tv);
+    ntp_time_t t2 = ntp_time_t::get_struct_from_timestamp(ntptime);
+    g_warning("t1 s%lu f%lu t2 s%lu f%lu", t1.second, t1.fraction, t2.second, t2.fraction);
     // g_warning("Sender report %lu", get_compressed_ntp_time(get_ntp_time()));
-    g_warning("Sender report %lu", get_ntp_time());
+    // g_warning("Sender report %lu", get_ntp_time());
     // ntptime = ntptime >> 32;
     // ntptime = (ntptime & 0x0000FFFF);
+
     g_warning("ssrc %llu, ntptime %llu, rtptime %llu, packetcount %llu", ssrc, ntptime, rtptime, packet_count);
 }
 
-guint64 QoSEstimator::get_ntp_time()
+guint64 QoSEstimator::get_current_ntp_time()
 {
     return time(NULL) + ntp_offset;
 }

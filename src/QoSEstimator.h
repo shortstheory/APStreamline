@@ -24,8 +24,10 @@ class QoSEstimator {
         static ntp_time_t get_struct_from_timestamp(guint64 full_ntp_timestamp)
         {
             ntp_time_t result;
-            result.second = (full_ntp_timestamp & 0xFFFF0000) >> 32;
-            result.fraction = (full_ntp_timestamp & 0x0000FFFF) >> 32;
+            guint32 r = full_ntp_timestamp & 0xFFFFFFFF;
+            g_warning("FT %llu", r);
+            result.fraction = r;
+            result.second = (full_ntp_timestamp & 0xFFFFFFFF00000000) >> 32;
             return result;
         }
     };
