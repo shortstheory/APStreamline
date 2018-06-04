@@ -5,7 +5,7 @@ const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
 
 AdaptiveStreaming::AdaptiveStreaming()
 {
-    h264_bitrate = 2000;
+    h264_bitrate = 12000;
     init_elements();
     init_caps(1280, 720, 30);
     init_element_properties();

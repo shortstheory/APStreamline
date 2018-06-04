@@ -72,9 +72,11 @@ class QoSEstimator {
         }
     };
     static const guint64 ntp_offset = 2208988800;
+    static const guint32 rtp_size = 1400;
 
     guint32 estimated_bitrate;
-    guint32 prev_rr_time;
+    guint64 prev_rr_time;
+    guint32 prev_pkt_count;
     gfloat smooth_rtt;
 
     guint64 get_current_ntp_time();
