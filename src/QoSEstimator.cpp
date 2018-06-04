@@ -8,7 +8,7 @@ void QoSEstimator::handle_rtcp_packet(GstRTCPPacket* packet)
 {
     GstRTCPType type;
     type = gst_rtcp_packet_get_type(packet);
-    g_warning("pkt type %d", type);
+    // g_warning("pkt type %d", type);
     switch (type) {
     case GST_RTCP_TYPE_RR:
         process_rr_packet(packet);
@@ -35,6 +35,12 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
         gint32 packetslost;
         gst_rtcp_packet_get_rb(packet, i, &ssrc, &fractionlost,
                 &packetslost, &exthighestseq, &jitter, &lsr, &dlsr);
+        
+        timeval tv;
+        gettimeofday(&tv, NULL);
+        ntp_time_t curr_time = ntp_time_t::convert_from_unix_time(tv);
+        gfloat timediff = curr_time.calculate_difference(lsr);
+        g_warning("TImedelta %f", timediff);
         // g_warning("    block         %llu", i);
         // g_warning("    ssrc          %llu", ssrc);
         // g_warning("    highest   seq %llu", exthighestseq);
@@ -54,13 +60,13 @@ void QoSEstimator::process_sr_packet(GstRTCPPacket* packet)
     gettimeofday(&tv, NULL);
     ntp_time_t t1 = ntp_time_t::convert_from_unix_time(tv);
     ntp_time_t t2 = ntp_time_t::get_struct_from_timestamp(ntptime);
-    g_warning("t1 s%lu f%lu t2 s%lu f%lu", t1.second, t1.fraction, t2.second, t2.fraction);
+    // g_warning("t1 s%lu f%lu t2 s%lu f%lu", t1.second, t1.fraction, t2.second, t2.fraction);
     // g_warning("Sender report %lu", get_compressed_ntp_time(get_ntp_time()));
     // g_warning("Sender report %lu", get_ntp_time());
     // ntptime = ntptime >> 32;
     // ntptime = (ntptime & 0x0000FFFF);
 
-    g_warning("ssrc %llu, ntptime %llu, rtptime %llu, packetcount %llu", ssrc, ntptime, rtptime, packet_count);
+    // g_warning("ssrc %llu, ntptime %llu, rtptime %llu, packetcount %llu", ssrc, ntptime, rtptime, packet_count);
 }
 
 guint64 QoSEstimator::get_current_ntp_time()

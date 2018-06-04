@@ -121,7 +121,7 @@ void AdaptiveStreaming::static_callback(GstElement *src, GstBuffer *buf, gpointe
 {
     AdaptiveStreaming* ptr = (AdaptiveStreaming*)data;
     ptr->rtcp_callback(src, buf);
-    g_warning("Received rtcp");
+    // g_warning("Received rtcp");
     // ptr->rtcp_callback(src, buf, data);
 }
 

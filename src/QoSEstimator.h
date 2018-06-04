@@ -24,11 +24,31 @@ class QoSEstimator {
         static ntp_time_t get_struct_from_timestamp(guint64 full_ntp_timestamp)
         {
             ntp_time_t result;
-            guint32 r = full_ntp_timestamp & 0xFFFFFFFF;
-            g_warning("FT %llu", r);
-            result.fraction = r;
+            result.fraction = full_ntp_timestamp & 0x00000000FFFFFFFF;
             result.second = (full_ntp_timestamp & 0xFFFFFFFF00000000) >> 32;
             return result;
+        }
+
+        gfloat calculate_difference(guint32 compressed_ntp_timestamp)
+        {
+            guint32 compressed_second;
+            guint32 compressed_fraction;
+
+            // last 16 bits of second field, first 16 bits of fraction field
+            compressed_second = (second & 0x0000FFFF);
+            compressed_fraction = (fraction & 0xFFFF0000) >> 16;
+
+            guint32 ts_compressed_second;
+            guint32 ts_compressed_fraction;
+
+            //upper 16 bits is seconds, lower 16 bits is fraction
+            ts_compressed_second = (compressed_ntp_timestamp & 0xFFFF0000) >> 16;
+            ts_compressed_fraction = (compressed_ntp_timestamp & 0x0000FFFF);
+
+            gfloat time_delta;
+
+            time_delta = (compressed_second - ts_compressed_second) + (float)(compressed_fraction - ts_compressed_fraction) * 1 / 65536.0; 
+            return time_delta;
         }
     };
     static const guint64 ntp_offset = 2208988800;
