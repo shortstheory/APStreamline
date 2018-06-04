@@ -13,7 +13,7 @@ class QoSEstimator {
 public:
     QoSEstimator();
     ~QoSEstimator();
-    void process_rtcp_packet(GstRTCPPacket* packet);
+    void handle_rtcp_packet(GstRTCPPacket* packet);
     void process_rr_packet(GstRTCPPacket* packet);
     void process_sr_packet(GstRTCPPacket* packet);
 };

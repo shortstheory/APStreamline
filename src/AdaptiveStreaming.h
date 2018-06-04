@@ -36,7 +36,10 @@ private:
 
     string video_caps_string;
     string rtcp_caps_string;
+    QoSEstimator qos_estimator;
+
     static const string receiver_ip_addr;
+
     bool init_elements();
     bool init_caps(int width, int height, int framerate);
     void init_element_properties();
@@ -44,6 +47,7 @@ private:
     bool link_all_elements();
     static void static_callback(GstElement *src, GstBuffer *buf, gpointer data);
     void rtcp_callback(GstElement *src, GstBuffer *buf);
+
 public:
     AdaptiveStreaming();
     ~AdaptiveStreaming();

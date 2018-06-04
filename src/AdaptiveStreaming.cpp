@@ -133,18 +133,11 @@ void AdaptiveStreaming::rtcp_callback(GstElement *src, GstBuffer *buf)
     gst_rtcp_buffer_map(buf, GST_MAP_READ, rtcp_buffer);
     GstRTCPPacket *packet = (GstRTCPPacket*)malloc(sizeof(GstRTCPPacket));
     gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
-	while (more) {
-		GstRTCPType type;
-		type = gst_rtcp_packet_get_type(packet);
-		switch (type) {
-		case GST_RTCP_TYPE_RR:
-            break;
-        case GST_RTCP_TYPE_SR:
-			break;
-		default:
-			g_debug("Other types");
-			break;
-		}
-		more = gst_rtcp_packet_move_to_next(packet);
-	}
+    //same buffer can have an SDES and an RTCP pkt
+    while (more) {
+        qos_estimator.handle_rtcp_packet(packet);
+        more = gst_rtcp_packet_move_to_next(packet);
+    }
+    free(rtcp_buffer);
+    free(packet);
 }
