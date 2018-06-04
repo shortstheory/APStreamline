@@ -1,6 +1,8 @@
 #include "QoSEstimator.h" 
 
-QoSEstimator::QoSEstimator(){}
+QoSEstimator::QoSEstimator() : smooth_rtt(0)
+{
+}
 
 QoSEstimator::~QoSEstimator(){}
 
@@ -40,7 +42,7 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
         gettimeofday(&tv, NULL);
         ntp_time_t curr_time = ntp_time_t::convert_from_unix_time(tv);
         gfloat timediff = curr_time.calculate_difference(lsr);
-        g_warning("TImedelta %f", timediff);
+        exp_smooth_val(timediff - dlsr*1/65535.0, smooth_rtt, 0.75);
         // g_warning("    block         %llu", i);
         // g_warning("    ssrc          %llu", ssrc);
         // g_warning("    highest   seq %llu", exthighestseq);
@@ -88,4 +90,9 @@ guint32 QoSEstimator::get_compressed_ntp_time(guint64 full_ntp_timestamp)
 
     result_time = (integral_time << 16) + (fractional_time);
     return integral_time;
+}
+
+void QoSEstimator::exp_smooth_val(gfloat curr_val, gfloat &smooth_val, gfloat alpha)
+{
+    smooth_val = curr_val * alpha + (1 - alpha) * smooth_val;
 }

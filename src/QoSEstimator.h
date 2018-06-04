@@ -29,17 +29,25 @@ class QoSEstimator {
             return result;
         }
 
+        static ntp_time_t get_struct_from_compressed_timestamp(guint32 compressed_ntp_timestamp)
+        {
+            ntp_time_t result;
+            result.second = (compressed_ntp_timestamp & 0xFFFF0000) >> 16;
+            result.fraction = compressed_ntp_timestamp & 0x0000FFFF;
+            return result;
+        }
+
         gfloat calculate_difference(guint32 compressed_ntp_timestamp)
         {
             guint32 compressed_second;
-            guint32 compressed_fraction;
+            gint32 compressed_fraction;
 
             // last 16 bits of second field, first 16 bits of fraction field
             compressed_second = (second & 0x0000FFFF);
             compressed_fraction = (fraction & 0xFFFF0000) >> 16;
 
             guint32 ts_compressed_second;
-            guint32 ts_compressed_fraction;
+            gint32 ts_compressed_fraction;
 
             //upper 16 bits is seconds, lower 16 bits is fraction
             ts_compressed_second = (compressed_ntp_timestamp & 0xFFFF0000) >> 16;
@@ -50,12 +58,28 @@ class QoSEstimator {
             time_delta = (compressed_second - ts_compressed_second) + (float)(compressed_fraction - ts_compressed_fraction) * 1 / 65536.0; 
             return time_delta;
         }
+
+        static gfloat calculate_compresssed_timestamp_diff(guint32 ts_1, guint ts_2)
+        {
+            ntp_time_t time1;
+            ntp_time_t time2;
+            time1 = ntp_time_t::get_struct_from_compressed_timestamp(ts_1);
+            time2 = ntp_time_t::get_struct_from_compressed_timestamp(ts_2);;
+            gfloat time_delta;
+
+            time_delta = (time2.second - time1.second) + (float)(time2.fraction - time1.fraction) * 1 / 65536.0;
+            return time_delta;
+        }
     };
     static const guint64 ntp_offset = 2208988800;
 
     guint32 estimated_bitrate;
+    guint32 prev_rr_time;
+    gfloat smooth_rtt;
+
     guint64 get_current_ntp_time();
     guint32 get_compressed_ntp_time(guint64 full_ntp_timestamp);
+    static void exp_smooth_val(gfloat curr_val, gfloat &smooth_val, gfloat alpha);
 public:
     QoSEstimator();
     ~QoSEstimator();
