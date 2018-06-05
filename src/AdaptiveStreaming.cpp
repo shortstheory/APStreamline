@@ -2,12 +2,11 @@
 #include <functional>
 
 const string AdaptiveStreaming::receiver_ip_addr = "192.168.0.102";
-const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
-
+// const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
 
 AdaptiveStreaming::AdaptiveStreaming()
 {
-    h264_bitrate = 12000;
+    h264_bitrate = 100;
     qos_estimator = QoSEstimator(&h264_bitrate);
     init_elements();
     init_caps(1280, 720, 30);
@@ -130,6 +129,7 @@ void AdaptiveStreaming::static_callback(GstElement *src, GstBuffer *buf, gpointe
 
 void AdaptiveStreaming::rtcp_callback(GstElement *src, GstBuffer *buf)
 {
+    g_warning("BuffSize: %lu", gst_buffer_get_size(buf));
     // find the right way around using mallocs
     GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
     rtcp_buffer->buffer = NULL;
