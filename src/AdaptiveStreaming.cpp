@@ -6,7 +6,7 @@ const string AdaptiveStreaming::receiver_ip_addr = "192.168.0.102";
 
 AdaptiveStreaming::AdaptiveStreaming()
 {
-    h264_bitrate = 100000;
+    h264_bitrate = 2000;
     qos_estimator = QoSEstimator(&h264_bitrate);
     init_elements();
     init_caps(1280, 720, 30);
@@ -61,8 +61,8 @@ bool AdaptiveStreaming::init_elements()
 bool AdaptiveStreaming::init_caps(int width, int height, int framerate)
 {
     video_caps = gst_caps_new_simple ("video/x-raw",
-                                "width", G_TYPE_INT, width,
-                                "height", G_TYPE_INT, height,
+                                "width", G_TYPE_INT, width/2,
+                                "height", G_TYPE_INT, height/2,
                                 "framerate", GST_TYPE_FRACTION, framerate, 1,
                                 NULL);
     return (video_caps != NULL);
@@ -70,7 +70,7 @@ bool AdaptiveStreaming::init_caps(int width, int height, int framerate)
 
 void AdaptiveStreaming::init_element_properties()
 {
-    g_object_set(G_OBJECT(v4l2_src), "device", "/dev/video0", NULL);
+    g_object_set(G_OBJECT(v4l2_src), "device", "/dev/video1", NULL);
     g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
                         "port", rtcp_src_port, NULL);
     g_object_set(G_OBJECT(rtpbin), "latency", 0, NULL);
