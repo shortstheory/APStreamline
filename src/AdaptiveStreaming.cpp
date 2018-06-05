@@ -1,7 +1,9 @@
 #include "AdaptiveStreaming.h" 
 #include <functional>
 
+const string AdaptiveStreaming::receiver_ip_addr = "192.168.0.102";
 const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
+
 
 AdaptiveStreaming::AdaptiveStreaming()
 {

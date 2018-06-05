@@ -76,6 +76,7 @@ class QoSEstimator {
 
     guint32 prev_pkt_count;
     guint64 prev_rr_time;
+    gfloat prev_buffer_occ;
 
     gfloat estimated_bitrate;
     gfloat smooth_rtt;
