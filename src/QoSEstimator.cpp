@@ -1,7 +1,7 @@
 #include "QoSEstimator.h" 
 
 QoSEstimator::QoSEstimator() : smooth_rtt(0), prev_rr_time(0), prev_pkt_count(0),
-                                prev_buffer_occ(0)
+                                prev_buffer_occ(0), rtp_size(0)
 {
 }
 
@@ -70,7 +70,7 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
 
     g_warning("bw %f %f", bandwidth,  curr_buffer_occ);
 
-    g_warning("rtt %f ", smooth_rtt);
+    g_warning("rtt %f rtpsize %f", smooth_rtt, rtp_size);
         // g_warning("    block         %llu", i);
         // g_warning("    ssrc          %llu", ssrc);
         // g_warning("    highest   seq %llu", exthighestseq);
@@ -103,7 +103,7 @@ guint64 QoSEstimator::get_current_ntp_time()
     return time(NULL) + ntp_offset;
 }
 
-guint32 QoSEstimator::get_compressed_ntp_time(guint64 full_ntp_timestamp)
+guint32 QoSEstimator::get_compressed_ntp_time(const guint64 &full_ntp_timestamp)
 {
     guint32 fractional_time;
     guint32 integral_time;
@@ -119,7 +119,13 @@ guint32 QoSEstimator::get_compressed_ntp_time(guint64 full_ntp_timestamp)
     return integral_time;
 }
 
-void QoSEstimator::exp_smooth_val(gfloat curr_val, gfloat &smooth_val, gfloat alpha)
+void QoSEstimator::exp_smooth_val(const gfloat &curr_val, gfloat &smooth_val, gfloat alpha)
 {
     smooth_val = curr_val * alpha + (1 - alpha) * smooth_val;
+}
+
+void QoSEstimator::estimate_rtp_pkt_size(const guint32 &pkt_size)
+{
+    exp_smooth_val(pkt_size, rtp_size, 0.25);
+    // g_warning("rtpPkt: %f", rtp_size);
 }

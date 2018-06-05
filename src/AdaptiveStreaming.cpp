@@ -6,7 +6,7 @@ const string AdaptiveStreaming::receiver_ip_addr = "192.168.0.102";
 
 AdaptiveStreaming::AdaptiveStreaming()
 {
-    h264_bitrate = 100;
+    h264_bitrate = 100000;
     qos_estimator = QoSEstimator(&h264_bitrate);
     init_elements();
     init_caps(1280, 720, 30);
@@ -44,6 +44,7 @@ bool AdaptiveStreaming::init_elements()
     h264_parser = gst_element_factory_make("h264parse", NULL);
     rtph264_payloader = gst_element_factory_make("rtph264pay", NULL);
     rtpbin = gst_element_factory_make("rtpbin", NULL);
+    rtp_identity = gst_element_factory_make("identity", NULL);
     rr_rtcp_identity = gst_element_factory_make("identity", NULL);
     sr_rtcp_identity = gst_element_factory_make("identity", NULL);
     rtcp_udp_src = gst_element_factory_make("udpsrc", NULL);
@@ -51,7 +52,7 @@ bool AdaptiveStreaming::init_elements()
     rtcp_udp_sink = gst_element_factory_make("udpsink", NULL);
 
     if (!pipeline && !v4l2_src && !h264_encoder && !h264_parser && !rtph264_payloader && !rtpbin && !rr_rtcp_identity
-        && !sr_rtcp_identity && !rtcp_udp_src && !video_udp_sink && !rtcp_udp_sink) {
+        && !sr_rtcp_identity && !rtcp_udp_src && !video_udp_sink && !rtcp_udp_sink && !rtp_identity) {
             return false;
     }
     return true;
@@ -83,7 +84,7 @@ void AdaptiveStreaming::init_element_properties()
 void AdaptiveStreaming::pipeline_add_elements()
 {
     gst_bin_add_many(GST_BIN(pipeline), v4l2_src, h264_encoder, h264_parser, rtph264_payloader,
-                    rtpbin, rr_rtcp_identity, sr_rtcp_identity, video_udp_sink,
+                    rtpbin, rtp_identity, rr_rtcp_identity, sr_rtcp_identity, video_udp_sink,
                     rtcp_udp_sink, rtcp_udp_src, NULL);
 }
 
@@ -99,7 +100,8 @@ bool AdaptiveStreaming::link_all_elements()
         && !gst_pad_link(gst_element_get_static_pad(rtph264_payloader,"src"), gst_element_get_request_pad(rtpbin, "send_rtp_sink_%u"))
         && !gst_pad_link(gst_element_get_request_pad(rtpbin, "send_rtcp_src_%u"), gst_element_get_static_pad(sr_rtcp_identity,"sink"))
         && !gst_pad_link(gst_element_get_static_pad(sr_rtcp_identity,"src"), gst_element_get_static_pad(rtcp_udp_sink,"sink"))) {
-        gst_element_link(rtpbin, video_udp_sink);
+        gst_element_link_many(rtpbin, rtp_identity, video_udp_sink, NULL);
+        g_signal_connect(rtp_identity, "handoff", G_CALLBACK(static_rtp_callback), this);
         g_signal_connect(rr_rtcp_identity, "handoff", G_CALLBACK(static_callback), this);
         g_signal_connect(sr_rtcp_identity, "handoff", G_CALLBACK(static_callback), this);
 
@@ -121,15 +123,32 @@ GstBus* AdaptiveStreaming::get_pipeline_bus()
 
 void AdaptiveStreaming::static_callback(GstElement *src, GstBuffer *buf, gpointer data)
 {
-    AdaptiveStreaming* ptr = (AdaptiveStreaming*)data;
-    ptr->rtcp_callback(src, buf);
+    if (data != nullptr) {
+        AdaptiveStreaming* ptr = (AdaptiveStreaming*)data;
+        ptr->rtcp_callback(src, buf);
+    }
     // g_warning("Received rtcp");
     // ptr->rtcp_callback(src, buf, data);
 }
 
-void AdaptiveStreaming::rtcp_callback(GstElement *src, GstBuffer *buf)
+void AdaptiveStreaming::static_rtp_callback(GstElement* src, GstBuffer* buf, gpointer data)
 {
-    g_warning("BuffSize: %lu", gst_buffer_get_size(buf));
+    if (data != nullptr) {
+        AdaptiveStreaming* ptr = (AdaptiveStreaming*)data;
+        ptr->rtp_callback(src, buf);
+    }
+}
+
+void AdaptiveStreaming::rtp_callback(GstElement* src, GstBuffer* buf)
+{
+    guint32 buffer_size;
+    buffer_size = gst_buffer_get_size(buf);
+    qos_estimator.estimate_rtp_pkt_size(buffer_size);
+}
+
+void AdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
+{
+    // g_warning("BuffSize: %lu", gst_buffer_get_size(buf));
     // find the right way around using mallocs
     GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
     rtcp_buffer->buffer = NULL;

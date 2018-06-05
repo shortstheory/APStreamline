@@ -25,6 +25,7 @@ private:
     GstElement* h264_parser;
     GstElement* rtph264_payloader;
     GstElement* rtpbin;
+    GstElement* rtp_identity;
     GstElement* rr_rtcp_identity;
     GstElement* sr_rtcp_identity;
     GstElement* video_udp_sink;
@@ -45,8 +46,10 @@ private:
     void init_element_properties();
     void pipeline_add_elements();
     bool link_all_elements();
+    void rtcp_callback(GstElement* src, GstBuffer *buf);
+    void rtp_callback(GstElement* src, GstBuffer* buf);
     static void static_callback(GstElement *src, GstBuffer *buf, gpointer data);
-    void rtcp_callback(GstElement *src, GstBuffer *buf);
+    static void static_rtp_callback(GstElement *src, GstBuffer *buf, gpointer data);
 
 public:
     AdaptiveStreaming();
