@@ -17,7 +17,7 @@ private:
     static const int rtcp_sink_port = 5001;
     static const int rtcp_src_port = 5005;
     
-    int h264_bitrate;
+    guint32 h264_bitrate;
 
     GstElement* pipeline;
     GstElement* v4l2_src;

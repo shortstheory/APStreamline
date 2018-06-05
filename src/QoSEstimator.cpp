@@ -4,6 +4,11 @@ QoSEstimator::QoSEstimator() : smooth_rtt(0), prev_rr_time(0), prev_pkt_count(0)
 {
 }
 
+QoSEstimator::QoSEstimator(guint32* bitrate) : smooth_rtt(0), prev_rr_time(0), 
+                                                prev_pkt_count(0), h264_bitrate(bitrate)
+{
+}
+
 QoSEstimator::~QoSEstimator(){}
 
 void QoSEstimator::handle_rtcp_packet(GstRTCPPacket* packet)
@@ -50,11 +55,12 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     packet_interval = exthighestseq - prev_pkt_count;
     rr_time_delta_ms = curr_time_ms - prev_rr_time;
     bandwidth = (packet_interval * rtp_size) * 8.0 / (float)rr_time_delta_ms;
+    exp_smooth_val(bandwidth, estimated_bitrate, 0.75);
 
     prev_pkt_count = exthighestseq;
     prev_rr_time = curr_time_ms;
 
-    g_warning("bw %f %llu %llu %llu", bandwidth, curr_time_ms, prev_rr_time, rr_time_delta_ms);
+    g_warning("bw %f %llu %llu %llu", estimated_bitrate, curr_time_ms, prev_rr_time, rr_time_delta_ms);
 
     g_warning("rtt %f ", smooth_rtt);
         // g_warning("    block         %llu", i);

@@ -74,16 +74,20 @@ class QoSEstimator {
     static const guint64 ntp_offset = 2208988800;
     static const guint32 rtp_size = 1400;
 
-    guint32 estimated_bitrate;
-    guint64 prev_rr_time;
     guint32 prev_pkt_count;
+    guint64 prev_rr_time;
+
+    gfloat estimated_bitrate;
     gfloat smooth_rtt;
+
+    const guint32* h264_bitrate; // maybe there's a better way than ptr
 
     guint64 get_current_ntp_time();
     guint32 get_compressed_ntp_time(guint64 full_ntp_timestamp);
     static void exp_smooth_val(gfloat curr_val, gfloat &smooth_val, gfloat alpha);
 public:
     QoSEstimator();
+    QoSEstimator(guint32* bitrate);
     ~QoSEstimator();
     void handle_rtcp_packet(GstRTCPPacket* packet);
     void process_rr_packet(GstRTCPPacket* packet);
