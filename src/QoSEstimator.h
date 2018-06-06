@@ -88,6 +88,7 @@ class QoSEstimator {
     gfloat estimated_bitrate;
     gfloat smooth_rtt;
     gfloat encoding_bitrate;
+    gfloat smooth_enc_bitrate;
 
     // not the same as encoding bitrate!
     const guint32* h264_bitrate; // maybe there's a better way than ptr

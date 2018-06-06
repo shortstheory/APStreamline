@@ -64,14 +64,14 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     bandwidth = (packet_interval * rtp_size) * 8.0 / (float)rr_time_delta_ms;
     exp_smooth_val(bandwidth, estimated_bitrate, 0.75);
 
-    curr_buffer_occ = prev_buffer_occ + (encoding_bitrate - estimated_bitrate) * curr_rtt;
+    curr_buffer_occ = prev_buffer_occ + (smooth_enc_bitrate - estimated_bitrate) * curr_rtt;
 
     prev_pkt_count = exthighestseq;
     prev_rr_time = curr_time_ms;
 
-    g_warning("bw %f occ %f loss %d jitt %d", bandwidth,  curr_buffer_occ, fractionlost, jitter);
+    g_warning("bw %f occ %f loss %d", bandwidth,  curr_buffer_occ, fractionlost);
 
-    g_warning("rtt %f rtpsize %f encode-Rate %f", smooth_rtt, rtp_size, encoding_bitrate);
+    g_warning("rtt %f rtpsize %f encode-Rate %f", smooth_rtt, rtp_size, smooth_enc_bitrate);
         // g_warning("    block         %llu", i);
         // g_warning("    ssrc          %llu", ssrc);
         // g_warning("    highest   seq %llu", exthighestseq);
@@ -137,6 +137,7 @@ void QoSEstimator::estimate_encoding_rate(const guint32 &pkt_size)
         // g_warning("b %f", encoding_bitrate);
         prev_tv = tv;
         bytes_transferred = 0;
+        exp_smooth_val(encoding_bitrate, smooth_enc_bitrate, 0.75);
     } else {
         bytes_transferred += pkt_size;
         // g_warning("b %llu", bytes_transferred);
