@@ -1,4 +1,5 @@
 #include "QoSEstimator.h" 
+
 QoSEstimator::QoSEstimator() : smooth_rtt(0), prev_rr_time(0), prev_pkt_count(0),
                                 prev_buffer_occ(0), rtp_size(0), bytes_transferred(0)
 {
@@ -100,26 +101,6 @@ void QoSEstimator::process_sr_packet(GstRTCPPacket* packet)
     // ntptime = (ntptime & 0x0000FFFF);
 
     // g_warning("ssrc %llu, ntptime %llu, rtptime %llu, packetcount %llu", ssrc, ntptime, rtptime, packet_count);
-}
-
-guint64 QoSEstimator::get_current_ntp_time()
-{
-    return time(NULL) + ntp_offset;
-}
-
-guint32 QoSEstimator::get_compressed_ntp_time(const guint64 &full_ntp_timestamp)
-{
-    guint32 fractional_time;
-    guint32 integral_time;
-
-    fractional_time = full_ntp_timestamp >> 16;
-    fractional_time = fractional_time & 0x0000FFFF;
-
-    integral_time = full_ntp_timestamp >> 32;
-    integral_time = integral_time & 0x0000FFFF;
-
-    result_time = (integral_time << 16) + (fractional_time);
-    return integral_time;
 }
 
 void QoSEstimator::exp_smooth_val(const gfloat &curr_val, gfloat &smooth_val, gfloat alpha)
