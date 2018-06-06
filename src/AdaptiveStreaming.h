@@ -48,7 +48,7 @@ private:
     bool link_all_elements();
     void rtcp_callback(GstElement* src, GstBuffer *buf);
     void rtp_callback(GstElement* src, GstBuffer* buf);
-    void adapt_stream(QoSReport report);
+    void adapt_stream();
     static void static_callback(GstElement *src, GstBuffer *buf, gpointer data);
     static void static_rtp_callback(GstElement *src, GstBuffer *buf, gpointer data);
 
