@@ -81,6 +81,11 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
         // g_warning("lsr %llu", lsr>>16);
 }
 
+QoSEstimator::QoSReport QoSEstimator::generate_qos_report()
+{
+
+}
+
 void QoSEstimator::process_sr_packet(GstRTCPPacket* packet)
 {
     guint32 ssrc, rtptime, packet_count, octet_count;
