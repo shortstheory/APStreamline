@@ -1,14 +1,15 @@
 #include "QoSEstimator.h" 
-
 QoSEstimator::QoSEstimator() : smooth_rtt(0), prev_rr_time(0), prev_pkt_count(0),
-                                prev_buffer_occ(0), rtp_size(0)
+                                prev_buffer_occ(0), rtp_size(0), bytes_transferred(0)
 {
+    gettimeofday(&prev_tv, NULL);
 }
 
 QoSEstimator::QoSEstimator(guint32* bitrate) : smooth_rtt(0), prev_rr_time(0), 
                                                 prev_pkt_count(0), h264_bitrate(bitrate),
-                                                prev_buffer_occ(0)
+                                                prev_buffer_occ(0), bytes_transferred(0)
 {
+    gettimeofday(&prev_tv, NULL);
 }
 
 QoSEstimator::~QoSEstimator(){}
@@ -68,9 +69,9 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     prev_pkt_count = exthighestseq;
     prev_rr_time = curr_time_ms;
 
-    g_warning("bw %f occ %f loss %d", bandwidth,  curr_buffer_occ, fractionlost);
+    g_warning("bw %f occ %f loss %d jitt %d", bandwidth,  curr_buffer_occ, fractionlost, jitter);
 
-    g_warning("rtt %f rtpsize %f", smooth_rtt, rtp_size);
+    g_warning("rtt %f rtpsize %f encode-Rate %f", smooth_rtt, rtp_size, encoding_bitrate);
         // g_warning("    block         %llu", i);
         // g_warning("    ssrc          %llu", ssrc);
         // g_warning("    highest   seq %llu", exthighestseq);
@@ -124,8 +125,27 @@ void QoSEstimator::exp_smooth_val(const gfloat &curr_val, gfloat &smooth_val, gf
     smooth_val = curr_val * alpha + (1 - alpha) * smooth_val;
 }
 
+void QoSEstimator::estimate_encoding_rate(const guint32 &pkt_size)
+{
+    // g_warning("BUFSIZE %lu", pkt_size);
+    guint64 last_count = ntp_time_t::unix_time_to_ms(prev_tv);
+    timeval tv;
+    gettimeofday(&tv, NULL);
+    guint64 curr_count = ntp_time_t::unix_time_to_ms(tv);
+    if (curr_count - last_count > 1000) {
+        encoding_bitrate = (bytes_transferred) * 8000.0 / (float)(curr_count - last_count);
+        g_warning("b %f", encoding_bitrate);
+        prev_tv = tv;
+        bytes_transferred = 0;
+    } else {
+        bytes_transferred += pkt_size;
+        // g_warning("b %llu", bytes_transferred);
+    }
+}
+
 void QoSEstimator::estimate_rtp_pkt_size(const guint32 &pkt_size)
 {
+
     exp_smooth_val(pkt_size, rtp_size, 0.25);
     // g_warning("rtpPkt: %f", rtp_size);
 }

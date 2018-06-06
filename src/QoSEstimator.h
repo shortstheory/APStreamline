@@ -70,17 +70,26 @@ class QoSEstimator {
             time_delta = (time2.second - time1.second) + (float)(time2.fraction - time1.fraction) * 1 / 65536.0;
             return time_delta;
         }
+
+        static guint64 unix_time_to_ms(timeval tp)
+        {
+            return tp.tv_sec * 1000 + tp.tv_usec / 1000;
+        }
     };
     static const guint64 ntp_offset = 2208988800;
     gfloat rtp_size;
 
     guint32 prev_pkt_count;
     guint64 prev_rr_time;
+    guint32 bytes_transferred;
     gfloat prev_buffer_occ;
+    timeval prev_tv;
 
     gfloat estimated_bitrate;
     gfloat smooth_rtt;
+    gfloat encoding_bitrate;
 
+    // not the same as encoding bitrate!
     const guint32* h264_bitrate; // maybe there's a better way than ptr
 
     guint64 get_current_ntp_time();
@@ -91,6 +100,7 @@ public:
     QoSEstimator(guint32* bitrate);
     ~QoSEstimator();
     void estimate_rtp_pkt_size(const guint32 &pkt_size);
+    void estimate_encoding_rate(const guint32 &pkt_size);
     void handle_rtcp_packet(GstRTCPPacket* packet);
     void process_rr_packet(GstRTCPPacket* packet);
     void process_sr_packet(GstRTCPPacket* packet);
