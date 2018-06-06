@@ -97,6 +97,12 @@ class QoSEstimator {
     guint32 get_compressed_ntp_time(const guint64 &full_ntp_timestamp);
     static void exp_smooth_val(const gfloat &curr_val, gfloat &smooth_val, gfloat alpha);
 public:
+    struct QoSInfo {
+        guint8 fraction_lost;
+        gfloat estimated_bitrate;
+        gfloat smooth_enc_bitrate;
+        gfloat rtt;
+    };
     QoSEstimator();
     QoSEstimator(guint32* bitrate);
     ~QoSEstimator();

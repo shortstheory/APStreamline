@@ -1,13 +1,13 @@
 #include "AdaptiveStreaming.h" 
 #include <functional>
 
-const string AdaptiveStreaming::receiver_ip_addr = "192.168.0.102";
-// const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
+// const string AdaptiveStreaming::receiver_ip_addr = "192.168.0.102";
+const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
 // const string AdaptiveStreaming::receiver_ip_addr = "10.42.0.56";
 
 AdaptiveStreaming::AdaptiveStreaming()
 {
-    h264_bitrate = 100000;
+    h264_bitrate = 10000;
     qos_estimator = QoSEstimator(&h264_bitrate);
     init_elements();
     init_caps(1280, 720, 30);
@@ -75,7 +75,7 @@ void AdaptiveStreaming::init_element_properties()
     g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
                         "port", rtcp_src_port, NULL);
     g_object_set(G_OBJECT(rtpbin), "latency", 0, NULL);
-    g_object_set(G_OBJECT(h264_encoder), "tune", 0x00000004, "bitrate", h264_bitrate, NULL);
+    g_object_set(G_OBJECT(h264_encoder), "tune", 0x00000004, "bitrate", h264_bitrate, "threads", 4, NULL);
     g_object_set(G_OBJECT(video_udp_sink), "host", receiver_ip_addr.c_str(), 
                         "port", video_sink_port, NULL);
     g_object_set(G_OBJECT(rtcp_udp_sink), "host", receiver_ip_addr.c_str(), 
@@ -144,13 +144,17 @@ void AdaptiveStreaming::rtp_callback(GstElement* src, GstBuffer* buf)
 {
     guint32 buffer_size;
     buffer_size = gst_buffer_get_size(buf);
-    // g_warning("BUFSIZE %llu", buffer_size);
     qos_estimator.estimate_rtp_pkt_size(buffer_size);
     qos_estimator.estimate_encoding_rate(buffer_size);
 }
 
 void AdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
 {
+        video_caps = gst_caps_new_simple ("video/x-raw",
+                                "width", G_TYPE_INT, 640,
+                                "height", G_TYPE_INT, 360,
+                                "framerate", GST_TYPE_FRACTION, 30, 1,
+                                NULL);
     // g_warning("BuffSize: %lu", gst_buffer_get_size(buf));
     // find the right way around using mallocs
     GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));

@@ -69,7 +69,7 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     prev_pkt_count = exthighestseq;
     prev_rr_time = curr_time_ms;
 
-    g_warning("bw %f occ %f loss %d", bandwidth,  curr_buffer_occ, fractionlost);
+    g_warning("bw %f occ %f loss %d", bandwidth, curr_buffer_occ, fractionlost);
 
     g_warning("rtt %f rtpsize %f encode-Rate %f", smooth_rtt, rtp_size, smooth_enc_bitrate);
         // g_warning("    block         %llu", i);
