@@ -1,14 +1,16 @@
 #include "QoSEstimator.h" 
 
 QoSEstimator::QoSEstimator() : smooth_rtt(0), prev_rr_time(0), prev_pkt_count(0),
-                                prev_buffer_occ(0), rtp_size(0), bytes_transferred(0)
+                                prev_buffer_occ(0), rtp_size(0), bytes_transferred(0),
+                                smooth_enc_bitrate(0)
 {
     gettimeofday(&prev_tv, NULL);
 }
 
 QoSEstimator::QoSEstimator(guint32* bitrate) : smooth_rtt(0), prev_rr_time(0), 
                                                 prev_pkt_count(0), h264_bitrate(bitrate),
-                                                prev_buffer_occ(0), bytes_transferred(0)
+                                                prev_buffer_occ(0), bytes_transferred(0),
+                                                smooth_enc_bitrate(0)
 {
     gettimeofday(&prev_tv, NULL);
 }
