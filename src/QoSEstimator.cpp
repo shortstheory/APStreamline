@@ -64,7 +64,7 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     bandwidth = (packet_interval * rtp_size) * 8.0 / (float)rr_time_delta_ms;
     exp_smooth_val(bandwidth, estimated_bitrate, 0.75);
 
-    curr_buffer_occ = prev_buffer_occ + (*h264_bitrate - estimated_bitrate) * curr_rtt;
+    curr_buffer_occ = prev_buffer_occ + (encoding_bitrate - estimated_bitrate) * curr_rtt;
 
     prev_pkt_count = exthighestseq;
     prev_rr_time = curr_time_ms;
@@ -133,8 +133,8 @@ void QoSEstimator::estimate_encoding_rate(const guint32 &pkt_size)
     gettimeofday(&tv, NULL);
     guint64 curr_count = ntp_time_t::unix_time_to_ms(tv);
     if (curr_count - last_count > 1000) {
-        encoding_bitrate = (bytes_transferred) * 8000.0 / (float)(curr_count - last_count);
-        g_warning("b %f", encoding_bitrate);
+        encoding_bitrate = (bytes_transferred) * 8.0 / (float)(curr_count - last_count);
+        // g_warning("b %f", encoding_bitrate);
         prev_tv = tv;
         bytes_transferred = 0;
     } else {

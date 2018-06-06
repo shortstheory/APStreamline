@@ -1,13 +1,13 @@
 #include "AdaptiveStreaming.h" 
 #include <functional>
 
-// const string AdaptiveStreaming::receiver_ip_addr = "192.168.0.102";
-const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
+const string AdaptiveStreaming::receiver_ip_addr = "192.168.0.102";
+// const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
 // const string AdaptiveStreaming::receiver_ip_addr = "10.42.0.56";
 
 AdaptiveStreaming::AdaptiveStreaming()
 {
-    h264_bitrate = 10000;
+    h264_bitrate = 1000;
     qos_estimator = QoSEstimator(&h264_bitrate);
     init_elements();
     init_caps(1280, 720, 30);
