@@ -8,7 +8,6 @@ const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
 AdaptiveStreaming::AdaptiveStreaming()
 {
     h264_bitrate = 10000;
-    qos_estimator = QoSEstimator(&h264_bitrate);
     init_elements();
     init_caps(1280, 720, 30);
     init_element_properties();
@@ -20,7 +19,7 @@ AdaptiveStreaming::AdaptiveStreaming()
     }
 }
 
-//unreffing pointers if not null can be dangerous, check this
+//unreffing pointers which are null can be dangerous, check this
 AdaptiveStreaming::~AdaptiveStreaming()
 {
     // gst_object_unref(pipeline);
