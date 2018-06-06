@@ -7,8 +7,9 @@
 #include <string>
 #include <gst/rtp/gstrtcpbuffer.h>
 #include <sys/time.h>
-
+#include "QoSReport.h"
 class QoSEstimator {
+private:
     struct ntp_time_t {
         guint32 second;
         guint32 fraction;
@@ -89,6 +90,7 @@ class QoSEstimator {
     gfloat smooth_rtt;
     gfloat encoding_bitrate;
     gfloat smooth_enc_bitrate;
+    QoSReport qos_report;
 
     // not the same as encoding bitrate!
     const guint32* h264_bitrate; // maybe there's a better way than ptr
@@ -99,16 +101,10 @@ class QoSEstimator {
     void process_sr_packet(GstRTCPPacket* packet);
     static void exp_smooth_val(const gfloat &curr_val, gfloat &smooth_val, gfloat alpha);
 public:
-    struct QoSReport {
-        guint8 fraction_lost;
-        gfloat estimated_bitrate;
-        gfloat smooth_enc_bitrate;
-        gfloat rtt;
-    };
     QoSEstimator();
     QoSEstimator(guint32* bitrate);
     ~QoSEstimator();
-    QoSReport generate_qos_report();
+    QoSReport get_qos_report();
     void estimate_rtp_pkt_size(const guint32 &pkt_size);
     void estimate_encoding_rate(const guint32 &pkt_size);
     void handle_rtcp_packet(GstRTCPPacket* packet);

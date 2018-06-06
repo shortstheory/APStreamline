@@ -69,6 +69,8 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     prev_pkt_count = exthighestseq;
     prev_rr_time = curr_time_ms;
 
+    qos_report = QoSReport(fractionlost, estimated_bitrate, smooth_enc_bitrate, smooth_rtt);
+
     g_warning("bw %f occ %f loss %d", bandwidth, curr_buffer_occ, fractionlost);
 
     g_warning("rtt %f rtpsize %f encode-Rate %f", smooth_rtt, rtp_size, smooth_enc_bitrate);
@@ -81,9 +83,9 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
         // g_warning("lsr %llu", lsr>>16);
 }
 
-QoSEstimator::QoSReport QoSEstimator::generate_qos_report()
+QoSReport QoSEstimator::get_qos_report()
 {
-
+    return qos_report;
 }
 
 void QoSEstimator::process_sr_packet(GstRTCPPacket* packet)

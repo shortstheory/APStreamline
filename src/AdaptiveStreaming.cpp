@@ -171,7 +171,7 @@ void AdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
     free(packet);
 }
 
-void AdaptiveStreaming::adapt_stream(QoSEstimator::QoSReport report)
+void AdaptiveStreaming::adapt_stream(QoSReport report)
 {
-    
+
 }
