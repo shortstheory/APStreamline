@@ -78,22 +78,22 @@ private:
         }
     };
     static const guint64 ntp_offset = 2208988800;
-    gfloat rtp_size;
 
-    guint32 prev_pkt_count;
+    gfloat smooth_rtt;
     guint64 prev_rr_time;
-    guint32 bytes_transferred;
+    guint32 prev_pkt_count;
     gfloat prev_buffer_occ;
+    gfloat rtp_size;
+    guint32 bytes_transferred;
+    // not the same as encoding bitrate!
+    const guint32* h264_bitrate; // maybe there's a better way than ptr
     timeval prev_tv;
 
     gfloat estimated_bitrate;
-    gfloat smooth_rtt;
     gfloat encoding_bitrate;
     gfloat smooth_enc_bitrate;
     QoSReport qos_report;
 
-    // not the same as encoding bitrate!
-    const guint32* h264_bitrate; // maybe there's a better way than ptr
 
     guint64 get_current_ntp_time();
     guint32 get_compressed_ntp_time(const guint64 &full_ntp_timestamp);

@@ -35,12 +35,11 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
 {
     guint64 rr_time_delta_ms;
     guint64 curr_time_ms;
-    guint64 ntptime;
     gfloat bandwidth;
 
     guint32 exthighestseq, jitter, lsr, dlsr;
     guint32 packet_interval;
-    guint32 ssrc, rtptime, packet_count, octet_count;
+    guint32 ssrc;
     gint32 packetslost;
 
     guint8 fractionlost;
@@ -88,15 +87,12 @@ QoSReport QoSEstimator::get_qos_report()
     return qos_report;
 }
 
+// not really used anywhere yet, but we'll keep it around till it becomes useful
 void QoSEstimator::process_sr_packet(GstRTCPPacket* packet)
 {
     guint32 ssrc, rtptime, packet_count, octet_count;
     guint64 ntptime;
     gst_rtcp_packet_sr_get_sender_info(packet, &ssrc, &ntptime, &rtptime, &packet_count, &octet_count);
-    timeval tv;
-    gettimeofday(&tv, NULL);
-    ntp_time_t t1 = ntp_time_t::convert_from_unix_time(tv);
-    ntp_time_t t2 = ntp_time_t::get_struct_from_timestamp(ntptime);
     // g_warning("t1 s%lu f%lu t2 s%lu f%lu", t1.second, t1.fraction, t2.second, t2.fraction);
     // g_warning("Sender report %lu", get_compressed_ntp_time(get_ntp_time()));
     // g_warning("Sender report %lu", get_ntp_time());
@@ -115,7 +111,6 @@ guint32 QoSEstimator::get_compressed_ntp_time(const guint64 &full_ntp_timestamp)
 {
     guint32 fractional_time;
     guint32 integral_time;
-    guint32 result_time;
 
     fractional_time = full_ntp_timestamp >> 16;
     fractional_time = fractional_time & 0x0000FFFF;
