@@ -14,7 +14,7 @@ using namespace std;
 
 class AdaptiveStreaming {
 private:
-    enum ResolutionPresets {LOW, MED, HIGH};
+    enum ResolutionPresets {LOW, MED, HIGH} current_res;
 
     static const int video_sink_port = 5000;
     static const int rtcp_sink_port = 5001;

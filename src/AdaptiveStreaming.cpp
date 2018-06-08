@@ -10,7 +10,7 @@ AdaptiveStreaming::AdaptiveStreaming()
     h264_bitrate = 5000;
 
     video_presets.push_back("video/x-raw, width=(int)424, height=(int)240, framerate=(fraction)30/1");
-    video_presets.push_back("video/x-raw, width=(int)848, height=(int)480, framerate=(fraction)30/1");
+    video_presets.push_back("video/x-raw, width=(int)640, height=(int)360, framerate=(fraction)30/1");
     video_presets.push_back("video/x-raw, width=(int)1280, height=(int)720, framerate=(fraction)30/1");
     init_elements();
     init_element_properties();
@@ -64,15 +64,7 @@ bool AdaptiveStreaming::init_elements()
 
 void AdaptiveStreaming::init_element_properties()
 {
-    GstCaps* src_caps; 
-    src_caps = gst_caps_new_simple ("video/x-raw",
-                            "width", G_TYPE_INT, 1280,
-                            "height", G_TYPE_INT, 720,
-                            "framerate", GST_TYPE_FRACTION, 30, 1,
-                            NULL);
-
-    g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
-    gst_caps_unref(src_caps);
+    set_resolution(ResolutionPresets::MED);
     g_object_set(G_OBJECT(v4l2_src), "device", "/dev/video0", NULL);
     g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
                         "port", rtcp_src_port, NULL);
@@ -189,19 +181,37 @@ void AdaptiveStreaming::set_resolution(ResolutionPresets setting)
         break;
     }
 
+    current_res = setting;
     GstCaps* src_caps;
     src_caps = gst_caps_from_string(caps_filter_string.c_str());
     g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
     gst_caps_unref(src_caps);
-
 }
 
 void AdaptiveStreaming::increase_resolution()
 {
-
+    switch (current_res) {
+    case ResolutionPresets::LOW:
+        set_resolution(ResolutionPresets::MED);
+        break;
+    case ResolutionPresets::MED:
+        set_resolution(ResolutionPresets::HIGH);
+        break;
+    default:
+        break;
+    }
 }
 
 void AdaptiveStreaming::decrease_resolution()
 {
-
+    switch (current_res) {
+    case ResolutionPresets::MED:
+        set_resolution(ResolutionPresets::LOW);
+        break;
+    case ResolutionPresets::HIGH:
+        set_resolution(ResolutionPresets::MED);
+        break;
+    default:
+        break;
+    }
 }
