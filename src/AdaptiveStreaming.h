@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <vector>
 #include <gst/rtp/gstrtcpbuffer.h>
 #include <time.h>
 #include "QoSEstimator.h"
@@ -38,6 +39,7 @@ private:
     QoSEstimator qos_estimator;
 
     static const string receiver_ip_addr;
+    vector<string> video_presets;
 
     bool init_elements();
     void init_element_properties();

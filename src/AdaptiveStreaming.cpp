@@ -8,6 +8,10 @@ const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
 AdaptiveStreaming::AdaptiveStreaming()
 {
     h264_bitrate = 5000;
+
+    video_presets.push_back("video/x-raw, width=(int)424, height=(int)240, framerate=(fraction)30/1");
+    video_presets.push_back("video/x-raw, width=(int)848, height=(int)480, framerate=(fraction)30/1");
+    video_presets.push_back("video/x-raw, width=(int)1280, height=(int)720, framerate=(fraction)30/1");
     init_elements();
     init_element_properties();
     pipeline_add_elements();
@@ -169,13 +173,9 @@ void AdaptiveStreaming::adapt_stream()
     QoSReport qos_report = qos_estimator.get_qos_report();
     // adapt according to the information in this report
 
-    GstCaps* src_caps; 
-    src_caps = gst_caps_new_simple ("video/x-raw",
-                            "width", G_TYPE_INT, 320,
-                            "height", G_TYPE_INT, 180,
-                            "framerate", GST_TYPE_FRACTION, 30, 1,
-                            NULL);
-
+    GstCaps* src_caps;
+    string f = "video/x-raw, width=(int)320, height=(int)180, framerate=(fraction)30/1";
+    src_caps = gst_caps_from_string(f.c_str());
     g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
     gst_caps_unref(src_caps);
 }
