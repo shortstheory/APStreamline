@@ -21,6 +21,7 @@ private:
 
     GstElement* pipeline;
     GstElement* v4l2_src;
+    GstElement* src_capsfilter;
     GstElement* h264_encoder;
     GstElement* h264_parser;
     GstElement* rtph264_payloader;
@@ -32,9 +33,6 @@ private:
     GstElement* rtcp_udp_sink;
     GstElement* rtcp_udp_src;
 
-    GstCaps* video_caps;
-    GstCaps* rtcp_caps;
-
     string video_caps_string;
     string rtcp_caps_string;
     QoSEstimator qos_estimator;
@@ -42,7 +40,6 @@ private:
     static const string receiver_ip_addr;
 
     bool init_elements();
-    bool init_caps(int width, int height, int framerate);
     void init_element_properties();
     void pipeline_add_elements();
     bool link_all_elements();

@@ -7,9 +7,8 @@ const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
 
 AdaptiveStreaming::AdaptiveStreaming()
 {
-    h264_bitrate = 10000;
+    h264_bitrate = 5000;
     init_elements();
-    init_caps(1280, 720, 30);
     init_element_properties();
     pipeline_add_elements();
     if(link_all_elements()) {
@@ -39,6 +38,7 @@ bool AdaptiveStreaming::init_elements()
 {
     pipeline = gst_pipeline_new ("adaptive-pipeline");
     v4l2_src = gst_element_factory_make ("v4l2src", NULL);
+    src_capsfilter = gst_element_factory_make("capsfilter", NULL);
     // choose encoder according to ctr next time
     h264_encoder = gst_element_factory_make("x264enc", NULL);
     h264_parser = gst_element_factory_make("h264parse", NULL);
@@ -51,26 +51,22 @@ bool AdaptiveStreaming::init_elements()
     video_udp_sink = gst_element_factory_make("udpsink", NULL);
     rtcp_udp_sink = gst_element_factory_make("udpsink", NULL);
 
-    if (!pipeline && !v4l2_src && !h264_encoder && !h264_parser && !rtph264_payloader && !rtpbin && !rr_rtcp_identity
+    if (!pipeline && !v4l2_src && !src_capsfilter && !h264_encoder && !h264_parser && !rtph264_payloader && !rtpbin && !rr_rtcp_identity
         && !sr_rtcp_identity && !rtcp_udp_src && !video_udp_sink && !rtcp_udp_sink && !rtp_identity) {
             return false;
     }
     return true;
 }
 
-bool AdaptiveStreaming::init_caps(int width, int height, int framerate)
-{
-    video_caps = gst_caps_new_simple ("video/x-raw",
-                                "width", G_TYPE_INT, width,
-                                "height", G_TYPE_INT, height,
-                                "framerate", GST_TYPE_FRACTION, framerate, 1,
-                                NULL);
-    return (video_caps != NULL);
-}
-
 void AdaptiveStreaming::init_element_properties()
 {
     g_object_set(G_OBJECT(v4l2_src), "device", "/dev/video0", NULL);
+    GstCaps* video_caps = gst_caps_new_simple ("video/x-raw",
+                            "width", G_TYPE_INT, 1280,
+                            "height", G_TYPE_INT, 720,
+                            "framerate", GST_TYPE_FRACTION, 30, 1,
+                            NULL);
+    g_object_set(G_OBJECT(src_capsfilter), "caps", video_caps, NULL);
     g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
                         "port", rtcp_src_port, NULL);
     g_object_set(G_OBJECT(rtpbin), "latency", 0, NULL);
@@ -83,7 +79,7 @@ void AdaptiveStreaming::init_element_properties()
 
 void AdaptiveStreaming::pipeline_add_elements()
 {
-    gst_bin_add_many(GST_BIN(pipeline), v4l2_src, h264_encoder, h264_parser, rtph264_payloader,
+    gst_bin_add_many(GST_BIN(pipeline), v4l2_src, src_capsfilter, h264_encoder, h264_parser, rtph264_payloader,
                     rtpbin, rtp_identity, rr_rtcp_identity, sr_rtcp_identity, video_udp_sink,
                     rtcp_udp_sink, rtcp_udp_src, NULL);
 }
@@ -91,8 +87,7 @@ void AdaptiveStreaming::pipeline_add_elements()
 bool AdaptiveStreaming::link_all_elements()
 {
     // first link all the elements with autoplugging
-    if (!(gst_element_link_filtered(v4l2_src, h264_encoder, video_caps) && 
-        gst_element_link(h264_encoder, h264_parser) && gst_element_link(h264_parser, rtph264_payloader) &&
+    if (!(gst_element_link_many(v4l2_src, src_capsfilter, h264_encoder, h264_parser, rtph264_payloader, NULL) &&
         gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
         return false;
     }
@@ -149,11 +144,6 @@ void AdaptiveStreaming::rtp_callback(GstElement* src, GstBuffer* buf)
 
 void AdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
 {
-        video_caps = gst_caps_new_simple ("video/x-raw",
-                                "width", G_TYPE_INT, 640,
-                                "height", G_TYPE_INT, 360,
-                                "framerate", GST_TYPE_FRACTION, 30, 1,
-                                NULL);
     // g_warning("BuffSize: %lu", gst_buffer_get_size(buf));
     // find the right way around using mallocs
     GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
