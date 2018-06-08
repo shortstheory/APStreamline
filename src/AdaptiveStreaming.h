@@ -52,6 +52,7 @@ private:
     void rtcp_callback(GstElement* src, GstBuffer *buf);
     void rtp_callback(GstElement* src, GstBuffer* buf);
     void adapt_stream();
+    void set_encoding_bitrate(guint32 bitrate);
     void set_resolution(ResolutionPresets setting);
     void increase_resolution();
     void decrease_resolution();
