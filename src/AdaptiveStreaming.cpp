@@ -60,13 +60,16 @@ bool AdaptiveStreaming::init_elements()
 
 void AdaptiveStreaming::init_element_properties()
 {
-    g_object_set(G_OBJECT(v4l2_src), "device", "/dev/video0", NULL);
-    GstCaps* video_caps = gst_caps_new_simple ("video/x-raw",
+    GstCaps* src_caps; 
+    src_caps = gst_caps_new_simple ("video/x-raw",
                             "width", G_TYPE_INT, 1280,
                             "height", G_TYPE_INT, 720,
                             "framerate", GST_TYPE_FRACTION, 30, 1,
                             NULL);
-    g_object_set(G_OBJECT(src_capsfilter), "caps", video_caps, NULL);
+
+    g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
+    gst_caps_unref(src_caps);
+    g_object_set(G_OBJECT(v4l2_src), "device", "/dev/video0", NULL);
     g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
                         "port", rtcp_src_port, NULL);
     g_object_set(G_OBJECT(rtpbin), "latency", 0, NULL);
@@ -154,6 +157,7 @@ void AdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
     //same buffer can have an SDES and an RTCP pkt
     while (more) {
         qos_estimator.handle_rtcp_packet(packet);
+        adapt_stream();
         more = gst_rtcp_packet_move_to_next(packet);
     }
     free(rtcp_buffer);
@@ -164,4 +168,14 @@ void AdaptiveStreaming::adapt_stream()
 {
     QoSReport qos_report = qos_estimator.get_qos_report();
     // adapt according to the information in this report
+
+    GstCaps* src_caps; 
+    src_caps = gst_caps_new_simple ("video/x-raw",
+                            "width", G_TYPE_INT, 320,
+                            "height", G_TYPE_INT, 180,
+                            "framerate", GST_TYPE_FRACTION, 30, 1,
+                            NULL);
+
+    g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
+    gst_caps_unref(src_caps);
 }
