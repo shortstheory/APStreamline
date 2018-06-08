@@ -172,10 +172,36 @@ void AdaptiveStreaming::adapt_stream()
 {
     QoSReport qos_report = qos_estimator.get_qos_report();
     // adapt according to the information in this report
+}
+
+void AdaptiveStreaming::set_resolution(ResolutionPresets setting)
+{
+    string caps_filter_string;
+    switch (setting) {
+    case ResolutionPresets::LOW:
+        caps_filter_string = video_presets.at(0);
+        break;
+    case ResolutionPresets::MED:
+        caps_filter_string = video_presets.at(1);
+        break;
+    case ResolutionPresets::HIGH:
+        caps_filter_string = video_presets.at(2);
+        break;
+    }
 
     GstCaps* src_caps;
-    string f = "video/x-raw, width=(int)320, height=(int)180, framerate=(fraction)30/1";
-    src_caps = gst_caps_from_string(f.c_str());
+    src_caps = gst_caps_from_string(caps_filter_string.c_str());
     g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
     gst_caps_unref(src_caps);
+
+}
+
+void AdaptiveStreaming::increase_resolution()
+{
+
+}
+
+void AdaptiveStreaming::decrease_resolution()
+{
+
 }
