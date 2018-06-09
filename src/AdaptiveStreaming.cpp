@@ -7,8 +7,8 @@ const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
 
 AdaptiveStreaming::AdaptiveStreaming()
 {
-    video_presets.push_back("video/x-raw, width=(int)424, height=(int)240, framerate=(fraction)30/1");
-    video_presets.push_back("video/x-raw, width=(int)640, height=(int)360, framerate=(fraction)30/1");
+    video_presets.push_back("video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1");
+    video_presets.push_back("video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1");
     video_presets.push_back("video/x-raw, width=(int)1280, height=(int)720, framerate=(fraction)30/1");
 
     bitrate_presets[ResolutionPresets::LOW] = 500;
@@ -68,7 +68,7 @@ bool AdaptiveStreaming::init_elements()
 void AdaptiveStreaming::init_element_properties()
 {
     set_resolution(ResolutionPresets::LOW);
-    g_object_set(G_OBJECT(v4l2_src), "device", "/dev/video0", NULL);
+    g_object_set(G_OBJECT(v4l2_src), "device", "/dev/video1", NULL);
     g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
                         "port", rtcp_src_port, NULL);
     g_object_set(G_OBJECT(rtpbin), "latency", 0, NULL);
@@ -168,9 +168,13 @@ void AdaptiveStreaming::adapt_stream()
     QoSReport qos_report = qos_estimator.get_qos_report();
     // adapt according to the information in this report
     if (qos_report.get_fraction_lost() == 0) {
-        improve_quality();
+        if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.2) {
+            improve_quality();
+        } else {
+            degrade_quality();
+        }
     } else {
-        degrade_quality();
+        decrease_resolution();
     }
 }
 
@@ -188,13 +192,24 @@ void AdaptiveStreaming::improve_quality()
 
 void AdaptiveStreaming::degrade_quality()
 {
-
+    set_encoding_bitrate(h264_bitrate-1000);
+    if (current_res == ResolutionPresets::HIGH && 
+        h264_bitrate < bitrate_presets[ResolutionPresets::MED]) {
+            set_resolution(ResolutionPresets::MED);
+    } else if (current_res == ResolutionPresets::MED && 
+        h264_bitrate < bitrate_presets[ResolutionPresets::LOW]) {
+            set_resolution(ResolutionPresets::LOW);
+    }
 }
 
 void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 {
-    h264_bitrate = bitrate;
-    g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
+    if (bitrate < 8000) {
+        h264_bitrate = bitrate;
+        g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
+    } else {
+        bitrate = 8000;
+    }
 }
 
 // presets
