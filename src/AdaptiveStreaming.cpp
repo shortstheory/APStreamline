@@ -1,8 +1,8 @@
 #include "AdaptiveStreaming.h" 
 #include <functional>
 
-// const string AdaptiveStreaming::receiver_ip_addr = "192.168.0.102";
-const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
+const string AdaptiveStreaming::receiver_ip_addr = "192.168.0.102";
+// const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
 // const string AdaptiveStreaming::receiver_ip_addr = "10.42.0.56";
 
 AdaptiveStreaming::AdaptiveStreaming()
@@ -168,7 +168,7 @@ void AdaptiveStreaming::adapt_stream()
     QoSReport qos_report = qos_estimator.get_qos_report();
     // adapt according to the information in this report
     if (qos_report.get_fraction_lost() == 0) {
-        if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.2) {
+        if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
             improve_quality();
         } else {
             degrade_quality();
