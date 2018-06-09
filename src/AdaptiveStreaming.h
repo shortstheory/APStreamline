@@ -44,6 +44,7 @@ private:
 
     // better off as a char array, change it later
     vector<string> video_presets;
+    int bitrate_presets[3];
 
     bool init_elements();
     void init_element_properties();

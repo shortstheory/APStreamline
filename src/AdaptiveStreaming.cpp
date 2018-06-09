@@ -10,6 +10,11 @@ AdaptiveStreaming::AdaptiveStreaming()
     video_presets.push_back("video/x-raw, width=(int)424, height=(int)240, framerate=(fraction)30/1");
     video_presets.push_back("video/x-raw, width=(int)640, height=(int)360, framerate=(fraction)30/1");
     video_presets.push_back("video/x-raw, width=(int)1280, height=(int)720, framerate=(fraction)30/1");
+
+    bitrate_presets[ResolutionPresets::LOW] = 500;
+    bitrate_presets[ResolutionPresets::MED] = 1500;
+    bitrate_presets[ResolutionPresets::HIGH] = 3500;
+
     init_elements();
     init_element_properties();
     pipeline_add_elements();
@@ -62,8 +67,7 @@ bool AdaptiveStreaming::init_elements()
 
 void AdaptiveStreaming::init_element_properties()
 {
-    set_resolution(ResolutionPresets::MED);
-    set_encoding_bitrate(2000);
+    set_resolution(ResolutionPresets::LOW);
     g_object_set(G_OBJECT(v4l2_src), "device", "/dev/video0", NULL);
     g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
                         "port", rtcp_src_port, NULL);
@@ -171,21 +175,16 @@ void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
     g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
 }
 
+// presets
+// LOW - 500kbps
+// MED - 1500kbps
+// HIGH - 3500kbps
+
 void AdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {
     string caps_filter_string;
-    switch (setting) {
-    case ResolutionPresets::LOW:
-        caps_filter_string = video_presets.at(0);
-        break;
-    case ResolutionPresets::MED:
-        caps_filter_string = video_presets.at(1);
-        break;
-    case ResolutionPresets::HIGH:
-        caps_filter_string = video_presets.at(2);
-        break;
-    }
-
+    caps_filter_string = video_presets[setting];
+    set_encoding_bitrate(bitrate_presets[setting]);
     current_res = setting;
     GstCaps* src_caps;
     src_caps = gst_caps_from_string(caps_filter_string.c_str());
