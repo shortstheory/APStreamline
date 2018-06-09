@@ -20,6 +20,32 @@ public:
     rtt(_rtt), buffer_occ(bo)
     {
     }
+
+    guint8 get_fraction_lost()
+    {
+        return fraction_lost;
+    }
+
+    gfloat get_estimated_bitrate()
+    {
+        return estimated_bitrate;
+    }
+
+    
+    gfloat get_encoding_bitrate()
+    {
+        return encoding_bitrate;
+    }
+
+    gfloat get_rtt()
+    {
+        return rtt;
+    }
+
+    gfloat get_buffer_occ()
+    {
+        return buffer_occ;
+    }
 };
 
 #endif

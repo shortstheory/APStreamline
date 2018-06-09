@@ -167,6 +167,28 @@ void AdaptiveStreaming::adapt_stream()
 {
     QoSReport qos_report = qos_estimator.get_qos_report();
     // adapt according to the information in this report
+    if (qos_report.get_fraction_lost() == 0) {
+        improve_quality();
+    } else {
+        degrade_quality();
+    }
+}
+
+void AdaptiveStreaming::improve_quality()
+{
+    set_encoding_bitrate(h264_bitrate+250);
+    if (current_res == ResolutionPresets::LOW && 
+        h264_bitrate > bitrate_presets[ResolutionPresets::MED]) {
+            set_resolution(ResolutionPresets::MED);
+    } else if (current_res == ResolutionPresets::MED && 
+        h264_bitrate > bitrate_presets[ResolutionPresets::HIGH]) {
+            set_resolution(ResolutionPresets::HIGH);
+    }
+}
+
+void AdaptiveStreaming::degrade_quality()
+{
+
 }
 
 void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)

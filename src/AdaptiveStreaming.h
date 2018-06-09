@@ -44,7 +44,7 @@ private:
 
     // better off as a char array, change it later
     vector<string> video_presets;
-    int bitrate_presets[3];
+    guint32 bitrate_presets[3];
 
     bool init_elements();
     void init_element_properties();
@@ -57,6 +57,10 @@ private:
     void set_resolution(ResolutionPresets setting);
     void increase_resolution();
     void decrease_resolution();
+
+    void improve_quality();
+    void degrade_quality();
+
     static void static_callback(GstElement *src, GstBuffer *buf, gpointer data);
     static void static_rtp_callback(GstElement *src, GstBuffer *buf, gpointer data);
 
