@@ -180,7 +180,7 @@ void AdaptiveStreaming::adapt_stream()
 
 void AdaptiveStreaming::improve_quality()
 {
-    set_encoding_bitrate(h264_bitrate+250);
+    set_encoding_bitrate(h264_bitrate+bitrate_inc);
     if (current_res == ResolutionPresets::LOW && 
         h264_bitrate > bitrate_presets[ResolutionPresets::MED]) {
             set_resolution(ResolutionPresets::MED);
@@ -192,7 +192,7 @@ void AdaptiveStreaming::improve_quality()
 
 void AdaptiveStreaming::degrade_quality()
 {
-    set_encoding_bitrate(h264_bitrate-1000);
+    set_encoding_bitrate(h264_bitrate-bitrate_dec);
     if (current_res == ResolutionPresets::HIGH && 
         h264_bitrate < bitrate_presets[ResolutionPresets::MED]) {
             set_resolution(ResolutionPresets::MED);
@@ -204,11 +204,9 @@ void AdaptiveStreaming::degrade_quality()
 
 void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 {
-    if (bitrate < 8000) {
+    if (bitrate >= min_bitrate && bitrate <= max_bitrate) {
         h264_bitrate = bitrate;
         g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
-    } else {
-        bitrate = 8000;
     }
 }
 

@@ -20,6 +20,12 @@ private:
     static const int rtcp_sink_port = 5001;
     static const int rtcp_src_port = 5005;
 
+    static const int bitrate_inc = 250;
+    static const int bitrate_dec = 1000;
+
+    static const int max_bitrate = 8000;
+    static const int min_bitrate = 50;
+
     guint32 h264_bitrate;
 
     GstElement* pipeline;
