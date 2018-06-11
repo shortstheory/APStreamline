@@ -217,6 +217,8 @@ void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
 void AdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {
+    g_warning("RES CHANGE! %d", setting);
+
     string caps_filter_string;
     caps_filter_string = video_presets[setting];
     set_encoding_bitrate(bitrate_presets[setting]);
