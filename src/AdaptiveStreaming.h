@@ -26,6 +26,9 @@ private:
     static const int max_bitrate = 8000;
     static const int min_bitrate = 50;
 
+    const string device;
+    const string receiver_ip_addr;
+
     guint32 h264_bitrate;
 
     GstElement* pipeline;
@@ -46,7 +49,6 @@ private:
     string rtcp_caps_string;
     QoSEstimator qos_estimator;
 
-    static const string receiver_ip_addr;
 
     // better off as a char array, change it later
     vector<string> video_presets;
@@ -71,7 +73,7 @@ private:
     static void static_rtp_callback(GstElement *src, GstBuffer *buf, gpointer data);
 
 public:
-    AdaptiveStreaming();
+    AdaptiveStreaming(string _device, string _ip_addr);
     ~AdaptiveStreaming();
     bool start_playing();
     GstBus* get_pipeline_bus();

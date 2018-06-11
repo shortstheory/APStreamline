@@ -1,11 +1,8 @@
 #include "AdaptiveStreaming.h" 
 #include <functional>
 
-const string AdaptiveStreaming::receiver_ip_addr = "192.168.0.102";
-// const string AdaptiveStreaming::receiver_ip_addr = "127.0.0.1";
-// const string AdaptiveStreaming::receiver_ip_addr = "10.42.0.56";
-
-AdaptiveStreaming::AdaptiveStreaming()
+AdaptiveStreaming::AdaptiveStreaming(string _device, string _ip_addr) :
+                                     device(_device), receiver_ip_addr(_ip_addr)
 {
     video_presets.push_back("video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1");
     video_presets.push_back("video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1");
@@ -68,7 +65,8 @@ bool AdaptiveStreaming::init_elements()
 void AdaptiveStreaming::init_element_properties()
 {
     set_resolution(ResolutionPresets::LOW);
-    g_object_set(G_OBJECT(v4l2_src), "device", "/dev/video1", NULL);
+
+    g_object_set(G_OBJECT(v4l2_src), "device", device.c_str(), NULL);
     g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
                         "port", rtcp_src_port, NULL);
     g_object_set(G_OBJECT(rtpbin), "latency", 0, NULL);
@@ -217,7 +215,7 @@ void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
 void AdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {
-    g_warning("RES CHANGE! %d", setting);
+    g_warning("RES CHANGE! %d %ul", setting, h264_bitrate);
 
     string caps_filter_string;
     caps_filter_string = video_presets[setting];
