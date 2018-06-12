@@ -246,10 +246,14 @@ void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
         } else if (camera_type == CameraType::RPICAM) {
             g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
             if (v4l2_cam_fd > 0) {
-                v4l2_control ctrl;
-                ctrl.id = V4L2_CID_BRIGHTNESS;
-                ctrl.value = 0;
-                if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &ctrl) == -1) {
+                
+                v4l2_ext_controls ctrl_list;
+                v4l2_ext_control bitrate_ctrl;
+
+                bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
+                bitrate_ctrl.value = 100*1000;
+
+                if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1) {
                     g_warning("ioctrl fail :/");
                 } else {
                     g_warning("ioctl style!");
