@@ -4,9 +4,15 @@
 AdaptiveStreaming::AdaptiveStreaming(string _device, string _ip_addr, CameraType type) :
                                      device(_device), receiver_ip_addr(_ip_addr), camera_type(type)
 {
-    video_presets.push_back("video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1");
-    video_presets.push_back("video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1");
-    video_presets.push_back("video/x-raw, width=(int)1280, height=(int)720, framerate=(fraction)30/1");
+    if (camera_type == CameraType::V4L2CAM) {
+        video_presets.push_back("video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1");
+        video_presets.push_back("video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1");
+        video_presets.push_back("video/x-raw, width=(int)1280, height=(int)720, framerate=(fraction)30/1");
+    } else if (camera_type == CameraType::RPICAM) {
+        video_presets.push_back("video/x-h264, width=(int)640, height=(int)480, framerate=(fraction)30/1");
+        video_presets.push_back("video/x-h264, width=(int)320, height=(int)240, framerate=(fraction)30/1");
+        video_presets.push_back("video/x-h264, width=(int)1280, height=(int)720, framerate=(fraction)30/1");
+    }
 
     bitrate_presets[ResolutionPresets::LOW] = 500;
     bitrate_presets[ResolutionPresets::MED] = 1500;
@@ -92,17 +98,29 @@ void AdaptiveStreaming::init_element_properties()
 
 void AdaptiveStreaming::pipeline_add_elements()
 {
-    gst_bin_add_many(GST_BIN(pipeline), v4l2_src, src_capsfilter, h264_encoder, h264_parser, rtph264_payloader,
+    gst_bin_add_many(GST_BIN(pipeline), src_capsfilter, rtph264_payloader,
                     rtpbin, rtp_identity, rr_rtcp_identity, sr_rtcp_identity, video_udp_sink,
                     rtcp_udp_sink, rtcp_udp_src, NULL);
+    if (camera_type == CameraType::V4L2CAM) {
+        gst_bin_add_many(GST_BIN(pipeline), v4l2_src, h264_encoder, h264_parser, NULL);
+    } else if (camera_type == CameraType::RPICAM) {
+        gst_bin_add(GST_BIN(pipeline), rpicam_src);
+    }
 }
 
 bool AdaptiveStreaming::link_all_elements()
 {
     // first link all the elements with autoplugging
-    if (!(gst_element_link_many(v4l2_src, src_capsfilter, h264_encoder, h264_parser, rtph264_payloader, NULL) &&
-        gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
-        return false;
+    if (camera_type == CameraType::V4L2CAM) {
+        if (!(gst_element_link_many(v4l2_src, src_capsfilter, h264_encoder, h264_parser, rtph264_payloader, NULL) &&
+            gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
+            return false;
+        }
+    } else if (camera_type == CameraType::RPICAM) {
+        if (!(gst_element_link_many(rpicam_src, src_capsfilter, rtph264_payloader, NULL) &&
+            gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
+            return false;
+        }
     }
     if(!gst_pad_link(gst_element_get_static_pad(rr_rtcp_identity,"src"), gst_element_get_request_pad(rtpbin, "recv_rtcp_sink_%u"))
         && !gst_pad_link(gst_element_get_static_pad(rtph264_payloader,"src"), gst_element_get_request_pad(rtpbin, "send_rtp_sink_%u"))
@@ -217,7 +235,11 @@ void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 {
     if (bitrate >= min_bitrate && bitrate <= max_bitrate) {
         h264_bitrate = bitrate;
-        g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
+        if (camera_type == CameraType::V4L2CAM) {
+            g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
+        } else if (camera_type == CameraType::RPICAM) {
+            g_object_set(G_OBJECT(rpicam_src), "bitrate", bitrate*1000, NULL);
+        }
     }
 }
 
