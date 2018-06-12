@@ -75,7 +75,7 @@ private:
     static void static_rtp_callback(GstElement *src, GstBuffer *buf, gpointer data);
 
 public:
-    enum CameraType {V4L2CAM, RPICAM};
+    enum CameraType {RAW_CAM, H264_CAM};
     const CameraType camera_type;
 
     AdaptiveStreaming(string _device, string _ip_addr, CameraType type);
