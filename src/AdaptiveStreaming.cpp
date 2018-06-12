@@ -86,7 +86,7 @@ void AdaptiveStreaming::init_element_properties()
         g_object_set(G_OBJECT(v4l2_src), "device", device.c_str(), NULL);
         g_object_set(G_OBJECT(h264_encoder), "tune", 0x00000004, "threads", 4, NULL);
     } else if (camera_type == CameraType::RPICAM) {
-        g_object_set(G_OBJECT(rpicam_src), "bitrate", 1000000, "video-direction", 180, NULL);
+        g_object_set(G_OBJECT(rpicam_src), "bitrate", 1000000, NULL);
     }
     g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
                         "port", rtcp_src_port, NULL);
