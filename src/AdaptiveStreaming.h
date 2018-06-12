@@ -31,6 +31,8 @@ private:
 
     guint32 h264_bitrate;
 
+    gint v4l2_cam_fd;
+
     GstElement* pipeline;
     GstElement* v4l2_src;
     GstElement* src_capsfilter;

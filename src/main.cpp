@@ -4,9 +4,9 @@ int main(int argc, char *argv[])
 {
     string receiver_ip_addr;
     // receiver_ip_addr = "192.168.0.102";
-    // receiver_ip_addr = "127.0.0.1";
+    receiver_ip_addr = "127.0.0.1";
     // receiver_ip_addr = "10.42.0.56";
-    receiver_ip_addr = "192.168.1.2";
+    // receiver_ip_addr = "192.168.1.2";
     string dev = "/dev/video0";
 
     gst_init(&argc, &argv);

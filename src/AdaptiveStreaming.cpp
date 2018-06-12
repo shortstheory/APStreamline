@@ -1,5 +1,10 @@
 #include "AdaptiveStreaming.h" 
-#include <functional>
+#include <dirent.h>
+#include <fcntl.h>
+#include <linux/videodev2.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <stdio.h>
 
 AdaptiveStreaming::AdaptiveStreaming(string _device, string _ip_addr, CameraType type) :
                                      device(_device), receiver_ip_addr(_ip_addr), camera_type(type)
@@ -233,11 +238,23 @@ void AdaptiveStreaming::degrade_quality()
 
 void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 {
+
     if (bitrate >= min_bitrate && bitrate <= max_bitrate) {
         h264_bitrate = bitrate;
         if (camera_type == CameraType::V4L2CAM) {
             g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
         } else if (camera_type == CameraType::RPICAM) {
+            g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
+            if (v4l2_cam_fd > 0) {
+                v4l2_control ctrl;
+                ctrl.id = V4L2_CID_BRIGHTNESS;
+                ctrl.value = 0;
+                if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &ctrl) == -1) {
+                    g_warning("ioctrl fail :/");
+                } else {
+                    g_warning("ioctl style!");
+                }
+            }
             // g_object_set(G_OBJECT(rpicam_src), "bitrate", bitrate*1000, NULL);
         }
     }
@@ -251,7 +268,6 @@ void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 void AdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {
     g_warning("RES CHANGE! %d %ul", setting, h264_bitrate);
-
     string caps_filter_string;
     caps_filter_string = video_presets[setting];
     set_encoding_bitrate(bitrate_presets[setting]);
