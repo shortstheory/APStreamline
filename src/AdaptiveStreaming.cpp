@@ -5,12 +5,12 @@ AdaptiveStreaming::AdaptiveStreaming(string _device, string _ip_addr, CameraType
                                      device(_device), receiver_ip_addr(_ip_addr), camera_type(type)
 {
     if (camera_type == CameraType::V4L2CAM) {
-        video_presets.push_back("video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1");
         video_presets.push_back("video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1");
+        video_presets.push_back("video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1");
         video_presets.push_back("video/x-raw, width=(int)1280, height=(int)720, framerate=(fraction)30/1");
     } else if (camera_type == CameraType::RPICAM) {
-        video_presets.push_back("video/x-h264, width=(int)640, height=(int)480, framerate=(fraction)30/1");
         video_presets.push_back("video/x-h264, width=(int)320, height=(int)240, framerate=(fraction)30/1");
+        video_presets.push_back("video/x-h264, width=(int)640, height=(int)480, framerate=(fraction)30/1");
         video_presets.push_back("video/x-h264, width=(int)1280, height=(int)720, framerate=(fraction)30/1");
     }
 
@@ -152,6 +152,7 @@ void AdaptiveStreaming::static_callback(GstElement *src, GstBuffer *buf, gpointe
 {
     if (data != nullptr) {
         AdaptiveStreaming* ptr = (AdaptiveStreaming*)data;
+        g_warning("h264val - %d", ptr->h264_bitrate);
         ptr->rtcp_callback(src, buf);
     }
     // g_warning("Received rtcp");
