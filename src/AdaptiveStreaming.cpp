@@ -251,12 +251,12 @@ void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
                 v4l2_ext_control bitrate_ctrl;
 
                 bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
-                bitrate_ctrl.value = 100*1000;
+                bitrate_ctrl.value = bitrate*1000;
 
                 if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1) {
-                    g_warning("ioctrl fail :/");
+                    g_warning("ioctl fail :/");
                 } else {
-                    g_warning("ioctl style!");
+                   // g_warning("ioctl style!");
                 }
             }
             // g_object_set(G_OBJECT(rpicam_src), "bitrate", bitrate*1000, NULL);
