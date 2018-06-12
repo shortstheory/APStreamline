@@ -33,6 +33,7 @@ private:
 
     GstElement* pipeline;
     GstElement* v4l2_src;
+    GstElement* rpicam_src;
     GstElement* src_capsfilter;
     GstElement* h264_encoder;
     GstElement* h264_parser;
@@ -73,7 +74,10 @@ private:
     static void static_rtp_callback(GstElement *src, GstBuffer *buf, gpointer data);
 
 public:
-    AdaptiveStreaming(string _device, string _ip_addr);
+    enum CameraType {V4L2CAM, RPICAM};
+    const CameraType camera_type;
+
+    AdaptiveStreaming(string _device, string _ip_addr, CameraType type);
     ~AdaptiveStreaming();
     bool start_playing();
     GstBus* get_pipeline_bus();

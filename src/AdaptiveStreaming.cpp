@@ -1,8 +1,8 @@
 #include "AdaptiveStreaming.h" 
 #include <functional>
 
-AdaptiveStreaming::AdaptiveStreaming(string _device, string _ip_addr) :
-                                     device(_device), receiver_ip_addr(_ip_addr)
+AdaptiveStreaming::AdaptiveStreaming(string _device, string _ip_addr, CameraType type) :
+                                     device(_device), receiver_ip_addr(_ip_addr), camera_type(type)
 {
     video_presets.push_back("video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1");
     video_presets.push_back("video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1");
@@ -41,11 +41,16 @@ AdaptiveStreaming::~AdaptiveStreaming()
 bool AdaptiveStreaming::init_elements()
 {
     pipeline = gst_pipeline_new ("adaptive-pipeline");
-    v4l2_src = gst_element_factory_make ("v4l2src", NULL);
     src_capsfilter = gst_element_factory_make("capsfilter", NULL);
     // choose encoder according to ctr next time
-    h264_encoder = gst_element_factory_make("x264enc", NULL);
-    h264_parser = gst_element_factory_make("h264parse", NULL);
+    if (camera_type == CameraType::V4L2CAM) {
+        v4l2_src = gst_element_factory_make("v4l2src", NULL);
+        h264_encoder = gst_element_factory_make("x264enc", NULL);
+        h264_parser = gst_element_factory_make("h264parse", NULL);
+    } else if (camera_type == CameraType::RPICAM) {
+        rpicam_src = gst_element_factory_make("rpicamsrc", NULL);
+    }
+
     rtph264_payloader = gst_element_factory_make("rtph264pay", NULL);
     rtpbin = gst_element_factory_make("rtpbin", NULL);
     rtp_identity = gst_element_factory_make("identity", NULL);
@@ -55,9 +60,13 @@ bool AdaptiveStreaming::init_elements()
     video_udp_sink = gst_element_factory_make("udpsink", NULL);
     rtcp_udp_sink = gst_element_factory_make("udpsink", NULL);
 
-    if (!pipeline && !v4l2_src && !src_capsfilter && !h264_encoder && !h264_parser && !rtph264_payloader && !rtpbin && !rr_rtcp_identity
+    if (!pipeline && !src_capsfilter && !rtph264_payloader && !rtpbin && !rr_rtcp_identity
         && !sr_rtcp_identity && !rtcp_udp_src && !video_udp_sink && !rtcp_udp_sink && !rtp_identity) {
+        if (camera_type == CameraType::V4L2CAM && !v4l2_src && !h264_encoder && !h264_parser) {
             return false;
+        } else if (camera_type == CameraType::RPICAM && !rpicam_src) {
+            return false;
+        }
     }
     return true;
 }
@@ -66,11 +75,15 @@ void AdaptiveStreaming::init_element_properties()
 {
     set_resolution(ResolutionPresets::LOW);
 
-    g_object_set(G_OBJECT(v4l2_src), "device", device.c_str(), NULL);
+    if (camera_type == CameraType::V4L2CAM) {
+        g_object_set(G_OBJECT(v4l2_src), "device", device.c_str(), NULL);
+        g_object_set(G_OBJECT(h264_encoder), "tune", 0x00000004, "threads", 4, NULL);
+    } else if (camera_type == CameraType::RPICAM) {
+        g_object_set(G_OBJECT(rpicam_src), "bitrate", 1000000, "video-direction", 180, NULL);
+    }
     g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
                         "port", rtcp_src_port, NULL);
     g_object_set(G_OBJECT(rtpbin), "latency", 0, NULL);
-    g_object_set(G_OBJECT(h264_encoder), "tune", 0x00000004, "threads", 4, NULL);
     g_object_set(G_OBJECT(video_udp_sink), "host", receiver_ip_addr.c_str(), 
                         "port", video_sink_port, NULL);
     g_object_set(G_OBJECT(rtcp_udp_sink), "host", receiver_ip_addr.c_str(), 

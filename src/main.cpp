@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     string dev = "/dev/video0";
 
     gst_init(&argc, &argv);
-    AdaptiveStreaming adaptiveStreaming(dev, receiver_ip_addr);
+    AdaptiveStreaming adaptiveStreaming(dev, receiver_ip_addr, AdaptiveStreaming::CameraType::V4L2CAM);
     adaptiveStreaming.start_playing();
     GstBus* bus = adaptiveStreaming.get_pipeline_bus();
     GstMessage *msg = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE, static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));

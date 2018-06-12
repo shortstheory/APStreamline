@@ -49,8 +49,9 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     ntp_time_t curr_time = ntp_time_t::convert_from_unix_time(tv);
     gfloat timediff = curr_time.calculate_difference(lsr);
     curr_rtt = timediff - dlsr*1/65535.0;
-    exp_smooth_val(curr_rtt, smooth_rtt, 0.80);
-
+    if (curr_rtt < 1) {
+        exp_smooth_val(curr_rtt, smooth_rtt, 0.80);
+    }
     // b/w estd
     curr_time_ms = (tv.tv_sec * (uint64_t)1000) + (tv.tv_usec / 1000);
     packet_interval = exthighestseq - prev_pkt_count;
