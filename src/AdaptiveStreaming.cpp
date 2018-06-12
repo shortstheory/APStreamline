@@ -246,9 +246,7 @@ void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
         } else if (camera_type == CameraType::RPICAM) {
             g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
             if (v4l2_cam_fd > 0) {
-                
-                v4l2_ext_controls ctrl_list;
-                v4l2_ext_control bitrate_ctrl;
+                v4l2_control bitrate_ctrl;
 
                 bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
                 bitrate_ctrl.value = bitrate*1000;
