@@ -50,11 +50,11 @@ bool AdaptiveStreaming::init_elements()
     src_capsfilter = gst_element_factory_make("capsfilter", NULL);
     // choose encoder according to ctr next time
     h264_parser = gst_element_factory_make("h264parse", NULL);
+    v4l2_src = gst_element_factory_make("v4l2src", NULL);
     if (camera_type == CameraType::V4L2CAM) {
-        v4l2_src = gst_element_factory_make("v4l2src", NULL);
         h264_encoder = gst_element_factory_make("x264enc", NULL);
     } else if (camera_type == CameraType::RPICAM) {
-        rpicam_src = gst_element_factory_make("rpicamsrc", NULL);
+        // do nothing
     }
 
     rtph264_payloader = gst_element_factory_make("rtph264pay", NULL);
@@ -68,15 +68,14 @@ bool AdaptiveStreaming::init_elements()
 
     if (!pipeline && !src_capsfilter && !rtph264_payloader && !rtpbin && !rr_rtcp_identity
         && !sr_rtcp_identity && !rtcp_udp_src && !video_udp_sink && !rtcp_udp_sink 
-        && !rtp_identity && !h264_parser) {
-        if (camera_type == CameraType::V4L2CAM && !v4l2_src && !h264_encoder) {
-            return false;
-        } else if (camera_type == CameraType::RPICAM && !rpicam_src) {
+        && !rtp_identity && !h264_parser && !v4l2_src) {
+        if (camera_type == CameraType::V4L2CAM && !h264_encoder) {
             return false;
         }
     }
     return true;
 }
+
 
 void AdaptiveStreaming::init_element_properties()
 {
@@ -86,7 +85,7 @@ void AdaptiveStreaming::init_element_properties()
         g_object_set(G_OBJECT(v4l2_src), "device", device.c_str(), NULL);
         g_object_set(G_OBJECT(h264_encoder), "tune", 0x00000004, "threads", 4, NULL);
     } else if (camera_type == CameraType::RPICAM) {
-        g_object_set(G_OBJECT(rpicam_src), "bitrate", 1000000, NULL);
+        // g_object_set(G_OBJECT(rpicam_src), "bitrate", 1000000, NULL);
     }
     g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
                         "port", rtcp_src_port, NULL);
@@ -99,13 +98,12 @@ void AdaptiveStreaming::init_element_properties()
 
 void AdaptiveStreaming::pipeline_add_elements()
 {
-    gst_bin_add_many(GST_BIN(pipeline), src_capsfilter, rtph264_payloader, h264_parser,
+    gst_bin_add_many(GST_BIN(pipeline), v4l2_src, src_capsfilter, rtph264_payloader, h264_parser,
                     rtpbin, rtp_identity, rr_rtcp_identity, sr_rtcp_identity, video_udp_sink,
                     rtcp_udp_sink, rtcp_udp_src, NULL);
     if (camera_type == CameraType::V4L2CAM) {
-        gst_bin_add_many(GST_BIN(pipeline), v4l2_src, h264_encoder, NULL);
+        gst_bin_add_many(GST_BIN(pipeline), h264_encoder, NULL);
     } else if (camera_type == CameraType::RPICAM) {
-        gst_bin_add(GST_BIN(pipeline), rpicam_src);
     }
 }
 
@@ -118,7 +116,7 @@ bool AdaptiveStreaming::link_all_elements()
             return false;
         }
     } else if (camera_type == CameraType::RPICAM) {
-        if (!(gst_element_link_many(rpicam_src, src_capsfilter, h264_parser, rtph264_payloader, NULL) &&
+        if (!(gst_element_link_many(v4l2_src, src_capsfilter, h264_parser, rtph264_payloader, NULL) &&
             gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
             return false;
         }
@@ -240,7 +238,7 @@ void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
         if (camera_type == CameraType::V4L2CAM) {
             g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
         } else if (camera_type == CameraType::RPICAM) {
-            g_object_set(G_OBJECT(rpicam_src), "bitrate", bitrate*1000, NULL);
+            // g_object_set(G_OBJECT(rpicam_src), "bitrate", bitrate*1000, NULL);
         }
     }
 }
