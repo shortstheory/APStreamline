@@ -10,13 +10,13 @@ AdaptiveStreaming::AdaptiveStreaming(string _device, string _ip_addr, CameraType
                                      device(_device), receiver_ip_addr(_ip_addr), camera_type(type)
 {
     if (camera_type == CameraType::RAW_CAM) {
-        video_presets.push_back("video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1");
-        video_presets.push_back("video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1");
-        video_presets.push_back("video/x-raw, width=(int)1280, height=(int)720, framerate=(fraction)30/1");
+        video_presets[ResolutionPresets::LOW] = "video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1";
+        video_presets[ResolutionPresets::MED] = "video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1";
+        video_presets[ResolutionPresets::HIGH] = "video/x-raw, width=(int)1280, height=(int)720, framerate=(fraction)30/1";
     } else if (camera_type == CameraType::H264_CAM) {
-        video_presets.push_back("video/x-h264, width=(int)320, height=(int)240, framerate=(fraction)30/1");
-        video_presets.push_back("video/x-h264, width=(int)640, height=(int)480, framerate=(fraction)30/1");
-        video_presets.push_back("video/x-h264, width=(int)1280, height=(int)720, framerate=(fraction)30/1");
+        video_presets[ResolutionPresets::LOW] = "video/x-h264, width=(int)320, height=(int)240, framerate=(fraction)30/1";
+        video_presets[ResolutionPresets::MED] = "video/x-h264, width=(int)640, height=(int)480, framerate=(fraction)30/1";
+        video_presets[ResolutionPresets::HIGH] = "video/x-h264, width=(int)1280, height=(int)720, framerate=(fraction)30/1";
     }
 
     bitrate_presets[ResolutionPresets::LOW] = 500;
@@ -86,8 +86,8 @@ void AdaptiveStreaming::init_element_properties()
 {
     set_resolution(ResolutionPresets::LOW);
 
+    g_object_set(G_OBJECT(v4l2_src), "device", device.c_str(), NULL);
     if (camera_type == CameraType::RAW_CAM) {
-        g_object_set(G_OBJECT(v4l2_src), "device", device.c_str(), NULL);
         g_object_set(G_OBJECT(h264_encoder), "tune", 0x00000004, "threads", 4, NULL);
     } else if (camera_type == CameraType::H264_CAM) {
         // g_object_set(G_OBJECT(H264_CAM_src), "bitrate", 1000000, NULL);
@@ -238,7 +238,6 @@ void AdaptiveStreaming::degrade_quality()
 
 void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 {
-
     if (bitrate >= min_bitrate && bitrate <= max_bitrate) {
         h264_bitrate = bitrate;
         if (camera_type == CameraType::RAW_CAM) {
@@ -247,13 +246,10 @@ void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
             g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
             if (v4l2_cam_fd > 0) {
                 v4l2_control bitrate_ctrl;
-
                 bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
                 bitrate_ctrl.value = bitrate*1000;
-
                 if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1) {
                     g_warning("ioctl fail :/");
-                } else {
                 }
             }
         }
@@ -267,7 +263,7 @@ void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
 void AdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {
-    g_warning("RES CHANGE! %d %ul", setting, h264_bitrate);
+    g_warning("RES CHANGE! %d ", setting);
     string caps_filter_string;
     caps_filter_string = video_presets[setting];
     set_encoding_bitrate(bitrate_presets[setting]);

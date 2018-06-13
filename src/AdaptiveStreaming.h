@@ -51,9 +51,8 @@ private:
     string rtcp_caps_string;
     QoSEstimator qos_estimator;
 
-
     // better off as a char array, change it later
-    vector<string> video_presets;
+    string video_presets[3];
     guint32 bitrate_presets[3];
 
     bool init_elements();
