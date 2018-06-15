@@ -3,11 +3,20 @@
 int main(int argc, char *argv[])
 {
     string receiver_ip_addr;
+    string dev;
     // receiver_ip_addr = "192.168.0.102";
-    receiver_ip_addr = "127.0.0.1";
     // receiver_ip_addr = "10.42.0.56";
     // receiver_ip_addr = "192.168.1.2";
-    string dev = "/dev/video0";
+    // g_warning("%d", argc);
+    if (argc == 1) {
+        dev = "/dev/video0";
+        receiver_ip_addr = "127.0.0.1";
+    } else {
+        dev = argv[1];
+        receiver_ip_addr = argv[2];
+    }
+
+    g_warning("Sending feed from %s to %s", dev.c_str(), receiver_ip_addr.c_str());
 
     gst_init(&argc, &argv);
     AdaptiveStreaming adaptiveStreaming(dev, receiver_ip_addr, AdaptiveStreaming::CameraType::RAW_CAM);
