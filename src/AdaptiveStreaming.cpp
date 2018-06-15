@@ -58,6 +58,7 @@ bool AdaptiveStreaming::init_elements()
     v4l2_src = gst_element_factory_make("v4l2src", NULL);
     if (camera_type == CameraType::RAW_CAM) {
         h264_encoder = gst_element_factory_make("x264enc", NULL);
+        videoconvert = gst_element_factory_make("videoconvert", NULL);
     } else if (camera_type == CameraType::H264_CAM) {
         // do nothing
     }
@@ -107,7 +108,7 @@ void AdaptiveStreaming::pipeline_add_elements()
                     rtpbin, rtp_identity, rr_rtcp_identity, sr_rtcp_identity, video_udp_sink,
                     rtcp_udp_sink, rtcp_udp_src, NULL);
     if (camera_type == CameraType::RAW_CAM) {
-        gst_bin_add_many(GST_BIN(pipeline), h264_encoder, NULL);
+        gst_bin_add_many(GST_BIN(pipeline), h264_encoder, videoconvert, NULL);
     } else if (camera_type == CameraType::H264_CAM) {
     }
 }
@@ -116,7 +117,7 @@ bool AdaptiveStreaming::link_all_elements()
 {
     // first link all the elements with autoplugging
     if (camera_type == CameraType::RAW_CAM) {
-        if (!(gst_element_link_many(v4l2_src, src_capsfilter, h264_encoder, h264_parser, rtph264_payloader, NULL) &&
+        if (!(gst_element_link_many(v4l2_src, src_capsfilter, videoconvert, h264_encoder, h264_parser, rtph264_payloader, NULL) &&
             gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
             return false;
         }

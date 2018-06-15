@@ -36,6 +36,7 @@ private:
     GstElement* pipeline;
     GstElement* v4l2_src;
     GstElement* src_capsfilter;
+    GstElement* videoconvert;
     GstElement* h264_encoder;
     GstElement* h264_parser;
     GstElement* rtph264_payloader;
