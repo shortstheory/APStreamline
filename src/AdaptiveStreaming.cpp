@@ -6,8 +6,10 @@
 #include <unistd.h>
 #include <stdio.h>
 
-AdaptiveStreaming::AdaptiveStreaming(string _device, string _ip_addr, CameraType type) :
-                                     device(_device), receiver_ip_addr(_ip_addr), camera_type(type)
+AdaptiveStreaming::AdaptiveStreaming(string _device = "/dev/video0", string _ip_addr = "127.0.0.1", CameraType type = CameraType::RAW_CAM,
+                                    gint _video_port = 5000, gint _rtcp_port = 5001) :
+                                     device(_device), receiver_ip_addr(_ip_addr), camera_type(type),
+                                     video_sink_port(_video_port), rtcp_port(_rtcp_port)
 {
     if (camera_type == CameraType::RAW_CAM) {
         video_presets[ResolutionPresets::LOW] = "video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1";
@@ -16,7 +18,7 @@ AdaptiveStreaming::AdaptiveStreaming(string _device, string _ip_addr, CameraType
     } else if (camera_type == CameraType::H264_CAM) {
         video_presets[ResolutionPresets::LOW] = "video/x-h264, width=(int)320, height=(int)240, framerate=(fraction)30/1";
         video_presets[ResolutionPresets::MED] = "video/x-h264, width=(int)640, height=(int)480, framerate=(fraction)30/1";
-        video_presets[ResolutionPresets::HIGH] = "video/x-h264, width=(int)1280, height=(int)720, framerate=(fraction)30/1";
+        video_presets[ResolutionPresets::HIGH] = "video/x-h264, widthCameraType::RAW_CAM=(int)1280, height=(int)720, framerate=(fraction)30/1";
     }
 
     bitrate_presets[ResolutionPresets::LOW] = 500;

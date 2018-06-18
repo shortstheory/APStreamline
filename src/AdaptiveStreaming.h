@@ -16,11 +16,11 @@ class AdaptiveStreaming {
 private:
     enum ResolutionPresets {LOW, MED, HIGH} current_res;
 
-    static const int video_sink_port = 5000;
-    static const int rtcp_port = 5001;
+    const gint video_sink_port;
+    const gint rtcp_port;
 
-    static const int bitrate_inc = 250;
-    static const int bitrate_dec = 1000;
+    const int bitrate_inc = 250;
+    const int bitrate_dec = 1000;
 
     static const int max_bitrate = 8000;
     static const int min_bitrate = 50;
@@ -77,7 +77,7 @@ public:
     enum CameraType {RAW_CAM, H264_CAM};
     const CameraType camera_type;
 
-    AdaptiveStreaming(string _device, string _ip_addr, CameraType type);
+    AdaptiveStreaming(string _device, string _ip_addr, CameraType type, gint _video_port, gint _rtcp_port);
     ~AdaptiveStreaming();
     bool start_playing();
     GstBus* get_pipeline_bus();
