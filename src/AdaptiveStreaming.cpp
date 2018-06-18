@@ -38,7 +38,8 @@ AdaptiveStreaming::AdaptiveStreaming(string _device, string _ip_addr, CameraType
 //unreffing pointers which are null can be dangerous, check this
 AdaptiveStreaming::~AdaptiveStreaming()
 {
-    // gst_object_unref(pipeline);
+    gst_element_set_state(pipeline, GST_STATE_NULL);
+    gst_object_unref(pipeline);
     // gst_object_unref(v4l2_src);
     // gst_object_unref(video_udp_sink);
     // gst_object_unref(h264_encoder);
@@ -46,9 +47,6 @@ AdaptiveStreaming::~AdaptiveStreaming()
     // gst_object_unref(rtpbin);
     // gst_object_unref(rr_rtcp_identity);
     // gst_object_unref(sr_rtcp_identity);
-
-    // gst_caps_unref(video_caps);
-    // gst_caps_unref(rtcp_caps);
 }
 
 bool AdaptiveStreaming::init_elements()

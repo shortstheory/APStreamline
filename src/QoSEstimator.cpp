@@ -124,7 +124,5 @@ void QoSEstimator::estimate_encoding_rate(const guint32 &pkt_size)
 
 void QoSEstimator::estimate_rtp_pkt_size(const guint32 &pkt_size)
 {
-
     exp_smooth_val(pkt_size, rtp_size, 0.25);
-    // g_warning("rtpPkt: %f", rtp_size);
 }
