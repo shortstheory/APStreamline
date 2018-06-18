@@ -93,13 +93,13 @@ void AdaptiveStreaming::init_element_properties()
     } else if (camera_type == CameraType::H264_CAM) {
         // g_object_set(G_OBJECT(H264_CAM_src), "bitrate", 1000000, NULL);
     }
-    g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
-                        "port", rtcp_src_port, NULL);
     g_object_set(G_OBJECT(rtpbin), "latency", 0, NULL);
     g_object_set(G_OBJECT(video_udp_sink), "host", receiver_ip_addr.c_str(), 
                         "port", video_sink_port, NULL);
     g_object_set(G_OBJECT(rtcp_udp_sink), "host", receiver_ip_addr.c_str(), 
-                        "port", rtcp_sink_port, NULL);
+                        "port", rtcp_port, NULL);
+    g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"), 
+                        "port", rtcp_port, NULL);
 }
 
 void AdaptiveStreaming::pipeline_add_elements()
