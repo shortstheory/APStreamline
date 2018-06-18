@@ -31,7 +31,6 @@ public:
         return estimated_bitrate;
     }
 
-    
     gfloat get_encoding_bitrate()
     {
         return encoding_bitrate;

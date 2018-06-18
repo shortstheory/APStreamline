@@ -34,6 +34,7 @@ private:
     void process_rr_packet(GstRTCPPacket* packet);
     void process_sr_packet(GstRTCPPacket* packet);
     static void exp_smooth_val(const gfloat &curr_val, gfloat &smooth_val, gfloat alpha);
+
 public:
     QoSEstimator();
     ~QoSEstimator();
