@@ -77,7 +77,10 @@ public:
     enum CameraType {RAW_CAM, H264_CAM};
     const CameraType camera_type;
 
-    AdaptiveStreaming(string _device, string _ip_addr, CameraType type, gint _video_port, gint _rtcp_port);
+    AdaptiveStreaming(string _device = "/dev/video0", string _ip_addr = "127.0.0.1", 
+                    CameraType type = CameraType::RAW_CAM, gint _video_port = 5000,
+                    gint _rtcp_port = 5001);
+
     ~AdaptiveStreaming();
     bool start_playing();
     GstBus* get_pipeline_bus();
