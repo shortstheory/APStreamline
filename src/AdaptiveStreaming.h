@@ -82,7 +82,9 @@ public:
                     gint _rtcp_port = 5001);
 
     ~AdaptiveStreaming();
-    bool start_playing();
+    bool play_pipeline();
+    bool pause_pipeline();
+    bool change_source(string _device);
     GstBus* get_pipeline_bus();
 };
 

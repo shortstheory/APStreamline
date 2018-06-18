@@ -1,4 +1,5 @@
 #include "AdaptiveStreaming.h"
+#include <unistd.h>
 
 int main(int argc, char *argv[])
 {
@@ -21,7 +22,11 @@ int main(int argc, char *argv[])
     gst_init(&argc, &argv);
     // AdaptiveStreaming adaptiveStreaming;
     AdaptiveStreaming adaptiveStreaming(dev, receiver_ip_addr, AdaptiveStreaming::CameraType::RAW_CAM);
-    adaptiveStreaming.start_playing();
+    adaptiveStreaming.play_pipeline();
+    sleep(5);
+    g_warning("Changing src");
+    adaptiveStreaming.change_source("/dev/video1");
+    // sleep(5);
     GstBus* bus = adaptiveStreaming.get_pipeline_bus();
     GstMessage *msg = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE, static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 
