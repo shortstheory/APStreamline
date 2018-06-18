@@ -1,13 +1,13 @@
-#include "QoSEstimator.h" 
+#include "QoSEstimator.h"
 
 QoSEstimator::QoSEstimator() : smooth_rtt(0), prev_rr_time(0), prev_pkt_count(0),
-                                prev_buffer_occ(0), rtp_size(0), bytes_transferred(0),
-                                smooth_enc_bitrate(0)
+    prev_buffer_occ(0), rtp_size(0), bytes_transferred(0),
+    smooth_enc_bitrate(0)
 {
     gettimeofday(&prev_tv, NULL);
 }
 
-QoSEstimator::~QoSEstimator(){}
+QoSEstimator::~QoSEstimator() {}
 
 void QoSEstimator::handle_rtcp_packet(GstRTCPPacket* packet)
 {
@@ -42,7 +42,7 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     gfloat curr_rtt;
 
     gst_rtcp_packet_get_rb(packet, 0, &ssrc, &fractionlost,
-            &packetslost, &exthighestseq, &jitter, &lsr, &dlsr);
+                           &packetslost, &exthighestseq, &jitter, &lsr, &dlsr);
     // rtt calc
     timeval tv;
     gettimeofday(&tv, NULL);
@@ -69,13 +69,13 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     g_warning("bw %f occ %f loss %d encode-Rate %f", bandwidth, curr_buffer_occ, fractionlost, smooth_enc_bitrate);
 
     // g_warning("rtt %f rtpsize %f encode-Rate %f", smooth_rtt, rtp_size, smooth_enc_bitrate);
-        // g_warning("    block         %llu", i);
-        // g_warning("    ssrc          %llu", ssrc);
-        // g_warning("    highest   seq %llu", exthighestseq);
-        // g_warning("    jitter        %llu", jitter);
-        // g_warning("    fraction lost %llu", fractionlost);
-        // g_warning("    packet   lost %llu", packetslost);
-        // g_warning("lsr %llu", lsr>>16);
+    // g_warning("    block         %llu", i);
+    // g_warning("    ssrc          %llu", ssrc);
+    // g_warning("    highest   seq %llu", exthighestseq);
+    // g_warning("    jitter        %llu", jitter);
+    // g_warning("    fraction lost %llu", fractionlost);
+    // g_warning("    packet   lost %llu", packetslost);
+    // g_warning("lsr %llu", lsr>>16);
 }
 
 QoSReport QoSEstimator::get_qos_report()
@@ -116,7 +116,8 @@ void QoSEstimator::estimate_encoding_rate(const guint32 &pkt_size)
         prev_tv = tv;
         bytes_transferred = 0;
         exp_smooth_val(encoding_bitrate, smooth_enc_bitrate, 0.75);
-    } else {
+    }
+    else {
         bytes_transferred += pkt_size;
         // g_warning("b %llu", bytes_transferred);
     }

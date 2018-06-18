@@ -12,7 +12,8 @@ int main(int argc, char *argv[])
     if (argc == 1) {
         dev = "/dev/video0";
         receiver_ip_addr = "127.0.0.1";
-    } else {
+    }
+    else {
         dev = argv[1];
         receiver_ip_addr = argv[2];
     }
@@ -28,8 +29,8 @@ int main(int argc, char *argv[])
     adaptiveStreaming.change_source("/dev/video1");
     // sleep(5);
     GstBus* bus = adaptiveStreaming.get_pipeline_bus();
-    GstMessage *msg = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE, static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+    GstMessage *msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE, static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
 
     // g_warning("done");
     return 0;
-} 
+}

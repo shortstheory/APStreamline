@@ -68,7 +68,7 @@ struct ntp_time_t {
 
         gfloat time_delta;
 
-        time_delta = (compressed_second - ts_compressed_second) + (float)(compressed_fraction - ts_compressed_fraction) * 1 / 65536.0; 
+        time_delta = (compressed_second - ts_compressed_second) + (float)(compressed_fraction - ts_compressed_fraction) * 1 / 65536.0;
         return time_delta;
     }
 
