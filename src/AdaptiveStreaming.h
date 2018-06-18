@@ -25,7 +25,7 @@ private:
     static const int max_bitrate = 8000;
     static const int min_bitrate = 50;
 
-    const string device;
+    string device;
     const string receiver_ip_addr;
 
     guint32 h264_bitrate;

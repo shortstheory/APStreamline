@@ -324,6 +324,7 @@ bool AdaptiveStreaming::change_source(string _device)
     if (pause_pipeline() && gst_bin_remove(GST_BIN(pipeline), v4l2_src)) {
         v4l2_src = gst_element_factory_make("v4l2src", NULL);
         if (v4l2_src) {
+            device = _device;
             g_object_set(G_OBJECT(v4l2_src), "device", _device.c_str(), NULL);
             gst_bin_add(GST_BIN(pipeline), v4l2_src);
             if (gst_element_link(v4l2_src, src_capsfilter)) {
