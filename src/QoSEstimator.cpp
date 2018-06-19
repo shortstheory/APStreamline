@@ -47,7 +47,7 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     timeval tv;
     gettimeofday(&tv, NULL);
     ntp_time_t curr_time = ntp_time_t::convert_from_unix_time(tv);
-    gfloat timediff = curr_time.calculate_difference(lsr);
+    gfloat timediff = ntp_time_t::calculate_difference(curr_time, lsr);
     curr_rtt = timediff - dlsr*1/65535.0;
     if (curr_rtt < 1) {
         exp_smooth_val(curr_rtt, smooth_rtt, 0.80);

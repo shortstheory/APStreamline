@@ -50,14 +50,14 @@ struct ntp_time_t {
         return integral_time;
     }
 
-    gfloat calculate_difference(guint32 compressed_ntp_timestamp)
+    static gfloat calculate_difference(const ntp_time_t &ntp_time, guint32 compressed_ntp_timestamp)
     {
         guint32 compressed_second;
         gint32 compressed_fraction;
 
         // last 16 bits of second field, first 16 bits of fraction field
-        compressed_second = (second & 0x0000FFFF);
-        compressed_fraction = (fraction & 0xFFFF0000) >> 16;
+        compressed_second = (ntp_time.second & 0x0000FFFF);
+        compressed_fraction = (ntp_time.fraction & 0xFFFF0000) >> 16;
 
         guint32 ts_compressed_second;
         gint32 ts_compressed_fraction;
