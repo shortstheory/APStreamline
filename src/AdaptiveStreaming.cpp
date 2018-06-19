@@ -263,9 +263,16 @@ void AdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
             g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
             if (v4l2_cam_fd > 0) {
                 v4l2_control bitrate_ctrl;
+                v4l2_control veritcal_flip;
+
                 bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
                 bitrate_ctrl.value = bitrate*1000;
-                if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1) {
+
+                veritcal_flip.id = V4L2_CID_VFLIP;
+                veritcal_flip.value = FALSE;
+
+                if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
+                    ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &veritcal_flip) == -1) {
                     g_warning("ioctl fail :/");
                 }
             }
