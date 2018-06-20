@@ -5,6 +5,7 @@ int main(int argc, char *argv[])
 {
     string receiver_ip_addr;
     string dev;
+    string cam_type;
     // receiver_ip_addr = "192.168.0.102";
     // receiver_ip_addr = "10.42.0.56";
     // receiver_ip_addr = "192.168.1.2";
@@ -12,25 +13,29 @@ int main(int argc, char *argv[])
     if (argc == 1) {
         dev = "/dev/video0";
         receiver_ip_addr = "127.0.0.1";
+        cam_type = "raw";
     }
     else {
         dev = argv[1];
         receiver_ip_addr = argv[2];
+        cam_type = argv[3];
     }
 
     g_warning("Sending feed from %s to %s", dev.c_str(), receiver_ip_addr.c_str());
 
     gst_init(&argc, &argv);
-    // AdaptiveStreaming adaptiveStreaming;
-    AdaptiveStreaming adaptiveStreaming(dev, receiver_ip_addr, AdaptiveStreaming::CameraType::RAW_CAM);
-    adaptiveStreaming.play_pipeline();
-    // sleep(5);
-    // g_warning("Changing src");
-    // adaptiveStreaming.change_source("/dev/video1");
-    // // sleep(5);
-    GstBus* bus = adaptiveStreaming.get_pipeline_bus();
+    AdaptiveStreaming* adaptiveStreaming;
+    if (cam_type == "h264") {
+        adaptiveStreaming = new AdaptiveStreaming(dev, receiver_ip_addr, AdaptiveStreaming::CameraType::H264_CAM);
+    } else if (cam_type == "raw") {
+        adaptiveStreaming = new AdaptiveStreaming(dev, receiver_ip_addr, AdaptiveStreaming::CameraType::RAW_CAM);
+    } else {
+        g_warning("Camera type not recognised - use `raw` or `h264`");
+    }
+    adaptiveStreaming->play_pipeline();
+    GstBus* bus = adaptiveStreaming->get_pipeline_bus();
     GstMessage *msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE, static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
-
+    // delete adaptiveStreaming;
     // g_warning("done");
     return 0;
 }

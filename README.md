@@ -35,3 +35,23 @@ cd build
 sudo ninja install
 adaptive_streaming
 ```
+
+By default, port 5000 is used for sending RTP packets and port 5001 is used for sending and receiving RTCP packets.
+
+## Usage
+
+On installing `adaptive-streaming`, run it from the terminal as so:
+
+`adaptive_streaming /dev/video0 <RECEIVER_IP> raw`
+
+for software encoding and:
+
+`adaptive_streaming /dev/video0 <RECEIVER_IP> h264`
+
+for hardware encoding (recommended for the Raspberry Pi).
+
+For receiving the video stream, use the following `gst-launch` pipeline on the receiver:
+
+`gst-launch-1.0 -v rtpbin latency=0 name=rtpbin udpsrc caps="application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264,payload=96" port=5000 !  rtpbin.recv_rtp_sink_0 rtpbin. ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink udpsrc port=5001 ! rtpbin.recv_rtcp_sink_0 rtpbin.send_rtcp_src_0 ! udpsink port=5001 sync=false async=false host=<SENDER_IP>`
+
+Typically, this `gst-launch` command should be run on the receiver before streaming the video from the companion computer.
