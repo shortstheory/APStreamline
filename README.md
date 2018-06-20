@@ -44,13 +44,9 @@ On the Raspberry Pi, use `sudo modprobe bcm2835-v4l2` to load the V4L2 driver fo
 
 On installing `adaptive-streaming`, run it from the terminal as so:
 
-`adaptive_streaming /dev/video0 <RECEIVER_IP> raw`
+Software encoding - `adaptive_streaming /dev/video0 <RECEIVER_IP> raw`
 
-for software encoding and:
-
-`adaptive_streaming /dev/video0 <RECEIVER_IP> h264`
-
-for hardware encoding (recommended for the Raspberry Pi).
+Hardware encoding (recommended for the Raspberry Pi) - `adaptive_streaming /dev/video0 <RECEIVER_IP> h264`
 
 For receiving the video stream, use the following `gst-launch` pipeline on the receiver:
 
