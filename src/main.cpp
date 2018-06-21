@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     g_warning("Sending feed from %s to %s", dev.c_str(), receiver_ip_addr.c_str());
 
     gst_init(&argc, &argv);
-    UDPAdaptiveStreaming adaptiveStreaming;
+    UDPAdaptiveStreaming adaptiveStreaming(dev, GenericAdaptiveStreaming::CameraType::RAW_CAM, receiver_ip_addr);
     adaptiveStreaming.play_pipeline();
     GstBus* bus = adaptiveStreaming.get_pipeline_bus();
     // UDPAdaptiveStreaming* adaptiveStreaming;
