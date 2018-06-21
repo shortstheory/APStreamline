@@ -12,7 +12,6 @@ using namespace std;
 
 class RTSPAdaptiveStreaming : public GenericAdaptiveStreaming {
 private:
-    GstRTSPMediaFactory* media_factory;
     GstRTSPServer* rtsp_server;
     const string uri;
 
