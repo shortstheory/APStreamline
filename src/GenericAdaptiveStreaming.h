@@ -22,20 +22,13 @@ private:
     static const int max_bitrate = 8000;
     static const int min_bitrate = 50;
 
-    string device;
-
-    guint32 h264_bitrate;
-
     gint v4l2_cam_fd;
 
-
     string video_caps_string;
-
 
     // better off as a char array, change it later
     string video_presets[3];
     guint32 bitrate_presets[3];
-
 
     bool init_elements();
     void init_element_properties();
@@ -50,6 +43,8 @@ private:
     void degrade_quality();
 
 public:
+    string device;
+    guint32 h264_bitrate;
     GstElement* pipeline;
     GstElement* v4l2_src;
     GstElement* src_capsfilter;
@@ -62,11 +57,12 @@ public:
     enum CameraType {RAW_CAM, H264_CAM};
     const CameraType camera_type;
 
+    // GenericAdaptiveStreaming();
     GenericAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM);
-    ~GenericAdaptiveStreaming();
+    // ~GenericAdaptiveStreaming();
 
     void adapt_stream();
-    virtual bool link_all_elements() = 0;
+    // virtual bool link_all_elements() = 0;
     bool play_pipeline();
     bool pause_pipeline();
     bool change_source(string _device);

@@ -1,14 +1,14 @@
 #include "UDPAdaptiveStreaming.h"
 
-UDPAdaptiveStreaming::UDPAdaptiveStreaming(string _device, string _ip_addr, CameraType type,
+UDPAdaptiveStreaming::UDPAdaptiveStreaming(string _device, CameraType type, string _ip_addr, 
                                             gint _video_port, gint _rtcp_port) : 
                                             GenericAdaptiveStreaming(device, type), 
                                             receiver_ip_addr(_ip_addr), video_sink_port(_video_port), 
                                             rtcp_port(_rtcp_port)
 {
-    init_rtp_elements();
-    init_rtp_element_properties();
-    pipeline_add_rtp_elements();
+    // init_rtp_elements();
+    // init_rtp_element_properties();
+    // pipeline_add_rtp_elements();
 }
 
 bool UDPAdaptiveStreaming::init_rtp_elements()
@@ -78,7 +78,7 @@ bool UDPAdaptiveStreaming::link_all_elements()
 void UDPAdaptiveStreaming::static_callback(GstElement *src, GstBuffer *buf, gpointer data)
 {
     if (data != nullptr) {
-        GenericAdaptiveStreaming* ptr = (GenericAdaptiveStreaming*)data;
+        UDPAdaptiveStreaming* ptr = (UDPAdaptiveStreaming*)data;
         g_warning("h264val - %d", ptr->h264_bitrate);
         ptr->rtcp_callback(src, buf);
     }
@@ -89,7 +89,7 @@ void UDPAdaptiveStreaming::static_callback(GstElement *src, GstBuffer *buf, gpoi
 void UDPAdaptiveStreaming::static_rtp_callback(GstElement* src, GstBuffer* buf, gpointer data)
 {
     if (data != nullptr) {
-        GenericAdaptiveStreaming* ptr = (GenericAdaptiveStreaming*)data;
+        UDPAdaptiveStreaming* ptr = (UDPAdaptiveStreaming*)data;
         ptr->rtp_callback(src, buf);
     }
 }

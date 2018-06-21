@@ -6,8 +6,14 @@
 #include <unistd.h>
 #include <stdio.h>
 
+// GenericAdaptiveStreaming::GenericAdaptiveStreaming() : camera_type(CameraType::RAW_CAM)
+// {
+//     g_warning("noparmctr");
+// }
+
 GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType type) : device(_device), camera_type(type)
 {
+    g_warning("param ctr");
     if (camera_type == CameraType::RAW_CAM) {
         video_presets[ResolutionPresets::LOW] = "video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1";
         video_presets[ResolutionPresets::MED] = "video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1";
@@ -34,10 +40,10 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
 }
 
 //unreffing pointers which are null can be dangerous, check this
-GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
-{
-    gst_element_set_state(pipeline, GST_STATE_NULL);
-    gst_object_unref(pipeline);
+// GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
+// {
+//     gst_element_set_state(pipeline, GST_STATE_NULL);
+//     gst_object_unref(pipeline);
     // gst_object_unref(v4l2_src);
     // gst_object_unref(video_udp_sink);
     // gst_object_unref(h264_encoder);
@@ -45,7 +51,7 @@ GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
     // gst_object_unref(rtpbin);
     // gst_object_unref(rr_rtcp_identity);
     // gst_object_unref(sr_rtcp_identity);
-}
+// }
 
 bool GenericAdaptiveStreaming::init_elements()
 {

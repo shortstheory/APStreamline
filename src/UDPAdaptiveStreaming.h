@@ -21,7 +21,7 @@ private:
     string rtcp_caps_string;
 
     bool init_rtp_elements();
-    bool link_all_elements() override;
+    bool link_all_elements();
 
     void init_rtp_element_properties();
     void pipeline_add_rtp_elements();
@@ -32,9 +32,9 @@ private:
     static void static_rtp_callback(GstElement *src, GstBuffer *buf, gpointer data);
 
 public:
-    UDPAdaptiveStreaming(string _device = "/dev/video0", string _ip_addr = "127.0.0.1",
-                      CameraType type = CameraType::RAW_CAM, gint _video_port = 5000,
-                      gint _rtcp_port = 5001);
+    UDPAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM,
+                        string _ip_addr = "127.0.0.1", gint _video_port = 5000,
+                        gint _rtcp_port = 5001);
 };
 
 #endif
