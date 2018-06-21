@@ -57,12 +57,12 @@ public:
     enum CameraType {RAW_CAM, H264_CAM};
     const CameraType camera_type;
 
-    // GenericAdaptiveStreaming();
     GenericAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM);
-    // ~GenericAdaptiveStreaming();
+
+    virtual ~GenericAdaptiveStreaming();
+    virtual bool link_all_elements() = 0;
 
     void adapt_stream();
-    // virtual bool link_all_elements() = 0;
     bool play_pipeline();
     bool pause_pipeline();
     bool change_source(string _device);

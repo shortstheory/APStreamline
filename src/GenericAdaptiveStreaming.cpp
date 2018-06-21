@@ -40,10 +40,10 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
 }
 
 //unreffing pointers which are null can be dangerous, check this
-// GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
-// {
-//     gst_element_set_state(pipeline, GST_STATE_NULL);
-//     gst_object_unref(pipeline);
+GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
+{
+    gst_element_set_state(pipeline, GST_STATE_NULL);
+    gst_object_unref(pipeline);
     // gst_object_unref(v4l2_src);
     // gst_object_unref(video_udp_sink);
     // gst_object_unref(h264_encoder);
@@ -51,7 +51,7 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     // gst_object_unref(rtpbin);
     // gst_object_unref(rr_rtcp_identity);
     // gst_object_unref(sr_rtcp_identity);
-// }
+}
 
 bool GenericAdaptiveStreaming::init_elements()
 {
@@ -197,12 +197,16 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {
     g_warning("RES CHANGE! %d ", setting);
+ 
     string caps_filter_string;
     caps_filter_string = video_presets[setting];
     set_encoding_bitrate(bitrate_presets[setting]);
+ 
     current_res = setting;
     GstCaps* src_caps;
+ 
     src_caps = gst_caps_from_string(caps_filter_string.c_str());
+ 
     g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
     gst_caps_unref(src_caps);
 }

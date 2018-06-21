@@ -3,12 +3,16 @@
 UDPAdaptiveStreaming::UDPAdaptiveStreaming(string _device, CameraType type, string _ip_addr, 
                                             gint _video_port, gint _rtcp_port) : 
                                             receiver_ip_addr(_ip_addr), video_sink_port(_video_port), 
-                                            rtcp_port(_rtcp_port)//, GenericAdaptiveStreaming(device, type)
+                                            rtcp_port(_rtcp_port), GenericAdaptiveStreaming(_device, type)
 {
     init_rtp_elements();
     init_rtp_element_properties();
     pipeline_add_rtp_elements();
     link_all_elements();
+}
+
+UDPAdaptiveStreaming::~UDPAdaptiveStreaming()
+{
 }
 
 bool UDPAdaptiveStreaming::init_rtp_elements()
