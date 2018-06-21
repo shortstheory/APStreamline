@@ -1,5 +1,4 @@
 #include "UDPAdaptiveStreaming.h"
-#include "RTSPAdaptiveStreaming.h"
 #include <unistd.h>
 
 int main(int argc, char *argv[])
@@ -34,7 +33,7 @@ int main(int argc, char *argv[])
     } else if (cam_type == "raw") {
         adaptiveStreaming = new UDPAdaptiveStreaming(dev, GenericAdaptiveStreaming::CameraType::RAW_CAM, receiver_ip_addr);
     } else {
-        g_warning("Camera type not recogGenericAdaptiveStreamingnised - use `raw` or `h264`");
+        g_warning("Camera type not recognised - use `raw` or `h264`");
     }
     adaptiveStreaming->play_pipeline();
     GstBus* bus = adaptiveStreaming->get_pipeline_bus();

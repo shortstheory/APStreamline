@@ -5,6 +5,8 @@
 #include <gst/gst.h>
 #include <gst/rtp/gstrtcpbuffer.h>
 #include <gst/rtsp-server/rtsp-server.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 using namespace std;
 
