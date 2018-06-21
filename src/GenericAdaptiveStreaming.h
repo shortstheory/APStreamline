@@ -16,9 +16,6 @@ class GenericAdaptiveStreaming {
 private:
     enum ResolutionPresets {LOW, MED, HIGH} current_res;
 
-    const gint video_sink_port;
-    const gint rtcp_port;
-
     const int bitrate_inc = 250;
     const int bitrate_dec = 1000;
 
@@ -26,7 +23,6 @@ private:
     static const int min_bitrate = 50;
 
     string device;
-    const string receiver_ip_addr;
 
     guint32 h264_bitrate;
 
@@ -39,16 +35,9 @@ private:
     GstElement* h264_encoder;
     GstElement* h264_parser;
     GstElement* rtph264_payloader;
-    GstElement* rtpbin;
-    GstElement* rtp_identity;
-    GstElement* rr_rtcp_identity;
-    GstElement* sr_rtcp_identity;
-    GstElement* video_udp_sink;
-    GstElement* rtcp_udp_sink;
-    GstElement* rtcp_udp_src;
 
     string video_caps_string;
-    string rtcp_caps_string;
+
     QoSEstimator qos_estimator;
 
     // better off as a char array, change it later
@@ -57,8 +46,9 @@ private:
 
     bool init_elements();
     void init_element_properties();
-    void pipeline_add_elements();
-    bool link_all_elements();
+    virtual void pipeline_add_elements();
+    virtual bool link_all_elements();
+
     void rtcp_callback(GstElement* src, GstBuffer *buf);
     void rtp_callback(GstElement* src, GstBuffer* buf);
     void adapt_stream();
@@ -77,11 +67,9 @@ public:
     enum CameraType {RAW_CAM, H264_CAM};
     const CameraType camera_type;
 
-    GenericAdaptiveStreaming(string _device = "/dev/video0", string _ip_addr = "127.0.0.1",
-                      CameraType type = CameraType::RAW_CAM, gint _video_port = 5000,
-                      gint _rtcp_port = 5001);
-
+    GenericAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM);
     ~GenericAdaptiveStreaming();
+
     bool play_pipeline();
     bool pause_pipeline();
     bool change_source(string _device);

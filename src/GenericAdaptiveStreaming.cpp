@@ -6,10 +6,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, string _ip_addr, CameraType type,
-                                     gint _video_port, gint _rtcp_port) :
-    device(_device), receiver_ip_addr(_ip_addr), camera_type(type),
-    video_sink_port(_video_port), rtcp_port(_rtcp_port)
+GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType type) : device(_device), camera_type(type)
 {
     if (camera_type == CameraType::RAW_CAM) {
         video_presets[ResolutionPresets::LOW] = "video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1";
@@ -55,6 +52,7 @@ bool GenericAdaptiveStreaming::init_elements()
 {
     pipeline = gst_pipeline_new("adaptive-pipeline");
     src_capsfilter = gst_element_factory_make("capsfilter", NULL);
+    
     // choose encoder according to ctr next time
     h264_parser = gst_element_factory_make("h264parse", NULL);
     v4l2_src = gst_element_factory_make("v4l2src", NULL);
