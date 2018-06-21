@@ -29,9 +29,9 @@ int main(int argc, char *argv[])
     // GstBus* bus = adaptiveStreaming.get_pipeline_bus();
     UDPAdaptiveStreaming* adaptiveStreaming;
     if (cam_type == "h264") {
-        adaptiveStreaming = new UDPAdaptiveStreaming(dev, receiver_ip_addr, GenericAdaptiveStreaming::CameraType::H264_CAM);
+        adaptiveStreaming = new UDPAdaptiveStreaming(dev, GenericAdaptiveStreaming::CameraType::H264_CAM, receiver_ip_addr);
     } else if (cam_type == "raw") {
-        adaptiveStreaming = new UDPAdaptiveStreaming(dev, receiver_ip_addr, GenericAdaptiveStreaming::CameraType::RAW_CAM);
+        adaptiveStreaming = new UDPAdaptiveStreaming(dev, GenericAdaptiveStreaming::CameraType::RAW_CAM, receiver_ip_addr);
     } else {
         g_warning("Camera type not recogGenericAdaptiveStreamingnised - use `raw` or `h264`");
     }
