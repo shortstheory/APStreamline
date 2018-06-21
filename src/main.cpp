@@ -24,11 +24,11 @@ int main(int argc, char *argv[])
     g_warning("Sending feed from %s to %s", dev.c_str(), receiver_ip_addr.c_str());
 
     gst_init(&argc, &argv);
-    GenericAdaptiveStreaming* adaptiveStreaming;
+    UDPAdaptiveStreaming* adaptiveStreaming;
     if (cam_type == "h264") {
-        adaptiveStreaming = new GenericAdaptiveStreaming(dev, receiver_ip_addr, GenericAdaptiveStreaming::CameraType::H264_CAM);
+        adaptiveStreaming = new UDPAdaptiveStreaming(dev, receiver_ip_addr, GenericAdaptiveStreaming::CameraType::H264_CAM);
     } else if (cam_type == "raw") {
-        adaptiveStreaming = new GenericAdaptiveStreaming(dev, receiver_ip_addr, GenericAdaptiveStreaming::CameraType::RAW_CAM);
+        adaptiveStreaming = new UDPAdaptiveStreaming(dev, receiver_ip_addr, GenericAdaptiveStreaming::CameraType::RAW_CAM);
     } else {
         g_warning("Camera type not recognised - use `raw` or `h264`");
     }
