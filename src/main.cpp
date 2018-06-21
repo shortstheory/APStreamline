@@ -1,4 +1,4 @@
-#include "AdaptiveStreaming.h"
+#include "GenericAdaptiveStreaming.h"
 #include <unistd.h>
 
 int main(int argc, char *argv[])
@@ -24,11 +24,11 @@ int main(int argc, char *argv[])
     g_warning("Sending feed from %s to %s", dev.c_str(), receiver_ip_addr.c_str());
 
     gst_init(&argc, &argv);
-    AdaptiveStreaming* adaptiveStreaming;
+    GenericAdaptiveStreaming* adaptiveStreaming;
     if (cam_type == "h264") {
-        adaptiveStreaming = new AdaptiveStreaming(dev, receiver_ip_addr, AdaptiveStreaming::CameraType::H264_CAM);
+        adaptiveStreaming = new GenericAdaptiveStreaming(dev, receiver_ip_addr, GenericAdaptiveStreaming::CameraType::H264_CAM);
     } else if (cam_type == "raw") {
-        adaptiveStreaming = new AdaptiveStreaming(dev, receiver_ip_addr, AdaptiveStreaming::CameraType::RAW_CAM);
+        adaptiveStreaming = new GenericAdaptiveStreaming(dev, receiver_ip_addr, GenericAdaptiveStreaming::CameraType::RAW_CAM);
     } else {
         g_warning("Camera type not recognised - use `raw` or `h264`");
     }
