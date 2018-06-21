@@ -54,11 +54,7 @@ bool UDPAdaptiveStreaming::link_all_elements()
             return false;
         }
     }
-    else if (camera_type == CameraType::H264_CAM) { (link_all_elements()) {
-    //     g_warning("goodlink");
-    // } else {
-    //     g_warning("bad link");
-    // }
+    else if (camera_type == CameraType::H264_CAM) {
         if (!(gst_element_link_many(v4l2_src, src_capsfilter, h264_parser, rtph264_payloader, NULL) &&
               gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
             return false;
@@ -79,7 +75,7 @@ bool UDPAdaptiveStreaming::link_all_elements()
     return false;
 }
 
-void GenericAdaptiveStreaming::static_callback(GstElement *src, GstBuffer *buf, gpointer data)
+void UDPAdaptiveStreaming::static_callback(GstElement *src, GstBuffer *buf, gpointer data)
 {
     if (data != nullptr) {
         GenericAdaptiveStreaming* ptr = (GenericAdaptiveStreaming*)data;
@@ -90,7 +86,7 @@ void GenericAdaptiveStreaming::static_callback(GstElement *src, GstBuffer *buf, 
     // ptr->rtcp_callback(src, buf, data);
 }
 
-void GenericAdaptiveStreaming::static_rtp_callback(GstElement* src, GstBuffer* buf, gpointer data)
+void UDPAdaptiveStreaming::static_rtp_callback(GstElement* src, GstBuffer* buf, gpointer data)
 {
     if (data != nullptr) {
         GenericAdaptiveStreaming* ptr = (GenericAdaptiveStreaming*)data;
@@ -98,7 +94,7 @@ void GenericAdaptiveStreaming::static_rtp_callback(GstElement* src, GstBuffer* b
     }
 }
 
-void GenericAdaptiveStreaming::rtp_callback(GstElement* src, GstBuffer* buf)
+void UDPAdaptiveStreaming::rtp_callback(GstElement* src, GstBuffer* buf)
 {
     guint32 buffer_size;
     buffer_size = gst_buffer_get_size(buf);
@@ -106,7 +102,7 @@ void GenericAdaptiveStreaming::rtp_callback(GstElement* src, GstBuffer* buf)
     qos_estimator.estimate_encoding_rate(buffer_size);
 }
 
-void GenericAdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
+void UDPAdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
 {
     // g_warning("BuffSize: %lu", gst_buffer_get_size(buf));
     // find the right way around using mallocs
