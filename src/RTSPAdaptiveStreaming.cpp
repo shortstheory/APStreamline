@@ -5,7 +5,11 @@
 RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device, CameraType type, string _uri, GstRTSPServer* server): 
                                             GenericAdaptiveStreaming(_device, type), uri(_uri), rtsp_server(server)
 {
-    link_all_elements();
+    if (link_all_elements()) {
+        g_warning("GOOdlink:)");
+    } else {
+        g_warning("jail link");
+    }
     init_media_factory();
 }
 
@@ -44,22 +48,18 @@ void RTSPAdaptiveStreaming::init_media_factory()
 
 GstElement* RTSPAdaptiveStreaming::create_custom_pipeline(GstRTSPMediaFactory * factory, const GstRTSPUrl  *url)
 {
-    GstElement* pipeline = gst_pipeline_new ("test-pipeline");
-    GstElement* source = gst_element_factory_make ("v4l2src", "source");
-    GstElement* enc = gst_element_factory_make("x264enc", "enc");
-    GstElement* h264p = gst_element_factory_make("h264parse", "h264p");
-    GstElement* rtph264 = gst_element_factory_make("rtph264pay", "pay0");    
-    g_warning("callhere");
-    g_object_set(G_OBJECT(enc), "tune", 0x00000004, "bitrate", 1000, NULL);
-    gst_bin_add_many (GST_BIN (pipeline), source, enc, h264p, rtph264, NULL);
-    gst_element_link_many (source, enc, h264p, rtph264, NULL);
-    return pipeline;
-    // RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)GST_RTSP_MEDIA_FACTORY_GET_CLASS(factory)->_gst_reserved[0];
-    // if (ptr == NULL) {
-    //     g_warning("FUCKKEKKE");
-    // } else {
-    //     string x = ptr->geturi();
-    //     g_warning("Should work %s", x.c_str());
-    // }
-    // return (GstElement*)ptr->pipeline;
+    // GstElement* pipeline = gst_element_factory_make ("pipeline", NULL);
+    // GstElement* source = gst_element_factory_make ("v4l2src", "source");
+    // GstElement* enc = gst_element_factory_make("x264enc", "enc");
+    // GstElement* h264p = gst_element_factory_make("h264parse", "h264p");
+    // GstElement* rtph264 = gst_element_factory_make("rtph264pay", "pay0");    
+    // g_warning("callhere");
+    // g_object_set(G_OBJECT(enc), "tune", 0x00000004, "bitrate", 1000, NULL);
+    // gst_bin_add_many (GST_BIN (pipeline), source, enc, h264p, rtph264, NULL);
+    // gst_element_link_many (source, enc, h264p, rtph264, NULL);
+    // return pipeline;
+    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)GST_RTSP_MEDIA_FACTORY_GET_CLASS(factory)->_gst_reserved[0];    
+    // string x = ptr->geturi();
+    g_warning("Should work ");//, x.c_str());
+    return (GstElement*)ptr->pipeline;
 }
