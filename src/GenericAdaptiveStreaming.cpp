@@ -26,12 +26,11 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     init_elements();
     init_element_properties();
     pipeline_add_elements();
-    if (link_all_elements()) {
-        g_warning("goodlink");
-    }
-    else {
-        g_warning("bad link");
-    }
+    // if (link_all_elements()) {
+    //     g_warning("goodlink");
+    // } else {
+    //     g_warning("bad link");
+    // }
 }
 
 //unreffing pointers which are null can be dangerous, check this
@@ -65,17 +64,8 @@ bool GenericAdaptiveStreaming::init_elements()
     }
 
     rtph264_payloader = gst_element_factory_make("rtph264pay", NULL);
-    rtpbin = gst_element_factory_make("rtpbin", NULL);
-    rtp_identity = gst_element_factory_make("identity", NULL);
-    rr_rtcp_identity = gst_element_factory_make("identity", NULL);
-    sr_rtcp_identity = gst_element_factory_make("identity", NULL);
-    rtcp_udp_src = gst_element_factory_make("udpsrc", NULL);
-    video_udp_sink = gst_element_factory_make("udpsink", NULL);
-    rtcp_udp_sink = gst_element_factory_make("udpsink", NULL);
 
-    if (!pipeline && !src_capsfilter && !rtph264_payloader && !rtpbin && !rr_rtcp_identity
-        && !sr_rtcp_identity && !rtcp_udp_src && !video_udp_sink && !rtcp_udp_sink
-        && !rtp_identity && !h264_parser && !v4l2_src) {
+    if (!pipeline && !src_capsfilter && !rtph264_payloader && !h264_parser && !v4l2_src) {
         if (camera_type == CameraType::RAW_CAM && !h264_encoder) {
             return false;
         }
@@ -95,55 +85,16 @@ void GenericAdaptiveStreaming::init_element_properties()
     else if (camera_type == CameraType::H264_CAM) {
         // g_object_set(G_OBJECT(H264_CAM_src), "bitrate", 1000000, NULL);
     }
-    g_object_set(G_OBJECT(rtpbin), "latency", 0, NULL);
-    g_object_set(G_OBJECT(video_udp_sink), "host", receiver_ip_addr.c_str(),
-                 "port", video_sink_port, NULL);
-    g_object_set(G_OBJECT(rtcp_udp_sink), "host", receiver_ip_addr.c_str(),
-                 "port", rtcp_port, NULL);
-    g_object_set(G_OBJECT(rtcp_udp_src), "caps", gst_caps_from_string("application/x-rtcp"),
-                 "port", rtcp_port, NULL);
 }
 
 void GenericAdaptiveStreaming::pipeline_add_elements()
 {
-    gst_bin_add_many(GST_BIN(pipeline), v4l2_src, src_capsfilter, rtph264_payloader, h264_parser,
-                     rtpbin, rtp_identity, rr_rtcp_identity, sr_rtcp_identity, video_udp_sink,
-                     rtcp_udp_sink, rtcp_udp_src, NULL);
+    gst_bin_add_many(GST_BIN(pipeline), v4l2_src, src_capsfilter, rtph264_payloader, h264_parser, NULL);
     if (camera_type == CameraType::RAW_CAM) {
         gst_bin_add_many(GST_BIN(pipeline), h264_encoder, videoconvert, NULL);
     }
     else if (camera_type == CameraType::H264_CAM) {
     }
-}
-
-bool GenericAdaptiveStreaming::link_all_elements()
-{
-    // first link all the elements with autoplugging
-    if (camera_type == CameraType::RAW_CAM) {
-        if (!(gst_element_link_many(v4l2_src, src_capsfilter, videoconvert, h264_encoder, h264_parser, rtph264_payloader, NULL) &&
-              gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
-            return false;
-        }
-    }
-    else if (camera_type == CameraType::H264_CAM) {
-        if (!(gst_element_link_many(v4l2_src, src_capsfilter, h264_parser, rtph264_payloader, NULL) &&
-              gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
-            return false;
-        }
-    }
-    if (!gst_pad_link(gst_element_get_static_pad(rr_rtcp_identity,"src"), gst_element_get_request_pad(rtpbin, "recv_rtcp_sink_%u"))
-        && !gst_pad_link(gst_element_get_static_pad(rtph264_payloader,"src"), gst_element_get_request_pad(rtpbin, "send_rtp_sink_%u"))
-        && !gst_pad_link(gst_element_get_request_pad(rtpbin, "send_rtcp_src_%u"), gst_element_get_static_pad(sr_rtcp_identity,"sink"))
-        && !gst_pad_link(gst_element_get_static_pad(sr_rtcp_identity,"src"), gst_element_get_static_pad(rtcp_udp_sink,"sink"))) {
-        gst_element_link_many(rtpbin, rtp_identity, video_udp_sink, NULL);
-        g_signal_connect(rtp_identity, "handoff", G_CALLBACK(static_rtp_callback), this);
-        g_signal_connect(rr_rtcp_identity, "handoff", G_CALLBACK(static_callback), this);
-        g_signal_connect(sr_rtcp_identity, "handoff", G_CALLBACK(static_callback), this);
-
-        //setup callbacks here
-        return true;
-    }
-    return false;
 }
 
 bool GenericAdaptiveStreaming::play_pipeline()
@@ -159,52 +110,6 @@ bool GenericAdaptiveStreaming::pause_pipeline()
 GstBus* GenericAdaptiveStreaming::get_pipeline_bus()
 {
     return gst_element_get_bus(pipeline);
-}
-
-void GenericAdaptiveStreaming::static_callback(GstElement *src, GstBuffer *buf, gpointer data)
-{
-    if (data != nullptr) {
-        GenericAdaptiveStreaming* ptr = (GenericAdaptiveStreaming*)data;
-        g_warning("h264val - %d", ptr->h264_bitrate);
-        ptr->rtcp_callback(src, buf);
-    }
-    // g_warning("Received rtcp");
-    // ptr->rtcp_callback(src, buf, data);
-}
-
-void GenericAdaptiveStreaming::static_rtp_callback(GstElement* src, GstBuffer* buf, gpointer data)
-{
-    if (data != nullptr) {
-        GenericAdaptiveStreaming* ptr = (GenericAdaptiveStreaming*)data;
-        ptr->rtp_callback(src, buf);
-    }
-}
-
-void GenericAdaptiveStreaming::rtp_callback(GstElement* src, GstBuffer* buf)
-{
-    guint32 buffer_size;
-    buffer_size = gst_buffer_get_size(buf);
-    qos_estimator.estimate_rtp_pkt_size(buffer_size);
-    qos_estimator.estimate_encoding_rate(buffer_size);
-}
-
-void GenericAdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
-{
-    // g_warning("BuffSize: %lu", gst_buffer_get_size(buf));
-    // find the right way around using mallocs
-    GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
-    rtcp_buffer->buffer = NULL;
-    gst_rtcp_buffer_map(buf, GST_MAP_READ, rtcp_buffer);
-    GstRTCPPacket *packet = (GstRTCPPacket*)malloc(sizeof(GstRTCPPacket));
-    gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
-    //same buffer can have an SDES and an RTCP pkt
-    while (more) {
-        qos_estimator.handle_rtcp_packet(packet);
-        adapt_stream();
-        more = gst_rtcp_packet_move_to_next(packet);
-    }
-    free(rtcp_buffer);
-    free(packet);
 }
 
 void GenericAdaptiveStreaming::adapt_stream()

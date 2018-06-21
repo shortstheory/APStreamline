@@ -44,13 +44,12 @@ private:
     string video_presets[3];
     guint32 bitrate_presets[3];
 
+    virtual bool link_all_elements() = 0;
+
     bool init_elements();
     void init_element_properties();
-    virtual void pipeline_add_elements();
-    virtual bool link_all_elements();
+    void pipeline_add_elements();
 
-    void rtcp_callback(GstElement* src, GstBuffer *buf);
-    void rtp_callback(GstElement* src, GstBuffer* buf);
     void adapt_stream();
     void set_encoding_bitrate(guint32 bitrate);
     void set_resolution(ResolutionPresets setting);
@@ -59,9 +58,6 @@ private:
 
     void improve_quality();
     void degrade_quality();
-
-    static void static_callback(GstElement *src, GstBuffer *buf, gpointer data);
-    static void static_rtp_callback(GstElement *src, GstBuffer *buf, gpointer data);
 
 public:
     enum CameraType {RAW_CAM, H264_CAM};
