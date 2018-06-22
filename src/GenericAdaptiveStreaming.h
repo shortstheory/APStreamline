@@ -14,8 +14,6 @@ using namespace std;
 
 class GenericAdaptiveStreaming {
 private:
-    enum ResolutionPresets {LOW, MED, HIGH} current_res;
-
     const int bitrate_inc = 250;
     const int bitrate_dec = 1000;
 
@@ -32,7 +30,6 @@ private:
 
 
     void set_encoding_bitrate(guint32 bitrate);
-    void set_resolution(ResolutionPresets setting);
     void increase_resolution();
     void decrease_resolution();
 
@@ -40,6 +37,7 @@ private:
     void degrade_quality();
 
 public:
+    enum ResolutionPresets {LOW, MED, HIGH} current_res;
     string device;
     guint32 h264_bitrate;
     GstElement* pipeline;
@@ -63,6 +61,7 @@ public:
     void init_element_properties();
     void pipeline_add_elements();
 
+    void set_resolution(ResolutionPresets setting);
     void adapt_stream();
     bool play_pipeline();
     bool pause_pipeline();

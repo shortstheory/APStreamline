@@ -94,6 +94,20 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
 {
     GstElement* e = gst_rtsp_media_get_element(media);
     GstElement* parent = (GstElement*)gst_object_get_parent(GST_OBJECT(e));
+    g_warning("got parent!");
+    GstElement* pipeline = gst_bin_get_by_name(GST_BIN(parent), "pipeline0");
+    h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), "x264enc0");
+    src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter0");
+    // GList* list = GST_BIN_CHILDREN(pipeline);
+    // GList* l;
+    // int i = 0;
+    // for (l = list; l != NULL; l = l->next)
+    // {
+    // e = (GstElement*)l->data;
+    // char* str = gst_element_get_name(e);
+    // g_warning("element name = %s %d", str, i++);
+    // }
+    set_resolution(ResolutionPresets::LOW);
     rtpbin = gst_bin_get_by_name(GST_BIN(parent), "rtpbin0");
     multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), "multiudpsink0");
     add_rtpbin_probes();
