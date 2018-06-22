@@ -82,7 +82,13 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes()
     rtcp_rr_pad = gst_element_get_static_pad(rtpbin, "recv_rtcp_sink_0");
     rtcp_sr_pad = gst_element_get_static_pad(rtpbin, "send_rtcp_src_0");
     rtp_pad = gst_element_get_static_pad(rtpbin, "send_rtp_sink_0");
+    gst_pad_add_probe(rtcp_rr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
+    gst_pad_add_probe(rtcp_sr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
+    gst_pad_add_probe(rtp_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtp_callback, this, NULL);
 
+    g_object_unref(rtcp_rr_pad);
+    g_object_unref(rtcp_sr_pad);
+    g_object_unref(rtp_pad);
     // GList* pads = GST_ELEMENT_PADS(rtpbin);
     // GstPad* p;
     // GList* l;
@@ -94,4 +100,50 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes()
     //     g_warning("rtpbinpad name = %s", str);
     //     // if ()
     // }
+}
+
+GstPadProbeReturn RTSPAdaptiveStreaming::static_rtcp_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
+{
+    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    return ptr->rtcp_callback(pad, info);
+}
+
+GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeInfo* info)
+{
+    GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
+    if (buf != nullptr) {    
+        GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
+        rtcp_buffer->buffer = NULL;
+        gst_rtcp_buffer_map(buf, GST_MAP_READ, rtcp_buffer);
+        GstRTCPPacket *packet = (GstRTCPPacket*)malloc(sizeof(GstRTCPPacket));
+        gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
+        //same buffer can have an SDES and an RTCP pkt
+        while (more) {
+            qos_estimator.handle_rtcp_packet(packet);
+            adapt_stream();
+            more = gst_rtcp_packet_move_to_next(packet);
+        }
+        free(rtcp_buffer);
+        free(packet);
+    }
+    return GST_PAD_PROBE_OK;
+}
+
+GstPadProbeReturn RTSPAdaptiveStreaming::static_rtp_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
+{
+    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    return ptr->rtp_callback(pad, info);
+}
+
+GstPadProbeReturn RTSPAdaptiveStreaming::rtp_callback(GstPad* pad, GstPadProbeInfo* info)
+{
+    guint32 buffer_size;
+    GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
+    if (buf != nullptr) {
+        buffer_size = gst_buffer_get_size(buf);
+        g_warning("BUFFERSIZE %d", buffer_size);
+        qos_estimator.estimate_rtp_pkt_size(buffer_size);
+        qos_estimator.estimate_encoding_rate(buffer_size);
+    }
+    return GST_PAD_PROBE_OK;
 }

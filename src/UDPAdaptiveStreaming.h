@@ -28,8 +28,8 @@ private:
     void rtcp_callback(GstElement* src, GstBuffer *buf);
     void rtp_callback(GstElement* src, GstBuffer* buf);
 
-    static void static_callback(GstElement *src, GstBuffer *buf, gpointer data);
-    static void static_rtp_callback(GstElement *src, GstBuffer *buf, gpointer data);
+    static void static_callback(GstElement* src, GstBuffer* buf, gpointer data);
+    static void static_rtp_callback(GstElement* src, GstBuffer* buf, gpointer data);
 
 public:
     UDPAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM,
