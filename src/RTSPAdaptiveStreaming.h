@@ -14,6 +14,7 @@ class RTSPAdaptiveStreaming : public GenericAdaptiveStreaming {
 private:
     GstRTSPServer* rtsp_server;
     GstElement* rtpbin;
+    GstElement* multi_udp_sink;
     const string uri;
 
     bool link_all_elements() override;

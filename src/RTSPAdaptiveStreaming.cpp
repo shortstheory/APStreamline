@@ -70,6 +70,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     GstElement* e = gst_rtsp_media_get_element(media);
     GstElement* parent = (GstElement*)gst_object_get_parent(GST_OBJECT(e));
     rtpbin = gst_bin_get_by_name(GST_BIN(parent), "rtpbin0");
+    multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), "multiudpsink0");
     add_rtpbin_probes();
 }
 
@@ -81,7 +82,9 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes()
 
     rtcp_rr_pad = gst_element_get_static_pad(rtpbin, "recv_rtcp_sink_0");
     rtcp_sr_pad = gst_element_get_static_pad(rtpbin, "send_rtcp_src_0");
-    rtp_pad = gst_element_get_static_pad(rtpbin, "send_rtp_sink_0");
+    // rtp_pad = gst_element_get_static_pad(rtpbin, "send_rtp_src_0");
+    rtp_pad = gst_element_get_static_pad(multi_udp_sink, "sink");
+
     gst_pad_add_probe(rtcp_rr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
     gst_pad_add_probe(rtcp_sr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
     gst_pad_add_probe(rtp_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtp_callback, this, NULL);
@@ -141,9 +144,11 @@ GstPadProbeReturn RTSPAdaptiveStreaming::rtp_callback(GstPad* pad, GstPadProbeIn
     GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buf != nullptr) {
         buffer_size = gst_buffer_get_size(buf);
-        g_warning("BUFFERSIZE %d", buffer_size);
-        qos_estimator.estimate_rtp_pkt_size(buffer_size);
-        qos_estimator.estimate_encoding_rate(buffer_size);
+        if (buffer_size > 14) {
+            g_warning("BUFFERSIZE %d", buffer_size);
+            qos_estimator.estimate_rtp_pkt_size(buffer_size);
+            qos_estimator.estimate_encoding_rate(buffer_size);
+        }
     }
     return GST_PAD_PROBE_OK;
 }
