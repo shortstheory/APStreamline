@@ -59,7 +59,39 @@ void RTSPAdaptiveStreaming::static_media_constructed_callback(GstRTSPMediaFactor
     g_signal_connect(media, "prepared", G_CALLBACK(static_media_prepared_callback), data);
 }
 
-void RTSPAdaptiveStreaming::static_media_prepared_callback(GstRTSPMedia *gstrtspmedia, gpointer user_data)
+void RTSPAdaptiveStreaming::static_media_prepared_callback(GstRTSPMedia* media, gpointer data)
 {
+    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    ptr->media_prepared_callback(media);
+}
 
+void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
+{
+    GstElement* e = gst_rtsp_media_get_element(media);
+    GstElement* parent = (GstElement*)gst_object_get_parent(GST_OBJECT(e));
+    rtpbin = gst_bin_get_by_name(GST_BIN(parent), "rtpbin0");
+    add_rtpbin_probes();
+}
+
+void RTSPAdaptiveStreaming::add_rtpbin_probes()
+{
+    GstPad* rtcp_rr_pad;
+    GstPad* rtcp_sr_pad;
+    GstPad* rtp_pad;
+
+    rtcp_rr_pad = gst_element_get_static_pad(rtpbin, "recv_rtcp_sink_0");
+    rtcp_sr_pad = gst_element_get_static_pad(rtpbin, "send_rtcp_src_0");
+    rtp_pad = gst_element_get_static_pad(rtpbin, "send_rtp_sink_0");
+
+    // GList* pads = GST_ELEMENT_PADS(rtpbin);
+    // GstPad* p;
+    // GList* l;
+
+    // for (l = pads; l != NULL; l = l->next)
+    // {
+    //     p = (GstPad*)l->data;
+    //     char* str = gst_pad_get_name(p);
+    //     g_warning("rtpbinpad name = %s", str);
+    //     // if ()
+    // }
 }

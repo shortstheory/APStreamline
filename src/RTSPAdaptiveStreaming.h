@@ -13,15 +13,18 @@ using namespace std;
 class RTSPAdaptiveStreaming : public GenericAdaptiveStreaming {
 private:
     GstRTSPServer* rtsp_server;
+    GstElement* rtpbin;
     const string uri;
 
     bool link_all_elements() override;
     void init_media_factory();
+    void add_rtpbin_probes();
 
     static GstElement* create_custom_pipeline(GstRTSPMediaFactory * factory, const GstRTSPUrl  *url);
     static void static_media_constructed_callback(GstRTSPMediaFactory *media_factory, GstRTSPMedia *media, 
                                                 gpointer data);
-    static void static_media_prepared_callback(GstRTSPMedia *media, gpointer user_data);
+    static void static_media_prepared_callback(GstRTSPMedia* media, gpointer user_data);
+    void media_prepared_callback(GstRTSPMedia* media);
 
 public:
     RTSPAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM,
