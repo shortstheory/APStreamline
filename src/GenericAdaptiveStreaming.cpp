@@ -69,7 +69,7 @@ bool GenericAdaptiveStreaming::init_elements()
         // do nothing
     }
 
-    rtph264_payloader = gst_element_factory_make("rtph264pay", NULL);
+    rtph264_payloader = gst_element_factory_make("rtph264pay", "pay0");
 
     if (!pipeline && !src_capsfilter && !rtph264_payloader && !h264_parser && !v4l2_src) {
         if (camera_type == CameraType::RAW_CAM && !h264_encoder) {

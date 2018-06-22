@@ -49,9 +49,9 @@ void RTSPAdaptiveStreaming::init_media_factory()
 GstElement* RTSPAdaptiveStreaming::create_custom_pipeline(GstRTSPMediaFactory * factory, const GstRTSPUrl  *url)
 {
     // GstElement* pipeline = gst_element_factory_make ("pipeline", NULL);
-    // GstElement* source = gst_element_factory_make ("v4l2src", "source");
-    // GstElement* enc = gst_element_factory_make("x264enc", "enc");
-    // GstElement* h264p = gst_element_factory_make("h264parse", "h264p");
+    // GstElement* source = gst_element_factory_make ("v4l2src", NULL);
+    // GstElement* enc = gst_element_factory_make("x264enc", NULL);
+    // GstElement* h264p = gst_element_factory_make("h264parse", NULL);
     // GstElement* rtph264 = gst_element_factory_make("rtph264pay", "pay0");    
     // g_warning("callhere");
     // g_object_set(G_OBJECT(enc), "tune", 0x00000004, "bitrate", 1000, NULL);
@@ -59,7 +59,7 @@ GstElement* RTSPAdaptiveStreaming::create_custom_pipeline(GstRTSPMediaFactory * 
     // gst_element_link_many (source, enc, h264p, rtph264, NULL);
     // return pipeline;
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)GST_RTSP_MEDIA_FACTORY_GET_CLASS(factory)->_gst_reserved[0];    
-    // string x = ptr->geturi();
+    string x = ptr->geturi();
     g_warning("Should work ");//, x.c_str());
     return (GstElement*)ptr->pipeline;
 }
