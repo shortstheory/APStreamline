@@ -5,11 +5,11 @@
 RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device, CameraType type, string _uri, GstRTSPServer* server): 
                                             GenericAdaptiveStreaming(_device, type), uri(_uri), rtsp_server(server)
 {
-    if (link_all_elements()) {
-        g_warning("GOOdlink:)");
-    } else {
-        g_warning("jail link");
-    }
+    // if (link_all_elements()) {
+    //     g_warning("GOOdlink:)");
+    // } else {
+    //     g_warning("jail link");
+    // }
     init_media_factory();
 }
 
@@ -39,8 +39,12 @@ void RTSPAdaptiveStreaming::init_media_factory()
     media_factory = gst_rtsp_media_factory_new();
 
     // time for some naughty business!
-    GST_RTSP_MEDIA_FACTORY_GET_CLASS(media_factory)->_gst_reserved[0] = this;
-    GST_RTSP_MEDIA_FACTORY_GET_CLASS(media_factory)->create_element = create_custom_pipeline;
+    // GST_RTSP_MEDIA_FACTORY_GET_CLASS(media_factory)->_gst_reserved[0] = this;
+    // GST_RTSP_MEDIA_FACTORY_GET_CLASS(media_factory)->create_element = create_custom_pipeline;
+    string launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! " 
+                            " x264enc tune=zerolatency threads=4 bitrate=500 ! h264parse ! rtph264pay name=pay0";
+    gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
+
     gst_rtsp_mount_points_add_factory(mounts, uri.c_str(), media_factory);
     g_signal_connect(media_factory, "media-constructed", G_CALLBACK(static_media_constructed_callback), this);
     g_object_unref(mounts);
@@ -51,8 +55,25 @@ GstElement* RTSPAdaptiveStreaming::create_custom_pipeline(GstRTSPMediaFactory * 
 {
     g_warning("RECpipeline!");
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)GST_RTSP_MEDIA_FACTORY_GET_CLASS(factory)->_gst_reserved[0];    
-    g_warning("%s", ptr->device.c_str());
-    g_warning("%s", ptr->uri.c_str());
+    
+    GstElement* v4l2_src;
+    GstElement* src_capsfilter;
+    GstElement* videoconvert;
+    GstElement* h264_encoder;
+    GstElement* h264_parser;
+    GstElement* rtph264_payloader;
+
+    v4l2_src = gst_element_factory_make("v4l2src", NULL);
+    src_capsfilter = gst_element_factory_make("capsfilter", NULL);
+    videoconvert = gst_element_factory_make("videoconvert", NULL);
+    h264_parser = gst_element_factory_make("h264parse", NULL);
+    h264_encoder = gst_element_factory_make("x264enc", NULL);
+    rtph264_payloader = gst_element_factory_make("rtph264pay", "pay0");
+    g_object_set(G_OBJECT(v4l2_src), "device", ptr->device.c_str(), NULL);
+    g_object_set(G_OBJECT(h264_encoder), "tune", 0x00000004, "threads", 4, NULL);
+    // gst_bin_add_many(GST_BIN(pipeline), v4l2_src, src_capsfilter, rtph264_payloader, h264_parser, NULL);
+    // gst_bin_add_many(GST_BIN(pipeline), h264_encoder, videoconvert, NULL);
+
     return (GstElement*)ptr->pipeline;
 }
 
