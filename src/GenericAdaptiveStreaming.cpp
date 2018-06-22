@@ -120,12 +120,12 @@ void GenericAdaptiveStreaming::adapt_stream()
     QoSReport qos_report = qos_estimator.get_qos_report();
     // adapt according to the information in this report
     if (qos_report.get_fraction_lost() == 0) {
-        if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
+        //if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
             improve_quality();
-        }
-        else {
-            degrade_quality();
-        }
+        //}
+        // else {
+        //     degrade_quality();
+        // }
     }
     else {
         decrease_resolution();

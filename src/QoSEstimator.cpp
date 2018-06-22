@@ -112,7 +112,7 @@ void QoSEstimator::estimate_encoding_rate(const guint32 &pkt_size)
     guint64 curr_count = ntp_time_t::unix_time_to_ms(tv);
     if (curr_count - last_count > 1000) {
         encoding_bitrate = (bytes_transferred) * 8.0 / (float)(curr_count - last_count);
-        // g_warning("b %f", encoding_bitrate);
+        g_warning("ENCODINGBITRATE!!! %f", encoding_bitrate);
         prev_tv = tv;
         bytes_transferred = 0;
         exp_smooth_val(encoding_bitrate, smooth_enc_bitrate, 0.75);
