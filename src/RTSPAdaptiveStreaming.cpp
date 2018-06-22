@@ -42,6 +42,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
     GST_RTSP_MEDIA_FACTORY_GET_CLASS(media_factory)->_gst_reserved[0] = this;
     GST_RTSP_MEDIA_FACTORY_GET_CLASS(media_factory)->create_element = create_custom_pipeline;
     gst_rtsp_mount_points_add_factory(mounts, uri.c_str(), media_factory);
+    g_signal_connect(media_factory, "media-constructed", G_CALLBACK(static_media_constructed_callback), this);
     g_object_unref(mounts);
     // g_object_unref(media_factory);
 }
@@ -50,4 +51,15 @@ GstElement* RTSPAdaptiveStreaming::create_custom_pipeline(GstRTSPMediaFactory * 
 {
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)GST_RTSP_MEDIA_FACTORY_GET_CLASS(factory)->_gst_reserved[0];    
     return (GstElement*)ptr->pipeline;
+}
+
+void RTSPAdaptiveStreaming::static_media_constructed_callback(GstRTSPMediaFactory *media_factory, 
+                                                    GstRTSPMedia *media, gpointer data)
+{
+    g_signal_connect(media, "prepared", G_CALLBACK(static_media_prepared_callback), data);
+}
+
+void RTSPAdaptiveStreaming::static_media_prepared_callback(GstRTSPMedia *gstrtspmedia, gpointer user_data)
+{
+
 }
