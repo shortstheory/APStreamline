@@ -66,7 +66,7 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
 
     qos_report = QoSReport(fractionlost, estimated_bitrate, smooth_enc_bitrate, smooth_rtt, curr_buffer_occ);
 
-    g_warning("bw %f occ %f loss %d encode-Rate %f", bandwidth, curr_buffer_occ, fractionlost, smooth_enc_bitrate);
+    g_warning("bw %f occ %f loss %d encode-Rate %f h264enc %d", bandwidth, curr_buffer_occ, fractionlost, smooth_enc_bitrate);
 
     // g_warning("rtt %f rtpsize %f encode-Rate %f", smooth_rtt, rtp_size, smooth_enc_bitrate);
     // g_warning("    block         %llu", i);
