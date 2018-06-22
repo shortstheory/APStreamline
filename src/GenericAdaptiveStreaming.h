@@ -30,9 +30,6 @@ private:
     string video_presets[3];
     guint32 bitrate_presets[3];
 
-    bool init_elements();
-    void init_element_properties();
-    void pipeline_add_elements();
 
     void set_encoding_bitrate(guint32 bitrate);
     void set_resolution(ResolutionPresets setting);
@@ -61,6 +58,10 @@ public:
 
     virtual ~GenericAdaptiveStreaming();
     virtual bool link_all_elements() = 0;
+
+    bool init_elements();
+    void init_element_properties();
+    void pipeline_add_elements();
 
     void adapt_stream();
     bool play_pipeline();

@@ -29,9 +29,6 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     bitrate_presets[ResolutionPresets::MED] = 1500;
     bitrate_presets[ResolutionPresets::HIGH] = 3500;
 
-    init_elements();
-    init_element_properties();
-    pipeline_add_elements();
     // if (link_all_elements()) {
     //     g_warning("goodlink");
     // } else {

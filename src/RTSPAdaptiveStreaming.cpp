@@ -49,7 +49,10 @@ void RTSPAdaptiveStreaming::init_media_factory()
 
 GstElement* RTSPAdaptiveStreaming::create_custom_pipeline(GstRTSPMediaFactory * factory, const GstRTSPUrl  *url)
 {
+    g_warning("RECpipeline!");
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)GST_RTSP_MEDIA_FACTORY_GET_CLASS(factory)->_gst_reserved[0];    
+    g_warning("%s", ptr->device.c_str());
+    g_warning("%s", ptr->uri.c_str());
     return (GstElement*)ptr->pipeline;
 }
 
@@ -57,6 +60,7 @@ void RTSPAdaptiveStreaming::static_media_constructed_callback(GstRTSPMediaFactor
                                                     GstRTSPMedia *media, gpointer data)
 {
     g_signal_connect(media, "prepared", G_CALLBACK(static_media_prepared_callback), data);
+    g_signal_connect(media, "removed-stream", G_CALLBACK(fxn), NULL);
 }
 
 void RTSPAdaptiveStreaming::static_media_prepared_callback(GstRTSPMedia* media, gpointer data)

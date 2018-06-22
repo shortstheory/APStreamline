@@ -30,6 +30,10 @@ private:
     static void static_media_prepared_callback(GstRTSPMedia* media, gpointer user_data);
     static GstPadProbeReturn static_rtcp_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data);
     static GstPadProbeReturn static_rtp_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data);
+    static void fxn (GstRTSPMedia  *gstrtspmedia,GstRTSPStream *arg1,gpointer user_data)
+    {
+        g_warning("STATE CHANGE CHANGE CHANGE");
+    }
 
 public:
     RTSPAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM,

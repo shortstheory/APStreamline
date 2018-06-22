@@ -5,6 +5,10 @@ UDPAdaptiveStreaming::UDPAdaptiveStreaming(string _device, CameraType type, stri
                                             receiver_ip_addr(_ip_addr), video_sink_port(_video_port), 
                                             rtcp_port(_rtcp_port), GenericAdaptiveStreaming(_device, type)
 {
+    init_elements();
+    init_element_properties();
+    pipeline_add_elements();
+
     init_rtp_elements();
     init_rtp_element_properties();
     pipeline_add_rtp_elements();
