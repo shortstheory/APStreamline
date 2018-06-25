@@ -22,7 +22,6 @@ UDPAdaptiveStreaming::~UDPAdaptiveStreaming()
 bool UDPAdaptiveStreaming::init_rtp_elements()
 {
     rtpbin = gst_element_factory_make("rtpbin", NULL);
-    rtp_identity = gst_element_factory_make("identity", NULL);
     rr_rtcp_identity = gst_element_factory_make("identity", NULL);
     sr_rtcp_identity = gst_element_factory_make("identity", NULL);
     rtcp_udp_src = gst_element_factory_make("udpsrc", NULL);
@@ -30,7 +29,7 @@ bool UDPAdaptiveStreaming::init_rtp_elements()
     rtcp_udp_sink = gst_element_factory_make("udpsink", NULL);
 
     if (!rtpbin && !rr_rtcp_identity && !sr_rtcp_identity && !rtcp_udp_src && !video_udp_sink && 
-        !rtcp_udp_sink && !rtp_identity) {
+        !rtcp_udp_sink) {
         return false;
     }
     return true;
@@ -49,7 +48,7 @@ void UDPAdaptiveStreaming::init_rtp_element_properties()
 
 void UDPAdaptiveStreaming::pipeline_add_rtp_elements()
 {
-    gst_bin_add_many(GST_BIN(pipeline), rtpbin, rtp_identity, rr_rtcp_identity, 
+    gst_bin_add_many(GST_BIN(pipeline), rtpbin, rr_rtcp_identity, 
                     sr_rtcp_identity, video_udp_sink, rtcp_udp_sink, rtcp_udp_src, NULL);
 }
 
@@ -72,8 +71,7 @@ bool UDPAdaptiveStreaming::link_all_elements()
         && !gst_pad_link(gst_element_get_static_pad(rtph264_payloader,"src"), gst_element_get_request_pad(rtpbin, "send_rtp_sink_%u"))
         && !gst_pad_link(gst_element_get_request_pad(rtpbin, "send_rtcp_src_%u"), gst_element_get_static_pad(sr_rtcp_identity,"sink"))
         && !gst_pad_link(gst_element_get_static_pad(sr_rtcp_identity,"src"), gst_element_get_static_pad(rtcp_udp_sink,"sink"))) {
-        gst_element_link_many(rtpbin, rtp_identity, video_udp_sink, NULL);
-        g_signal_connect(rtp_identity, "handoff", G_CALLBACK(static_rtp_callback), this);
+        gst_element_link_many(rtpbin, video_udp_sink, NULL);
         g_signal_connect(rr_rtcp_identity, "handoff", G_CALLBACK(static_callback), this);
         g_signal_connect(sr_rtcp_identity, "handoff", G_CALLBACK(static_callback), this);
         gst_pad_add_probe(gst_element_get_static_pad(rtph264_payloader,"sink"), GST_PAD_PROBE_TYPE_BUFFER, static_rtph_callback, this, NULL);
@@ -93,22 +91,6 @@ void UDPAdaptiveStreaming::static_callback(GstElement *src, GstBuffer *buf, gpoi
     }
     // g_warning("Received rtcp");
     // ptr->rtcp_callback(src, buf, data);
-}
-
-void UDPAdaptiveStreaming::static_rtp_callback(GstElement* src, GstBuffer* buf, gpointer data)
-{
-    if (data != nullptr) {
-        UDPAdaptiveStreaming* ptr = (UDPAdaptiveStreaming*)data;
-        ptr->rtp_callback(src, buf);
-    }
-}
-
-void UDPAdaptiveStreaming::rtp_callback(GstElement* src, GstBuffer* buf)
-{
-    guint32 buffer_size;
-    buffer_size = gst_buffer_get_size(buf);
-    // qos_estimator.estimate_rtp_pkt_size(buffer_size);
-    // qos_estimator.estimate_encoding_rate(buffer_size);
 }
 
 void UDPAdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)

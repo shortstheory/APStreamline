@@ -12,7 +12,6 @@ private:
     const string receiver_ip_addr;
 
     GstElement* rtpbin;
-    GstElement* rtp_identity;
     GstElement* rr_rtcp_identity;
     GstElement* sr_rtcp_identity;
     GstElement* video_udp_sink;
@@ -26,10 +25,8 @@ private:
     void init_rtp_element_properties();
     void pipeline_add_rtp_elements();
     void rtcp_callback(GstElement* src, GstBuffer *buf);
-    void rtp_callback(GstElement* src, GstBuffer* buf);
 
     static void static_callback(GstElement* src, GstBuffer* buf, gpointer data);
-    static void static_rtp_callback(GstElement* src, GstBuffer* buf, gpointer data);
     static GstPadProbeReturn static_rtph_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
     {
         UDPAdaptiveStreaming* ptr = (UDPAdaptiveStreaming*)data;
