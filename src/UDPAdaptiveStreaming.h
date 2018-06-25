@@ -20,7 +20,7 @@ private:
     string rtcp_caps_string;
 
     bool init_rtp_elements();
-    bool link_all_elements() override;
+    bool link_all_elements();
 
     void init_rtp_element_properties();
     void pipeline_add_rtp_elements();

@@ -55,7 +55,6 @@ public:
     GenericAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM);
 
     virtual ~GenericAdaptiveStreaming();
-    virtual bool link_all_elements() = 0;
 
     bool init_elements();
     void init_element_properties();

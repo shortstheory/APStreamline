@@ -17,7 +17,6 @@ private:
     GstElement* multi_udp_sink;
     const string uri;
 
-    bool link_all_elements() override;
     void init_media_factory();
     void add_rtpbin_probes();
     void media_prepared_callback(GstRTSPMedia* media);

@@ -12,21 +12,6 @@ RTSPAdaptiveStreaming::~RTSPAdaptiveStreaming()
 {
 }
 
-bool RTSPAdaptiveStreaming::link_all_elements()
-{
-    if (camera_type == CameraType::RAW_CAM) {
-        if (!gst_element_link_many(v4l2_src, src_capsfilter, videoconvert, h264_encoder, h264_parser, rtph264_payloader, NULL)) {
-            return false;
-        }
-    }
-    else if (camera_type == CameraType::H264_CAM) {
-        if (!gst_element_link_many(v4l2_src, src_capsfilter, h264_parser, rtph264_payloader, NULL)) {
-            return false;
-        }
-    }
-    return true;
-}
-
 void RTSPAdaptiveStreaming::init_media_factory()
 {
     GstRTSPMediaFactory* media_factory;
@@ -34,9 +19,6 @@ void RTSPAdaptiveStreaming::init_media_factory()
     mounts = gst_rtsp_server_get_mount_points(rtsp_server);
     media_factory = gst_rtsp_media_factory_new();
 
-    // time for some naughty business!
-    // GST_RTSP_MEDIA_FACTORY_GET_CLASS(media_factory)->_gst_reserved[0] = this;
-    // GST_RTSP_MEDIA_FACTORY_GET_CLASS(media_factory)->create_element = create_custom_pipeline;
     string launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! "
                            " x264enc tune=zerolatency threads=4 bitrate=500 ! h264parse ! rtph264pay name=pay0";
     gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
@@ -44,7 +26,6 @@ void RTSPAdaptiveStreaming::init_media_factory()
     gst_rtsp_mount_points_add_factory(mounts, uri.c_str(), media_factory);
     g_signal_connect(media_factory, "media-constructed", G_CALLBACK(static_media_constructed_callback), this);
     g_object_unref(mounts);
-    // g_object_unref(media_factory);
 }
 
 void RTSPAdaptiveStreaming::static_media_constructed_callback(GstRTSPMediaFactory *media_factory,
@@ -99,16 +80,14 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         if (str.find("capsfilter") != std::string::npos) {
             src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
         }
+
         // there should be only 1 payloader, but just check later on
         if (str.find("pay") != std::string::npos) {
             rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
         }
     }
 
-    // h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), "x264enc0");
-    // src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter0");
     set_resolution(ResolutionPresets::LOW);
-    // multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), "multiudpsink0");
     add_rtpbin_probes();
 }
 
@@ -129,17 +108,6 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes()
     g_object_unref(rtcp_rr_pad);
     g_object_unref(rtcp_sr_pad);
     g_object_unref(payloader_pad);
-    // GList* pads = GST_ELEMENT_PADS(rtpbin);
-    // GstPad* p;
-    // GList* l;
-
-    // for (l = pads; l != NULL; l = l->next)
-    // {
-    //     p = (GstPad*)l->data;
-    //     char* str = gst_pad_get_name(p);
-    //     g_warning("rtpbinpad name = %s", str);
-    //     // if ()
-    // }
 }
 
 GstPadProbeReturn RTSPAdaptiveStreaming::static_rtcp_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
