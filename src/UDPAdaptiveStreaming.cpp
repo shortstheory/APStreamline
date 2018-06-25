@@ -123,7 +123,7 @@ void UDPAdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
     // g_signal_connect(video_udp_sink, "get-stats", )
     guint64 bytes_sent;
     g_object_get(video_udp_sink, "bytes-served", &bytes_sent, NULL);
-    g_warning("BYTES SENT - %llu", bytes_sent);
+    qos_estimator.estimate_bandwidth(bytes_sent);
     //same buffer can have an SDES and an RTCP pkt
     while (more) {
         qos_estimator.handle_rtcp_packet(packet);

@@ -2,9 +2,10 @@
 
 QoSEstimator::QoSEstimator() : smooth_rtt(0), prev_rr_time(0), prev_pkt_count(0),
     prev_buffer_occ(0), rtp_size(0), bytes_transferred(0),
-    smooth_enc_bitrate(0)
+    smooth_enc_bitrate(0), last_bytes_sent(0)
 {
     gettimeofday(&prev_tv, NULL);
+    gettimeofday(&prev_bw_tv, NULL);
 }
 
 QoSEstimator::~QoSEstimator() {}
@@ -41,7 +42,7 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     gint32 packetslost;
 
     guint8 fractionlost;
-    gfloat curr_buffer_occ;
+    gfloat curr_buffer_occ = 0;
     gfloat curr_rtt;
 
     gst_rtcp_packet_get_rb(packet, 0, &ssrc, &fractionlost,
@@ -52,20 +53,21 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     curr_rtt = update_rtt(lsr, dlsr);
 
     // b/w estd
-    curr_time_ms = (tv.tv_sec * (uint64_t)1000) + (tv.tv_usec / 1000);
-    packet_interval = exthighestseq - prev_pkt_count;
-    rr_time_delta_ms = curr_time_ms - prev_rr_time;
-    bandwidth = (packet_interval * rtp_size) * 8.0 / (float)rr_time_delta_ms;
-    exp_smooth_val(bandwidth, estimated_bitrate, 0.75);
+    // curr_time_ms = (tv.tv_sec * (uint64_t)1000) + (tv.tv_usec / 1000);
+    // packet_interval = exthighestseq - prev_pkt_count;
+    // rr_time_delta_ms = curr_time_ms - prev_rr_time;
+    // bandwidth = (packet_interval * rtp_size) * 8.0 / (float)rr_time_delta_ms;
+    // exp_smooth_val(bandwidth, estimated_bitrate, 0.75);
 
-    curr_buffer_occ = prev_buffer_occ + (smooth_enc_bitrate - estimated_bitrate) * curr_rtt;
+    // curr_buffer_occ = prev_buffer_occ + (smooth_enc_bitrate - estimated_bitrate) * curr_rtt;
 
-    prev_pkt_count = exthighestseq;
+    // prev_pkt_count = exthighestseq;
+
     prev_rr_time = curr_time_ms;
 
     qos_report = QoSReport(fractionlost, estimated_bitrate, smooth_enc_bitrate, smooth_rtt, curr_buffer_occ);
 
-    g_warning("bw %f occ %f loss %d encode-Rate %f h264enc %d", bandwidth, curr_buffer_occ, fractionlost, smooth_enc_bitrate);
+    g_warning("bw %f occ %f loss %d encode-Rate %f h264enc %d", estimated_bitrate, curr_buffer_occ, fractionlost, smooth_enc_bitrate);
 
     // g_warning("rtt %f rtpsize %f encode-Rate %f", smooth_rtt, rtp_size, smooth_enc_bitrate);
     // g_warning("    block         %llu", i);
@@ -111,8 +113,8 @@ void QoSEstimator::estimate_encoding_rate(const guint32 &pkt_size)
     guint64 curr_count = ntp_time_t::unix_time_to_ms(tv);
     if (curr_count - last_count > 1000) {
         encoding_bitrate = (bytes_transferred) * 8.0 / (float)(curr_count - last_count);
-        g_warning("ENCODINGBITRATE!!! %f", encoding_bitrate);
-        prev_tv = tv;
+        // g_warning("ENCODINGBITRATE!!! %f", encoding_bitrate);
+        // prev_tv = tv;
         bytes_transferred = 0;
         exp_smooth_val(encoding_bitrate, smooth_enc_bitrate, 0.75);
     }
@@ -129,16 +131,16 @@ void QoSEstimator::estimate_rtp_pkt_size(const guint32 &pkt_size)
 
 gfloat QoSEstimator::estimate_bandwidth(const guint64 &bytes_sent)
 {
-    guint64 last_count = ntp_time_t::unix_time_to_ms(prev_tv);
+    guint64 last_count = ntp_time_t::unix_time_to_ms(prev_bw_tv);
     timeval tv;
     gettimeofday(&tv, NULL);
     guint64 curr_count = ntp_time_t::unix_time_to_ms(tv);
     guint64 bytes_interval;
-    if (curr_count - last_count > 200) {
+    if (curr_count - last_count > 1000) {
         bytes_interval = bytes_sent - last_bytes_sent;
-        encoding_bitrate = (bytes_interval) * 8.0 / (float)(curr_count - last_count);
-        g_warning("ENCODINGBITRATE!!! %f", encoding_bitrate);
-        prev_tv = tv;
+        estimated_bitrate = (bytes_interval) * 8.0 / (float)(curr_count - last_count);
+        g_warning("ESTD Bw!!! %f", estimated_bitrate);
+        prev_bw_tv = tv;
         last_bytes_sent = bytes_sent;
         // exp_smooth_val(encoding_bitrate, smooth_enc_bitrate, 0.75);
     }

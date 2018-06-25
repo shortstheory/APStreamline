@@ -22,6 +22,7 @@ private:
     guint64 last_bytes_sent;
     // not the same as encoding bitrate!
     timeval prev_tv;
+    timeval prev_bw_tv;
 
     gfloat estimated_bitrate;
     gfloat encoding_bitrate;
