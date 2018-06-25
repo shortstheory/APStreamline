@@ -32,7 +32,10 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     guint64 curr_time_ms;
     gfloat bandwidth;
 
-    guint32 exthighestseq, jitter, lsr, dlsr;
+    guint32 exthighestseq; 
+    guint32 jitter;
+    guint32 lsr;
+    guint32 dlsr;
     guint32 packet_interval;
     guint32 ssrc;
     gint32 packetslost;
@@ -44,14 +47,8 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     gst_rtcp_packet_get_rb(packet, 0, &ssrc, &fractionlost,
                            &packetslost, &exthighestseq, &jitter, &lsr, &dlsr);
     // rtt calc
-    timeval tv;
-    gettimeofday(&tv, NULL);
-    ntp_time_t curr_time = ntp_time_t::convert_from_unix_time(tv);
-    gfloat timediff = ntp_time_t::calculate_difference(curr_time, lsr);
-    curr_rtt = timediff - dlsr*1/65535.0;
-    if (curr_rtt < 1) {
-        exp_smooth_val(curr_rtt, smooth_rtt, 0.80);
-    }
+    curr_rtt = update_rtt(lsr, dlsr);
+
     // b/w estd
     curr_time_ms = (tv.tv_sec * (uint64_t)1000) + (tv.tv_usec / 1000);
     packet_interval = exthighestseq - prev_pkt_count;
@@ -126,4 +123,35 @@ void QoSEstimator::estimate_encoding_rate(const guint32 &pkt_size)
 void QoSEstimator::estimate_rtp_pkt_size(const guint32 &pkt_size)
 {
     exp_smooth_val(pkt_size, rtp_size, 0.25);
+}
+
+gfloat QoSEstimator::estimate_bandwidth(const guint64 &bytes_sent)
+{
+    guint64 last_count = ntp_time_t::unix_time_to_ms(prev_tv);
+    timeval tv;
+    gettimeofday(&tv, NULL);
+    guint64 curr_count = ntp_time_t::unix_time_to_ms(tv);
+    guint64 bytes_interval;
+    if (curr_count - last_count > 200) {
+        bytes_interval = bytes_sent - last_bytes_sent;
+        encoding_bitrate = (bytes_interval) * 8.0 / (float)(curr_count - last_count);
+        g_warning("ENCODINGBITRATE!!! %f", encoding_bitrate);
+        prev_tv = tv;
+        last_bytes_sent = bytes_sent;
+        // exp_smooth_val(encoding_bitrate, smooth_enc_bitrate, 0.75);
+    }
+}
+
+gfloat QoSEstimator::update_rtt(const guint32 &lsr, const guint32 &dlsr)
+{
+    gfloat curr_rtt;
+    timeval tv;
+    gettimeofday(&tv, NULL);
+    ntp_time_t curr_time = ntp_time_t::convert_from_unix_time(tv);
+    gfloat timediff = ntp_time_t::calculate_difference(curr_time, lsr);
+    curr_rtt = timediff - dlsr * 1/65535.0;
+    if (curr_rtt < 1) {
+        exp_smooth_val(curr_rtt, smooth_rtt, 0.80);
+    }
+    return curr_rtt;
 }

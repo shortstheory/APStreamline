@@ -19,6 +19,7 @@ private:
     gfloat prev_buffer_occ;
     gfloat rtp_size;
     guint32 bytes_transferred;
+    guint64 last_bytes_sent;
     // not the same as encoding bitrate!
     timeval prev_tv;
 
@@ -33,6 +34,7 @@ private:
 
     void process_rr_packet(GstRTCPPacket* packet);
     void process_sr_packet(GstRTCPPacket* packet);
+    gfloat update_rtt(const guint32 &lsr, const guint32 &dlsr);
     static void exp_smooth_val(const gfloat &curr_val, gfloat &smooth_val, gfloat alpha);
 
 public:
@@ -41,6 +43,7 @@ public:
     QoSReport get_qos_report();
     void estimate_rtp_pkt_size(const guint32 &pkt_size);
     void estimate_encoding_rate(const guint32 &pkt_size);
+    gfloat estimate_bandwidth(const guint64 &bytes_sent);
     void handle_rtcp_packet(GstRTCPPacket* packet);
 };
 

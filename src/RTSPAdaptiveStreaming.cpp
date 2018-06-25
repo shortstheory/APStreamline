@@ -208,7 +208,7 @@ GstPadProbeReturn RTSPAdaptiveStreaming::rtp_callback(GstPad* pad, GstPadProbeIn
         }
         // g_warning("BUFFERSIZE %d", buffer_size);
         qos_estimator.estimate_rtp_pkt_size(buffer_size);
-        qos_estimator.estimate_encoding_rate(buffer_size);
+        // qos_estimator.estimate_encoding_rate(buffer_size);
     }
     return GST_PAD_PROBE_OK;
 }

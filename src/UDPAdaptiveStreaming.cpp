@@ -119,6 +119,11 @@ void UDPAdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
     gst_rtcp_buffer_map(buf, GST_MAP_READ, rtcp_buffer);
     GstRTCPPacket *packet = (GstRTCPPacket*)malloc(sizeof(GstRTCPPacket));
     gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
+
+    // g_signal_connect(video_udp_sink, "get-stats", )
+    guint64 bytes_sent;
+    g_object_get(video_udp_sink, "bytes-served", &bytes_sent, NULL);
+    g_warning("BYTES SENT - %llu", bytes_sent);
     //same buffer can have an SDES and an RTCP pkt
     while (more) {
         qos_estimator.handle_rtcp_packet(packet);
