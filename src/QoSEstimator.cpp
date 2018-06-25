@@ -46,6 +46,8 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
 
     gst_rtcp_packet_get_rb(packet, 0, &ssrc, &fractionlost,
                            &packetslost, &exthighestseq, &jitter, &lsr, &dlsr);
+    timeval tv;
+    gettimeofday(&tv, NULL);
     // rtt calc
     curr_rtt = update_rtt(lsr, dlsr);
 
