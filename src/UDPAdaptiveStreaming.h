@@ -40,7 +40,7 @@ private:
             // g_warning("RTPHBUFSIZE %d", buffer_size);
             guint64 bytes_sent;
             g_object_get(ptr->video_udp_sink, "bytes-served", &bytes_sent, NULL);
-            ptr->qos_estimator.estimate_bandwidth(bytes_sent, buffer_size);
+            ptr->qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
             // qos_estimator.estimate_rtp_pkt_size(buffer_size);
             // qos_estimator.estimate_encoding_rate(buffer_size);
         }

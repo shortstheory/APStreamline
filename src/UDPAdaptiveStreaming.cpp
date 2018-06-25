@@ -107,8 +107,8 @@ void UDPAdaptiveStreaming::rtp_callback(GstElement* src, GstBuffer* buf)
 {
     guint32 buffer_size;
     buffer_size = gst_buffer_get_size(buf);
-    qos_estimator.estimate_rtp_pkt_size(buffer_size);
-    qos_estimator.estimate_encoding_rate(buffer_size);
+    // qos_estimator.estimate_rtp_pkt_size(buffer_size);
+    // qos_estimator.estimate_encoding_rate(buffer_size);
 }
 
 void UDPAdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)

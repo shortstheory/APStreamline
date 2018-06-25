@@ -43,9 +43,7 @@ public:
     QoSEstimator();
     ~QoSEstimator();
     QoSReport get_qos_report();
-    void estimate_rtp_pkt_size(const guint32 &pkt_size);
-    void estimate_encoding_rate(const guint32 &pkt_size);
-    void estimate_bandwidth(const guint64 &bytes_sent, const guint32 &buffer_size);
+    void calculate_bitrates(const guint64 &bytes_sent, const guint32 &buffer_size);
     void handle_rtcp_packet(GstRTCPPacket* packet);
 };
 
