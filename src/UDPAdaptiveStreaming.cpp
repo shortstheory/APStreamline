@@ -1,9 +1,9 @@
 #include "UDPAdaptiveStreaming.h"
 
-UDPAdaptiveStreaming::UDPAdaptiveStreaming(string _device, CameraType type, string _ip_addr, 
-                                            gint _video_port, gint _rtcp_port) : 
-                                            receiver_ip_addr(_ip_addr), video_sink_port(_video_port), 
-                                            rtcp_port(_rtcp_port), GenericAdaptiveStreaming(_device, type)
+UDPAdaptiveStreaming::UDPAdaptiveStreaming(string _device, CameraType type, string _ip_addr,
+        gint _video_port, gint _rtcp_port) :
+    receiver_ip_addr(_ip_addr), video_sink_port(_video_port),
+    rtcp_port(_rtcp_port), GenericAdaptiveStreaming(_device, type)
 {
     init_elements();
     init_element_properties();
@@ -28,7 +28,7 @@ bool UDPAdaptiveStreaming::init_rtp_elements()
     video_udp_sink = gst_element_factory_make("udpsink", NULL);
     rtcp_udp_sink = gst_element_factory_make("udpsink", NULL);
 
-    if (!rtpbin && !rr_rtcp_identity && !sr_rtcp_identity && !rtcp_udp_src && !video_udp_sink && 
+    if (!rtpbin && !rr_rtcp_identity && !sr_rtcp_identity && !rtcp_udp_src && !video_udp_sink &&
         !rtcp_udp_sink) {
         return false;
     }
@@ -48,8 +48,8 @@ void UDPAdaptiveStreaming::init_rtp_element_properties()
 
 void UDPAdaptiveStreaming::pipeline_add_rtp_elements()
 {
-    gst_bin_add_many(GST_BIN(pipeline), rtpbin, rr_rtcp_identity, 
-                    sr_rtcp_identity, video_udp_sink, rtcp_udp_sink, rtcp_udp_src, NULL);
+    gst_bin_add_many(GST_BIN(pipeline), rtpbin, rr_rtcp_identity,
+                     sr_rtcp_identity, video_udp_sink, rtcp_udp_sink, rtcp_udp_src, NULL);
 }
 
 bool UDPAdaptiveStreaming::link_all_elements()

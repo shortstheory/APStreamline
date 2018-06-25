@@ -54,7 +54,7 @@ bool GenericAdaptiveStreaming::init_elements()
 {
     pipeline = gst_pipeline_new("adaptive-pipeline");
     src_capsfilter = gst_element_factory_make("capsfilter", NULL);
-    
+
     // choose encoder according to ctr next time
     h264_parser = gst_element_factory_make("h264parse", NULL);
     v4l2_src = gst_element_factory_make("v4l2src", NULL);
@@ -120,12 +120,13 @@ void GenericAdaptiveStreaming::adapt_stream()
     QoSReport qos_report = qos_estimator.get_qos_report();
     // adapt according to the information in this report
     if (qos_report.get_fraction_lost() == 0) {
-        //if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
+        if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
             improve_quality();
-        //}
-        // else {
-        //     degrade_quality();
-        // }
+        }
+        else {
+            g_warning("Buffer overflow possible!");
+            degrade_quality();
+        }
     }
     else {
         decrease_resolution();
@@ -194,16 +195,16 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {
     g_warning("RES CHANGE! %d ", setting);
- 
+
     string caps_filter_string;
     caps_filter_string = video_presets[setting];
     set_encoding_bitrate(bitrate_presets[setting]);
- 
+
     current_res = setting;
     GstCaps* src_caps;
- 
+
     src_caps = gst_caps_from_string(caps_filter_string.c_str());
- 
+
     g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
     gst_caps_unref(src_caps);
 }

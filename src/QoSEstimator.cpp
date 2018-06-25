@@ -33,7 +33,7 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     guint64 curr_time_ms;
     gfloat bandwidth;
 
-    guint32 exthighestseq; 
+    guint32 exthighestseq;
     guint32 jitter;
     guint32 lsr;
     guint32 dlsr;
@@ -51,9 +51,7 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     gettimeofday(&tv, NULL);
     // rtt calc
     curr_rtt = update_rtt(lsr, dlsr);
-
     prev_rr_time = curr_time_ms;
-
     qos_report = QoSReport(fractionlost, estimated_bitrate, encoding_bitrate, smooth_rtt, curr_buffer_occ);
 
     g_warning("bw %f occ %f loss %d encode-Rate %f h264enc %d", estimated_bitrate, curr_buffer_occ, fractionlost, encoding_bitrate);
@@ -102,7 +100,8 @@ void QoSEstimator::calculate_bitrates(const guint64 &bytes_sent, const guint32 &
         last_bytes_sent = bytes_sent;
         rtph_bytes_interval = 0;
         // exp_smooth_val(encoding_bitrate, smooth_enc_bitrate, 0.75);
-    } else {
+    }
+    else {
         rtph_bytes_interval += buffer_size;
     }
 }
