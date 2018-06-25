@@ -29,7 +29,6 @@ private:
 
     static void static_callback(GstElement* src, GstBuffer* buf, gpointer data);
     static GstPadProbeReturn static_payloader_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data);
-    // static void 
 
 public:
     UDPAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM,

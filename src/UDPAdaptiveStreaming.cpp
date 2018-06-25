@@ -125,12 +125,8 @@ GstPadProbeReturn UDPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadPr
     GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buf != nullptr) {
         buffer_size = gst_buffer_get_size(buf);
-        // g_warning("RTPHBUFSIZE %d", buffer_size);
-        guint64 bytes_sent;
         g_object_get(video_udp_sink, "bytes-served", &bytes_sent, NULL);
         qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
-        // qos_estimator.estimate_rtp_pkt_size(buffer_size);
-        // qos_estimator.estimate_encoding_rate(buffer_size);
     }
     return GST_PAD_PROBE_OK;
 }
