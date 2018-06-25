@@ -76,6 +76,7 @@ bool UDPAdaptiveStreaming::link_all_elements()
         g_signal_connect(rtp_identity, "handoff", G_CALLBACK(static_rtp_callback), this);
         g_signal_connect(rr_rtcp_identity, "handoff", G_CALLBACK(static_callback), this);
         g_signal_connect(sr_rtcp_identity, "handoff", G_CALLBACK(static_callback), this);
+        // gst_pad_add_probe(gst_element_get_static_pad(rtph264_payloader,"sink"), GST_PAD_PROBE_TYPE_BUFFER, static_rtph_callback, this, NULL);
 
         //setup callbacks here
         return true;
@@ -121,9 +122,7 @@ void UDPAdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
     gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
 
     // g_signal_connect(video_udp_sink, "get-stats", )
-    guint64 bytes_sent;
-    g_object_get(video_udp_sink, "bytes-served", &bytes_sent, NULL);
-    qos_estimator.estimate_bandwidth(bytes_sent);
+
     //same buffer can have an SDES and an RTCP pkt
     while (more) {
         qos_estimator.handle_rtcp_packet(packet);
