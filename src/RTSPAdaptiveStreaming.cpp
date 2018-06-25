@@ -19,8 +19,15 @@ void RTSPAdaptiveStreaming::init_media_factory()
     mounts = gst_rtsp_server_get_mount_points(rtsp_server);
     media_factory = gst_rtsp_media_factory_new();
 
-    string launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! "
-                           " x264enc tune=zerolatency threads=4 bitrate=500 ! h264parse ! rtph264pay name=pay0";
+    string launch_string;
+
+    if (camera_type == CameraType::RAW_CAM) {
+        launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! "
+                            " x264enc tune=zerolatency threads=4 bitrate=500 ! h264parse ! rtph264pay name=pay0";
+    } else if (camera_type == CameraType::H264_CAM) {
+        launch_string = "v4l2src device=" + device + " ! video/x-h264, width=320, height=240, framerate=30/1 ! "
+                            " h264parse ! rtph264pay name=pay0";
+    }
     gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
 
     gst_rtsp_mount_points_add_factory(mounts, uri.c_str(), media_factory);
@@ -74,8 +81,10 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         element = (GstElement*)l->data;
         str = gst_element_get_name(element);
         // g_warning("String val - %s", str.c_str());
-        if (str.find("x264enc") != std::string::npos) {
-            h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+        if (camera_type == CameraType::RAW_CAM) {
+            if (str.find("x264enc") != std::string::npos) {
+                h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+            }
         }
         if (str.find("capsfilter") != std::string::npos) {
             src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
