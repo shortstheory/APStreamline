@@ -25,24 +25,10 @@ private:
     void init_rtp_element_properties();
     void pipeline_add_rtp_elements();
     void rtcp_callback(GstElement* src, GstBuffer *buf);
+    GstPadProbeReturn payloader_callback(GstPad* pad, GstPadProbeInfo* info);
 
     static void static_callback(GstElement* src, GstBuffer* buf, gpointer data);
-    static GstPadProbeReturn static_rtph_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
-    {
-        UDPAdaptiveStreaming* ptr = (UDPAdaptiveStreaming*)data;
-        guint32 buffer_size;
-        GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
-        if (buf != nullptr) {
-            buffer_size = gst_buffer_get_size(buf);
-            // g_warning("RTPHBUFSIZE %d", buffer_size);
-            guint64 bytes_sent;
-            g_object_get(ptr->video_udp_sink, "bytes-served", &bytes_sent, NULL);
-            ptr->qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
-            // qos_estimator.estimate_rtp_pkt_size(buffer_size);
-            // qos_estimator.estimate_encoding_rate(buffer_size);
-        }
-        return GST_PAD_PROBE_OK;
-    }
+    static GstPadProbeReturn static_payloader_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data);
     // static void 
 
 public:

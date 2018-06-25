@@ -74,7 +74,7 @@ bool UDPAdaptiveStreaming::link_all_elements()
         gst_element_link_many(rtpbin, video_udp_sink, NULL);
         g_signal_connect(rr_rtcp_identity, "handoff", G_CALLBACK(static_callback), this);
         g_signal_connect(sr_rtcp_identity, "handoff", G_CALLBACK(static_callback), this);
-        gst_pad_add_probe(gst_element_get_static_pad(rtph264_payloader,"sink"), GST_PAD_PROBE_TYPE_BUFFER, static_rtph_callback, this, NULL);
+        gst_pad_add_probe(gst_element_get_static_pad(rtph264_payloader,"sink"), GST_PAD_PROBE_TYPE_BUFFER, static_payloader_callback, this, NULL);
 
         //setup callbacks here
         return true;
@@ -103,8 +103,6 @@ void UDPAdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
     GstRTCPPacket *packet = (GstRTCPPacket*)malloc(sizeof(GstRTCPPacket));
     gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
 
-    // g_signal_connect(video_udp_sink, "get-stats", )
-
     //same buffer can have an SDES and an RTCP pkt
     while (more) {
         qos_estimator.handle_rtcp_packet(packet);
@@ -114,3 +112,26 @@ void UDPAdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
     free(rtcp_buffer);
     free(packet);
 }
+
+GstPadProbeReturn UDPAdaptiveStreaming::static_payloader_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
+{
+    UDPAdaptiveStreaming* ptr = (UDPAdaptiveStreaming*)data;
+    return ptr->payloader_callback(pad, info);
+}
+
+GstPadProbeReturn UDPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadProbeInfo* info)
+{
+    guint32 buffer_size;
+    GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
+    if (buf != nullptr) {
+        buffer_size = gst_buffer_get_size(buf);
+        // g_warning("RTPHBUFSIZE %d", buffer_size);
+        guint64 bytes_sent;
+        g_object_get(video_udp_sink, "bytes-served", &bytes_sent, NULL);
+        qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
+        // qos_estimator.estimate_rtp_pkt_size(buffer_size);
+        // qos_estimator.estimate_encoding_rate(buffer_size);
+    }
+    return GST_PAD_PROBE_OK;
+}
+
