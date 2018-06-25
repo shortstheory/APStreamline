@@ -97,6 +97,9 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     g_warning("got parent!");
     GstElement* element;
     GstElement* pipeline;
+
+    multi_udp_sink = NULL;
+
     string str;
     GList* list = GST_BIN_CHILDREN(parent);
     GList* l;
@@ -109,21 +112,29 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         if (str.find("rtpbin") != std::string::npos) {
             rtpbin = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
         }
-        // g_warning("element name = %s %d", str.c_str(), i++);
+        if (str.find("multiudpsink") != std::string::npos) {
+            g_warning("Identified %s", str.c_str());
+            multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+        }
+        // g_warning("element name = %s", str.c_str());
     }
 
     list = GST_BIN_CHILDREN(pipeline);
     for (l = list; l != NULL; l = l->next) {
         element = (GstElement*)l->data;
         str = gst_element_get_name(element);
+        // g_warning("String val - %s", str.c_str());
         if (str.find("x264enc") != std::string::npos) {
             h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
         }
         if (str.find("capsfilter") != std::string::npos) {
             src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
         }
+        // there should be only 1 payloader, but just check later on
+        if (str.find("pay") != std::string::npos) {
+            rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+        }
     }
-
 
     // h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), "x264enc0");
     // src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter0");
@@ -136,20 +147,19 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes()
 {
     GstPad* rtcp_rr_pad;
     GstPad* rtcp_sr_pad;
-    GstPad* rtp_pad;
+    GstPad* payloader_pad;
 
     rtcp_rr_pad = gst_element_get_static_pad(rtpbin, "recv_rtcp_sink_0");
     rtcp_sr_pad = gst_element_get_static_pad(rtpbin, "send_rtcp_src_0");
-    rtp_pad = gst_element_get_static_pad(rtpbin, "send_rtp_src_0");
-    // rtp_pad = gst_element_get_static_pad(multi_udp_sink, "sink");
+    payloader_pad = gst_element_get_static_pad(rtph264_payloader, "sink");
 
     gst_pad_add_probe(rtcp_rr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
     gst_pad_add_probe(rtcp_sr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
-    gst_pad_add_probe(rtp_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtp_callback, this, NULL);
+    gst_pad_add_probe(payloader_pad, GST_PAD_PROBE_TYPE_BUFFER, static_payloader_callback, this, NULL);
 
     g_object_unref(rtcp_rr_pad);
     g_object_unref(rtcp_sr_pad);
-    g_object_unref(rtp_pad);
+    g_object_unref(payloader_pad);
     // GList* pads = GST_ELEMENT_PADS(rtpbin);
     // GstPad* p;
     // GList* l;
@@ -191,24 +201,21 @@ GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeI
     return GST_PAD_PROBE_OK;
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::static_rtp_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
+GstPadProbeReturn RTSPAdaptiveStreaming::static_payloader_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
 {
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
-    return ptr->rtp_callback(pad, info);
+    return ptr->payloader_callback(pad, info);
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::rtp_callback(GstPad* pad, GstPadProbeInfo* info)
+GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadProbeInfo* info)
 {
     guint32 buffer_size;
+    guint64 bytes_sent;
     GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buf != nullptr) {
         buffer_size = gst_buffer_get_size(buf);
-        if (buffer_size == 14) {
-            buffer_size = 1442;
-        }
-        // g_warning("BUFFERSIZE %d", buffer_size);
-        // qos_estimator.estimate_rtp_pkt_size(buffer_size);
-        // qos_estimator.estimate_encoding_rate(buffer_size);
+        g_object_get(multi_udp_sink, "bytes-served", &bytes_sent, NULL);
+        qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
     }
     return GST_PAD_PROBE_OK;
 }

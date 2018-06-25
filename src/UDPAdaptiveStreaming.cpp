@@ -122,6 +122,7 @@ GstPadProbeReturn UDPAdaptiveStreaming::static_payloader_callback(GstPad* pad, G
 GstPadProbeReturn UDPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadProbeInfo* info)
 {
     guint32 buffer_size;
+    guint64 bytes_sent;
     GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buf != nullptr) {
         buffer_size = gst_buffer_get_size(buf);
