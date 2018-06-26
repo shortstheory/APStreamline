@@ -1,4 +1,5 @@
 #include "RTSPAdaptiveStreaming.h"
+#include "RTSPStreamServer.h"
 
 int main(int argc, char *argv[])
 {
