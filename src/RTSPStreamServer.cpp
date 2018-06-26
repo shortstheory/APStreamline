@@ -26,8 +26,6 @@ RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_
 
     get_v4l2_devices();
     get_v4l2_devices_info();
-    // rtsp_adaptive_streaming = new RTSPAdaptiveStreaming("/dev/video0", GenericAdaptiveStreaming::CameraType::RAW_CAM,
-    //         "/webcam", server);
     setup_streams();
 }
 
@@ -97,6 +95,9 @@ RTSPStreamServer* RTSPStreamServer::get_instance()
 
 RTSPStreamServer::~RTSPStreamServer()
 {
+    for (RTSPAdaptiveStreaming* stream : adaptive_streams) {
+        free(stream);
+    }
     free(instance);
     initialised = false;
 }
