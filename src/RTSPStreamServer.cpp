@@ -1,4 +1,6 @@
 #include "RTSPStreamServer.h"
+#include <sys/ioctl.h>
+#include <linux/videodev.h>
 
 bool RTSPStreamServer::initialised = true;
 RTSPStreamServer* RTSPStreamServer::instance = nullptr;
@@ -15,4 +17,9 @@ RTSPStreamServer* RTSPStreamServer::get_instance()
         initialised = true;
     }
     return instance;
+}
+
+RTSPStreamServer::~RTSPStreamServer()
+{
+    free(instance);
 }

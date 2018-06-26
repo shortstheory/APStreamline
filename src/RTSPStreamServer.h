@@ -14,7 +14,7 @@ private:
     }
 public:
     static RTSPStreamServer* get_instance();
-    ~Singleton()
+    ~RTSPStreamServer()
     {
         initialised = false;
     }
