@@ -19,12 +19,16 @@ string RTSPStreamServer::mount_point_prefix = "/cam";
 
 RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_addr), port(_port)
 {
-    get_v4l2_devices();
-    get_v4l2_devices_info();
 
     server = gst_rtsp_server_new();
     gst_rtsp_server_set_address(server, ip_addr.c_str());
     gst_rtsp_server_set_service(server, port.c_str());
+
+    get_v4l2_devices();
+    get_v4l2_devices_info();
+    // rtsp_adaptive_streaming = new RTSPAdaptiveStreaming("/dev/video0", GenericAdaptiveStreaming::CameraType::RAW_CAM,
+    //         "/webcam", server);
+    setup_streams();
 }
 
 // convert strings to char arrays here, this is sub-optimal
@@ -72,8 +76,8 @@ void RTSPStreamServer::setup_streams()
     int i;
     i = 0;
     for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++, i++) {
-        RTSPAdaptiveStreaming rtsp_adaptive_streaming0(it->first, it->second.camera_type,
-                                                    mount_point_prefix+to_string(i), server);
+        adaptive_streams.push_back(new RTSPAdaptiveStreaming(it->first, it->second.camera_type,
+                                    mount_point_prefix+to_string(i), server));
     }
 }
 
