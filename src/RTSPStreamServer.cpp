@@ -16,10 +16,14 @@ RTSPStreamServer* RTSPStreamServer::instance = nullptr;
 string RTSPStreamServer::v4l2_device_path = "/dev/";
 string RTSPStreamServer::v4l2_device_prefix = "video";
 
-RTSPStreamServer::RTSPStreamServer()
+RTSPStreamServer::RTSPStreamServer(string ip_addr, string port)
 {
     get_v4l2_devices();
     get_v4l2_devices_info();
+
+    server = gst_rtsp_server_new();
+    gst_rtsp_server_set_address(server, ip_addr.c_str());
+    gst_rtsp_server_set_service(server, port.c_str());
 }
 
 // convert strings to char arrays here, this is sub-optimal
@@ -38,7 +42,7 @@ void RTSPStreamServer::get_v4l2_devices()
             s = v4l2_device_path + s;
             fprintf(stderr, "Found V4L2 camera device %s\n", s.c_str());
             // add device path to list
-            v4l2_device_list.push_back(s);
+            device_list.push_back(s);
         }
     }
     closedir(dp);
@@ -46,12 +50,17 @@ void RTSPStreamServer::get_v4l2_devices()
 
 void RTSPStreamServer::get_v4l2_devices_info()
 {
-    for (string dev : v4l2_device_list) {
+    for (string dev : device_list) {
         fprintf(stderr, "%s\n", dev.c_str());
         int fd = open(dev.c_str(), O_RDONLY);
+        v4l2_info info;
         if (fd != -1) {
             v4l2_capability caps;
             ioctl(fd, VIDIOC_QUERYCAP, &caps);
+            info.camera_name = string(caps.card, caps.card + sizeof caps.card / sizeof caps.card[0]);
+            device_properties_map.insert(pair<string, v4l2_info>(dev, info));
+            fprintf(stderr, "name - %s driver - %s\n", caps.card, caps.driver);
+            close(fd);
         }
     }
 }
