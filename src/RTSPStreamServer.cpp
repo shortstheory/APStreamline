@@ -15,8 +15,9 @@ RTSPStreamServer* RTSPStreamServer::instance = nullptr;
 
 string RTSPStreamServer::v4l2_device_path = "/dev/";
 string RTSPStreamServer::v4l2_device_prefix = "video";
+string RTSPStreamServer::mount_point_prefix = "/cam";
 
-RTSPStreamServer::RTSPStreamServer(string ip_addr, string port)
+RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_addr), port(_port)
 {
     get_v4l2_devices();
     get_v4l2_devices_info();
@@ -58,11 +59,27 @@ void RTSPStreamServer::get_v4l2_devices_info()
             v4l2_capability caps;
             ioctl(fd, VIDIOC_QUERYCAP, &caps);
             info.camera_name = string(caps.card, caps.card + sizeof caps.card / sizeof caps.card[0]);
+            info.camera_type = GenericAdaptiveStreaming::CameraType::RAW_CAM;
             device_properties_map.insert(pair<string, v4l2_info>(dev, info));
             fprintf(stderr, "name - %s driver - %s\n", caps.card, caps.driver);
             close(fd);
         }
     }
+}
+
+void RTSPStreamServer::setup_streams()
+{
+    int i;
+    i = 0;
+    for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++, i++) {
+        RTSPAdaptiveStreaming rtsp_adaptive_streaming0(it->first, it->second.camera_type,
+                                                    mount_point_prefix+to_string(i), server);
+    }
+}
+
+GstRTSPServer* RTSPStreamServer::get_server()
+{
+    return server;
 }
 
 RTSPStreamServer* RTSPStreamServer::get_instance()
