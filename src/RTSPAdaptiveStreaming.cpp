@@ -64,10 +64,10 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         element = (GstElement*)l->data;
         str = gst_element_get_name(element);
 #ifdef __amd64__
-        if ((str.find("pipeline") != std::string::npos)) {
+        if (str.find("pipeline") != std::string::npos) {
 #endif
 #ifdef __arm__
-        if (str.find("bin") != std::string::npos)) {
+        if (str.find("bin") != std::string::npos) {
 #endif
             pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
         }
