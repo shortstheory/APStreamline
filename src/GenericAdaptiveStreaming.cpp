@@ -22,7 +22,7 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     else if (camera_type == CameraType::H264_CAM) {
         video_presets[ResolutionPresets::LOW] = "video/x-h264, width=(int)320, height=(int)240, framerate=(fraction)30/1";
         video_presets[ResolutionPresets::MED] = "video/x-h264, width=(int)640, height=(int)480, framerate=(fraction)30/1";
-        video_presets[ResolutionPresets::HIGH] = "video/x-h264, widthCameraType::RAW_CAM=(int)1280, height=(int)720, framerate=(fraction)30/1";
+        video_presets[ResolutionPresets::HIGH] = "video/x-h264, width=(int)1280, height=(int)720, framerate=(fraction)30/1";
     }
 
     bitrate_presets[ResolutionPresets::LOW] = 500;
@@ -176,7 +176,7 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
                 bitrate_ctrl.value = bitrate*1000;
 
                 veritcal_flip.id = V4L2_CID_VFLIP;
-                veritcal_flip.value = FALSE;
+                veritcal_flip.value = TRUE;
 
                 if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
                     ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &veritcal_flip) == -1) {
