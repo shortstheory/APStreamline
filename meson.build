@@ -1,5 +1,5 @@
 project('adaptive-streaming', 'c', 'cpp', default_options: [
-    'cpp_std=c++14', '-pthread'
+    'cpp_std=c++14'
   ])
 gst_dep = dependency('gstreamer-1.0')
 gst_rtp_dep = dependency('gstreamer-rtp-1.0')
