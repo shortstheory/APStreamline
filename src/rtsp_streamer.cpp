@@ -16,6 +16,5 @@ int main(int argc, char *argv[])
             "/webcam", server);
     gst_rtsp_server_attach(server, NULL);
     g_main_loop_run(loop);
-
     return 0;
 }
