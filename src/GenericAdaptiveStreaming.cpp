@@ -28,7 +28,7 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     bitrate_presets[ResolutionPresets::LOW] = 500;
     bitrate_presets[ResolutionPresets::MED] = 1500;
     bitrate_presets[ResolutionPresets::HIGH] = 3500;
-
+    text_overlay = NULL;
     // if (link_all_elements()) {
     //     g_warning("goodlink");
     // } else {
@@ -58,6 +58,7 @@ bool GenericAdaptiveStreaming::init_elements()
     // choose encoder according to ctr next time
     h264_parser = gst_element_factory_make("h264parse", NULL);
     v4l2_src = gst_element_factory_make("v4l2src", NULL);
+    text_overlay = gst_element_factory_make("textoverlay", NULL);
     if (camera_type == CameraType::RAW_CAM) {
         h264_encoder = gst_element_factory_make("x264enc", NULL);
         videoconvert = gst_element_factory_make("videoconvert", NULL);
@@ -67,7 +68,7 @@ bool GenericAdaptiveStreaming::init_elements()
     }
 
     rtph264_payloader = gst_element_factory_make("rtph264pay", "pay0");
-
+    // FIXME: Update this soon!!!
     if (!pipeline && !src_capsfilter && !rtph264_payloader && !h264_parser && !v4l2_src) {
         if (camera_type == CameraType::RAW_CAM && !h264_encoder) {
             return false;
@@ -82,6 +83,11 @@ void GenericAdaptiveStreaming::init_element_properties()
     set_resolution(ResolutionPresets::LOW);
 
     g_object_set(G_OBJECT(v4l2_src), "device", device.c_str(), NULL);
+    g_object_set(G_OBJECT(text_overlay), "text", device.c_str(), NULL);
+    g_object_set(G_OBJECT(text_overlay), "valignment", 2, NULL); //top
+    g_object_set(G_OBJECT(text_overlay), "halignment", 0, NULL); //left
+    g_object_set(G_OBJECT(text_overlay), "font-desc", "Sans, 9", NULL);
+    // valignment=2 halignment=0
     if (camera_type == CameraType::RAW_CAM) {
         g_object_set(G_OBJECT(h264_encoder), "tune", 0x00000004, "threads", 4, NULL);
     }
@@ -92,7 +98,7 @@ void GenericAdaptiveStreaming::init_element_properties()
 
 void GenericAdaptiveStreaming::pipeline_add_elements()
 {
-    gst_bin_add_many(GST_BIN(pipeline), v4l2_src, src_capsfilter, rtph264_payloader, h264_parser, NULL);
+    gst_bin_add_many(GST_BIN(pipeline), v4l2_src, src_capsfilter, text_overlay, rtph264_payloader, h264_parser, NULL);
     if (camera_type == CameraType::RAW_CAM) {
         gst_bin_add_many(GST_BIN(pipeline), h264_encoder, videoconvert, NULL);
     }
@@ -163,6 +169,12 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 {
     if (bitrate >= min_bitrate && bitrate <= max_bitrate) {
         h264_bitrate = bitrate;
+       if (text_overlay) {
+            QoSReport qos_report = qos_estimator.get_qos_report();
+            string stats = "BR: " + to_string(h264_bitrate) + " H264: " + to_string(qos_report.get_encoding_bitrate())
+                            + " BW: " + to_string(qos_report.get_estimated_bitrate());
+            g_object_set(G_OBJECT(text_overlay), "text", stats.c_str(), NULL);
+        }
         if (camera_type == CameraType::RAW_CAM) {
             g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
         }

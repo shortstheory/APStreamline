@@ -56,13 +56,13 @@ bool UDPAdaptiveStreaming::link_all_elements()
 {
     // first link all the elements with autoplugging
     if (camera_type == CameraType::RAW_CAM) {
-        if (!(gst_element_link_many(v4l2_src, src_capsfilter, videoconvert, h264_encoder, h264_parser, rtph264_payloader, NULL) &&
+        if (!(gst_element_link_many(v4l2_src, src_capsfilter, text_overlay, videoconvert, h264_encoder, h264_parser, rtph264_payloader, NULL) &&
               gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
             return false;
         }
     }
     else if (camera_type == CameraType::H264_CAM) {
-        if (!(gst_element_link_many(v4l2_src, src_capsfilter, h264_parser, rtph264_payloader, NULL) &&
+        if (!(gst_element_link_many(v4l2_src, src_capsfilter, text_overlay, h264_parser, rtph264_payloader, NULL) &&
               gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
             return false;
         }

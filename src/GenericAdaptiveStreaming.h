@@ -49,6 +49,7 @@ public:
     GstElement* h264_encoder;
     GstElement* h264_parser;
     GstElement* rtph264_payloader;
+    GstElement* text_overlay;
 
     QoSEstimator qos_estimator;
     const CameraType camera_type;
