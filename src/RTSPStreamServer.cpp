@@ -75,7 +75,7 @@ void RTSPStreamServer::setup_streams()
     i = 0;
     for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++, i++) {
         adaptive_streams.push_back(new RTSPAdaptiveStreaming(it->first, it->second.camera_type,
-                                    mount_point_prefix+to_string(i), server));
+                                   mount_point_prefix+to_string(i), server));
     }
 }
 

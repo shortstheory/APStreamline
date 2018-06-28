@@ -27,9 +27,11 @@ int main()
         exit(-1);
     }
 
-    while((rc=read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
+    while ((rc=read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
         if (write(fd, buf, rc) != rc) {
-            if (rc > 0) fprintf(stderr,"partial write");
+            if (rc > 0) {
+                fprintf(stderr,"partial write");
+            }
             else {
                 perror("write error");
             }
