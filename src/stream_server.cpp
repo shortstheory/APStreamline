@@ -28,6 +28,35 @@ string get_message_payload(char* buf)
     return buffer.substr(3);
 }
 
+string serialise_device_props(vector<v4l2_info> device_props)
+{
+    string list;
+    for (auto it = device_props.begin(); it != device_props.end(); it++) {
+        string dev_info;
+        dev_info = it->camera_name + "::" + it->mount_point + "::" + to_string(it->camera_type);
+        list = list + "||" + dev_info;
+    }
+    return list;
+}
+
+// bool send_device_props(vector<v4l2_info> device_props)
+// {
+//     // string
+//     string device_list;
+//     device_list = serialise_device_props(device_props);
+//     return send_string(device)
+// }
+
+bool send_string(string data, int cli_fd)
+{
+    int numbytes;
+    numbytes = send(cli_fd, data.c_str(), data.length(), 0);
+    if (numbytes > 0) {
+        return true;
+    }
+    return false;
+}
+
 void ipc_loop(RTSPStreamServer* streamer)
 {
     struct sockaddr_un addr;
