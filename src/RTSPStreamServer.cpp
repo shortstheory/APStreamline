@@ -1,4 +1,3 @@
-#include "RTSPStreamServer.h"
 #include <sys/ioctl.h>
 #include <linux/videodev2.h>
 #include <dirent.h>
@@ -9,6 +8,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#include "RTSPStreamServer.h"
 
 bool RTSPStreamServer::initialised = false;
 RTSPStreamServer* RTSPStreamServer::instance = nullptr;
@@ -53,6 +54,7 @@ void RTSPStreamServer::get_v4l2_devices()
 
 void RTSPStreamServer::get_v4l2_devices_info()
 {
+    int i = 0;
     for (string dev : device_list) {
         fprintf(stderr, "%s\n", dev.c_str());
         int fd = open(dev.c_str(), O_RDONLY);
@@ -61,22 +63,36 @@ void RTSPStreamServer::get_v4l2_devices_info()
             v4l2_capability caps;
             ioctl(fd, VIDIOC_QUERYCAP, &caps);
             info.camera_name = string(caps.card, caps.card + sizeof caps.card / sizeof caps.card[0]);
-            info.camera_type = GenericAdaptiveStreaming::CameraType::RAW_CAM;
+            info.camera_type = CameraType::RAW_CAM;
+            info.mount_point = mount_point_prefix + to_string(i);
             device_properties_map.insert(pair<string, v4l2_info>(dev, info));
             fprintf(stderr, "name - %s driver - %s\n", caps.card, caps.driver);
             close(fd);
         }
+        i++;
     }
 }
 
 void RTSPStreamServer::setup_streams()
 {
-    int i;
-    i = 0;
-    for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++, i++) {
+    for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++) {
         adaptive_streams.push_back(new RTSPAdaptiveStreaming(it->first, it->second.camera_type,
-                                   mount_point_prefix+to_string(i), server));
+                                   it->second.mount_point, server));
     }
+}
+
+map<string, v4l2_info> RTSPStreamServer::get_device_map()
+{
+    return device_properties_map;
+}
+
+vector<v4l2_info> RTSPStreamServer::get_device_properties()
+{
+    vector<v4l2_info> device_properties;
+    for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++) {
+        device_properties.push_back(it->second);
+    }
+    return device_properties;
 }
 
 GstRTSPServer* RTSPStreamServer::get_server()

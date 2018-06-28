@@ -39,7 +39,7 @@ void ipc_loop(RTSPStreamServer* streamer)
             perror("accept error");
             continue;
         }
-
+        g_warning("Connection accepted!");
         while ((rc=read(cl,buf,sizeof(buf))) > 0) {
             printf("read %u bytes: %.*s\n", rc, rc, buf);
         }

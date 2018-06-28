@@ -8,7 +8,9 @@
 #include <vector>
 #include <gst/rtp/gstrtcpbuffer.h>
 #include <time.h>
+
 #include "QoSEstimator.h"
+#include "DeviceDatatypes.h"
 
 using namespace std;
 
@@ -37,8 +39,8 @@ private:
     void degrade_quality();
 
 public:
-    enum ResolutionPresets {LOW, MED, HIGH} current_res;
     string device;
+    ResolutionPresets current_res;
     guint32 h264_bitrate;
     GstElement* pipeline;
     GstElement* v4l2_src;
@@ -49,7 +51,6 @@ public:
     GstElement* rtph264_payloader;
 
     QoSEstimator qos_estimator;
-    enum CameraType {RAW_CAM, H264_CAM};
     const CameraType camera_type;
 
     GenericAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM);

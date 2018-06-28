@@ -12,11 +12,6 @@ using namespace std;
 
 class RTSPStreamServer {
 private:
-    struct v4l2_info {
-        string camera_name;
-        GenericAdaptiveStreaming::CameraType camera_type;
-    };
-
     static string v4l2_device_path;
     static string v4l2_device_prefix;
     static string mount_point_prefix;
@@ -42,6 +37,9 @@ private:
 public:
     static RTSPStreamServer* get_instance();
     GstRTSPServer* get_server();
+
+    map<string, v4l2_info> get_device_map();
+    vector<v4l2_info> get_device_properties();
 };
 
 #endif
