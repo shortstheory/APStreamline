@@ -9,47 +9,61 @@
 
 char socket_path[80] = "mysocket";
 
+
+RTSPMessageType get_message_type(char* buf)
+{
+    string buffer(buf);
+
+    for (int i = 0; i < 2; i++) {
+        if (buffer.compare(0, RTSPMessageHeader[i].size(), RTSPMessageHeader[i])) {
+            return static_cast<RTSPMessageType>(i);
+        }
+    }
+    return RTSPMessageType::ERR;
+}
+
+string get_message_payload(char* buf)
+{
+    string buffer(buf);
+    return buffer.substr(3);
+}
+
 void ipc_loop(RTSPStreamServer* streamer)
 {
     struct sockaddr_un addr;
     char buf[100];
-    int fd,cl,rc;
+    int socket_fd, client_fd, bytes_read;
 
-    if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
-        perror("socket error");
-        exit(-1);
+    if ((socket_fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+        g_warning("Local socket creation failed, IPC will be disabled");
+        return;
     }
 
     memset(&addr, 0, sizeof(addr));
     addr.sun_family = AF_UNIX;
     strcpy(addr.sun_path, socket_path);
     unlink(socket_path);
-    if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
-        perror("bind error");
-        exit(-1);
+
+    if (bind(socket_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
+        g_warning("Bind error");
+        return;
     }
 
-    if (listen(fd, 5) == -1) {
-        perror("listen error");
-        exit(-1);
+    if (listen(socket_fd, 1) == -1) {
+        g_warning("Listen error");
+        return;
     }
 
-    while (1) {
-        if ((cl = accept(fd, NULL, NULL)) == -1) {
-            perror("accept error");
+    while (true) {
+        if ((client_fd = accept(socket_fd, NULL, NULL)) == -1) {
+            g_warning("Connection failed");
             continue;
         }
         g_warning("Connection accepted!");
-        while ((rc=read(cl,buf,sizeof(buf))) > 0) {
-            printf("read %u bytes: %.*s\n", rc, rc, buf);
+        while ((bytes_read=read(client_fd,buf,sizeof(buf))) > 0) {
+            printf("read %u bytes: %s\n", bytes_read, buf);
         }
-        if (rc == -1) {
-            perror("read");
-            exit(-1);
-        }
-        else if (rc == 0) {
-            printf("EOF\n");
-            close(cl);
+        if (bytes_read == -1) {
         }
     }
 }

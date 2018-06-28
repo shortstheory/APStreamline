@@ -1,12 +1,12 @@
 #include <sys/ioctl.h>
-#include <linux/videodev2.h>
-#include <dirent.h>
-#include <string>
-#include <iostream>
-#include <string.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <linux/videodev2.h>
+#include <dirent.h>
+#include <string>
+#include <string.h>
+#include <iostream>
 #include <fcntl.h>
 
 #include "RTSPStreamServer.h"

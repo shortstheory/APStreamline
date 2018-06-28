@@ -3,10 +3,15 @@
 
 #include <string>
 
+using namespace std;
+
 enum CameraType {RAW_CAM, H264_CAM};
 enum ResolutionPresets {LOW, MED, HIGH};
+enum RTSPMessageType {GET_DEVICE_PROPS, TMP, ERR};
 
-using namespace std;
+static string RTSPMessageHeader[] = {
+    "GDP", "TMP"
+};
 
 struct v4l2_info {
     string camera_name;
