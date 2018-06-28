@@ -22,11 +22,11 @@ void RTSPAdaptiveStreaming::init_media_factory()
     string launch_string;
 
     if (camera_type == CameraType::RAW_CAM) {
-        launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! "
+        launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! textoverlay ! "
                         " x264enc tune=zerolatency threads=4 bitrate=500 ! h264parse ! rtph264pay name=pay0";
     }
     else if (camera_type == CameraType::H264_CAM) {
-        launch_string = "v4l2src device=" + device + " ! video/x-h264, width=320, height=240, framerate=30/1 ! "
+        launch_string = "v4l2src device=" + device + " ! video/x-h264, width=320, height=240, framerate=30/1 ! textoverlay ! "
                         " h264parse ! rtph264pay name=pay0";
     }
     gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
@@ -95,7 +95,12 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
             if (str.find("capsfilter") != std::string::npos) {
                 src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
-
+            if (str.find("textoverlay") != std::string::npos) {
+                text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+                g_object_set(G_OBJECT(text_overlay), "valignment", 2, NULL); //top
+                g_object_set(G_OBJECT(text_overlay), "halignment", 0, NULL); //left
+                g_object_set(G_OBJECT(text_overlay), "font-desc", "Sans, 9", NULL);
+            }
             // there should be only 1 payloader, but just check later on
             if (str.find("pay") != std::string::npos) {
                 rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
