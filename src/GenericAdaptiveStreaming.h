@@ -35,7 +35,6 @@ private:
     // better off as a char array, change it later
     string video_presets[3];
     guint32 bitrate_presets[3];
-    bool res_changed;
 
     void set_encoding_bitrate(guint32 bitrate);
     void increase_resolution();
