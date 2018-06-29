@@ -16,11 +16,17 @@ using namespace std;
 
 class GenericAdaptiveStreaming {
 private:
-    const int bitrate_inc = 250;
     const int bitrate_dec = 1000;
-
-    static const int max_bitrate = 8000;
     static const int min_bitrate = 50;
+
+#ifdef __amd64__
+    static const int max_bitrate = 8000;
+    const int bitrate_inc = 250;
+#endif
+#ifdef __arm__
+    const int bitrate_inc = 125;
+    static const int max_bitrate = 3200;
+#endif
 
     gint v4l2_cam_fd;
 
@@ -29,7 +35,7 @@ private:
     // better off as a char array, change it later
     string video_presets[3];
     guint32 bitrate_presets[3];
-
+    bool res_changed;
 
     void set_encoding_bitrate(guint32 bitrate);
     void increase_resolution();

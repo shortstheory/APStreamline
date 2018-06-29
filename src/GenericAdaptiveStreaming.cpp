@@ -14,6 +14,7 @@
 GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType type) : device(_device), camera_type(type)
 {
     g_warning("param ctr");
+    res_changed = false;
     if (camera_type == CameraType::RAW_CAM) {
         video_presets[ResolutionPresets::LOW] = "video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1";
         video_presets[ResolutionPresets::MED] = "video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1";
@@ -127,7 +128,11 @@ void GenericAdaptiveStreaming::adapt_stream()
     // adapt according to the information in this report
     if (qos_report.get_fraction_lost() == 0) {
         if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
-            improve_quality();
+            if (!res_changed) {
+                increase_resolution();
+            } else {
+                res_changed = false;
+            }
         }
         else {
             g_warning("Buffer overflow possible!");
@@ -135,7 +140,11 @@ void GenericAdaptiveStreaming::adapt_stream()
         }
     }
     else {
-        decrease_resolution();
+        if (!res_changed) {
+            decrease_resolution();
+        } else {
+            res_changed = false;
+        }
     }
 }
 
@@ -206,19 +215,23 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
 void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {
-    g_warning("RES CHANGE! %d ", setting);
+    if (!res_changed) {
+        g_warning("RES CHANGE! %d ", setting);
 
-    string caps_filter_string;
-    caps_filter_string = video_presets[setting];
-    set_encoding_bitrate(bitrate_presets[setting]);
+        string caps_filter_string;
+        caps_filter_string = video_presets[setting];
+        set_encoding_bitrate(bitrate_presets[setting]);
 
-    current_res = setting;
-    GstCaps* src_caps;
+        current_res = setting;
+        GstCaps* src_caps;
 
-    src_caps = gst_caps_from_string(caps_filter_string.c_str());
+        src_caps = gst_caps_from_string(caps_filter_string.c_str());
 
-    g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
-    gst_caps_unref(src_caps);
+        g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
+        res_changed = true;
+
+        gst_caps_unref(src_caps);
+    }
 }
 
 void GenericAdaptiveStreaming::increase_resolution()
