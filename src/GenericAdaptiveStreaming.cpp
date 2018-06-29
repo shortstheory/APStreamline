@@ -127,7 +127,7 @@ void GenericAdaptiveStreaming::adapt_stream()
     // adapt according to the information in this report
     if (qos_report.get_fraction_lost() == 0) {
         if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
-            increase_resolution();
+            improve_quality();
         }
         else {
             g_warning("Buffer overflow possible!");

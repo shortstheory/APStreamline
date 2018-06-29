@@ -104,11 +104,11 @@ void UDPAdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
     gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
 
     //same buffer can have an SDES and an RTCP pkt
-    while (more) {
+    // while (more) {
         qos_estimator.handle_rtcp_packet(packet);
         adapt_stream();
-        more = gst_rtcp_packet_move_to_next(packet);
-    }
+        // more = gst_rtcp_packet_move_to_next(packet);
+    // }
     free(rtcp_buffer);
     free(packet);
 }
