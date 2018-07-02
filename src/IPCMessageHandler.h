@@ -43,8 +43,8 @@ private:
         for (auto it = device_props.begin(); it != device_props.end(); it++) {
             string dev_info;
             // weird hack to work around \0?
-            dev_info = it->camera_name.substr(0, it->camera_name.size()-1) + "::" + it->mount_point + "::" + to_string(it->camera_type);
-            list = list + "||" + dev_info;
+            dev_info = it->camera_name.substr(0, it->camera_name.size()-1) + "!" + it->mount_point + "!" + to_string(it->camera_type) + '\0';
+            list = list + "|" + dev_info;
         }
         printf("SERIALIST!! %s", list.c_str());
         return list;

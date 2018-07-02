@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 char socket_path[80] = "mysocket";
 
@@ -17,9 +18,20 @@ typedef struct v4l2_info {
 
 void process_msg(char* read_buffer)
 {
-    char* msg_header = strtok(read_buffer, "||");
-    char* msg = strtok(read_buffer, "||");
-    printf("header - %s msg - %s", msg_header, msg);
+    printf("%s\n\n", read_buffer);
+    char* msg_header = strtok(read_buffer, "|");
+    // car* msg = strtok(L, "::");
+    char camera_name[100];//= strtok(NULL, "::");
+    char mount_pt   [100];//= strtok(NULL, "::");
+    char cam_type   [100];//= strtok(NULL, "::");
+    // char msg;
+    char* tok;
+    while (tok!=NULL) {
+        tok = strtok(NULL, "!");
+        printf("val - %s\n", tok);
+    }
+
+    // printf("header - %s // camera_name - %s // mountpt - %s // cam_type - %s\n", msg_header, camera_name, mount_pt, cam_type);
 }
 
 int main()
@@ -54,6 +66,7 @@ int main()
             }
         }
         int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
-        printf("read %u bytes: %s\n", bytes_read, read_buffer);
+        process_msg(read_buffer);
+        printf("\nread %u bytes: %s\n", bytes_read, read_buffer);
     }
 }
