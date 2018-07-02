@@ -36,18 +36,16 @@ private:
         return buffer.substr(3);
     }
 
-    string serialise_device_props(vector<v4l2_info> device_props)
+    string serialise_device_props(v4l2_info device_props)
     {
         string list;
-        list = RTSPMessageHeader[RTSPMessageType::GET_DEVICE_PROPS];
-        for (auto it = device_props.begin(); it != device_props.end(); it++) {
-            string dev_info;
-            // weird hack to work around \0?
-            dev_info = it->camera_name.substr(0, it->camera_name.size()-1) + "!" + it->mount_point + "!" + to_string(it->camera_type) + '\0';
-            list = list + "|" + dev_info;
-        }
-        printf("SERIALIST!! %s", list.c_str());
-        return list;
+        list = RTSPMessageHeader[RTSPMessageType::GET_DEVICE_PROPS] + "$";
+        string dev_info;
+        // weird hack to work around \0?
+        dev_info = device_props.camera_name.substr(0, device_props.camera_name.size()-1) + "!" + device_props.mount_point + "!" + to_string(device_props.camera_type);
+        // cout << dev_info;
+        printf("SERIALIST!! %s", dev_info.c_str());
+        return dev_info;
     }
 
     bool send_string(string data)
@@ -61,13 +59,15 @@ private:
         return false;
     }
 
-    bool send_device_props()
+    void send_device_props()
     {
-        string device_list;
         vector<v4l2_info> device_props;
         device_props = rtsp_stream_server->get_device_properties();
-        device_list = serialise_device_props(device_props);
-        return send_string(device_list);
+        for (v4l2_info info : device_props) {
+            string device_list;
+            device_list = serialise_device_props(info);
+            send_string(device_list);
+        }
     }
 
 public:

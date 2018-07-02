@@ -42,6 +42,7 @@ RTSPMessageType get_message_type(char* buf)
 
 void process_device_props(char* p, v4l2_info* info)
 {
+    // p = strtok(NULL, "|");
     p = strtok(NULL, "!");
     char* camera_name = strdup(p);
     p = strtok(NULL, "!");
@@ -58,7 +59,7 @@ void process_device_props(char* p, v4l2_info* info)
 void process_msg(char* read_buffer)
 {
     printf("%s\n\n", read_buffer);
-    char* p = strtok(read_buffer, "|");
+    char* p = strtok(read_buffer, "$");
 
     char* msg_header = strdup(p);
     RTSPMessageType message_type;
@@ -102,15 +103,21 @@ int main()
         exit(-1);
     }
 
-    while ((rc=read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
-        if (write(fd, buf, rc) != rc) {
-            if (rc > 0) {
-                fprintf(stderr,"partial write");
-            }
-            else {
-                perror("write error");
-            }
-        }
+    // while ((rc=read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
+    //     if (write(fd, buf, rc) != rc) {
+    //         if (rc > 0) {
+    //             fprintf(stderr,"partial write");
+    //         }
+    //         else {
+    //             perror("write error");
+    //         }
+    //     }
+    //     int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
+    //     process_msg(read_buffer);
+    //     printf("\nread %u bytes: %s\n", bytes_read, read_buffer);
+    // }
+    write(fd, "GDP", 4);
+    while (read(fd,read_buffer,sizeof(read_buffer) > 0)) {
         int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
         process_msg(read_buffer);
         printf("\nread %u bytes: %s\n", bytes_read, read_buffer);
