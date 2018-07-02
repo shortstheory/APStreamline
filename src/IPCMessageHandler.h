@@ -23,7 +23,6 @@ private:
         cout << "Recevied buffer - " << buf << endl;
         for (int i = 0; i < RTSPMessageHeader.size(); i++) {
             if (!buffer.compare(0, RTSPMessageHeader[i].size(), RTSPMessageHeader[i])) {
-            // if (buffer == RTSPMessageHeader[i]) {
                 cout << "Message type - " << RTSPMessageHeader[i] << " " << static_cast<RTSPMessageType>(i);
                 return static_cast<RTSPMessageType>(i);
             }
@@ -42,9 +41,11 @@ private:
         string list;
         for (auto it = device_props.begin(); it != device_props.end(); it++) {
             string dev_info;
-            dev_info = it->camera_name + "::" + it->mount_point + "::" + to_string(it->camera_type);
+            // weird hack to work around \0?
+            dev_info = it->camera_name.substr(0, it->camera_name.size()-1) + "::" + it->mount_point + "::" + to_string(it->camera_type);
             list = list + "||" + dev_info;
         }
+        printf("SERIALIST!! %s", list.c_str());
         return list;
     }
 
@@ -53,6 +54,7 @@ private:
         int numbytes;
         numbytes = send(client_fd, data.c_str(), data.length(), 0);
         if (numbytes > 0) {
+            cout << "Bytes sent - " << numbytes << endl;
             return true;
         }
         return false;
@@ -64,6 +66,7 @@ private:
         vector<v4l2_info> device_props;
         device_props = rtsp_stream_server->get_device_properties();
         device_list = serialise_device_props(device_props);
+        cout << "DEVICE LIST - " << device_list << endl;
         return send_string(device_list);
     }
 

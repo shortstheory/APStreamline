@@ -10,6 +10,7 @@ int main()
 {
     struct sockaddr_un addr;
     char buf[100];
+    char read_buffer[100];
     int fd,rc;
 
     if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
@@ -36,5 +37,10 @@ int main()
                 perror("write error");
             }
         }
+        int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
+        for (int i = 0; i < bytes_read; i++) {
+            // printf("%c", read_buffer[i]);
+        }
+        printf("read %u bytes: %s\n", bytes_read, read_buffer);
     }
 }
