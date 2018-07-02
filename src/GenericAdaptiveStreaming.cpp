@@ -7,6 +7,9 @@
 #include <unistd.h>
 #include <stdio.h>
 
+// not sure why this isn't included in some pacakges?!
+#define V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME		(V4L2_CID_MPEG_BASE+229)
+
 // GenericAdaptiveStreaming::GenericAdaptiveStreaming() : camera_type(CameraType::RAW_CAM)
 // {
 //     g_warning("noparmctr");
