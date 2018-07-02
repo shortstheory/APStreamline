@@ -3,7 +3,9 @@
 #define IPC_MESSAGE_HANDLER_H
 
 #include "RTSPStreamServer.h"
+
 #include <iostream>
+// #include <stdlib.h>
 #include <thread>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -42,10 +44,13 @@ private:
         list = RTSPMessageHeader[RTSPMessageType::GET_DEVICE_PROPS] + "$";
         string dev_info;
         // weird hack to work around \0?
-        dev_info = device_props.camera_name.substr(0, device_props.camera_name.size()-1) + "!" + device_props.mount_point + "!" + to_string(device_props.camera_type);
+        // dev_info = device_props.camera_name.substr(0, device_props.camera_name.size()-1) + "!" + device_props.mount_point + "!" + to_string(device_props.camera_type);
+        char info_buffer[100];
+        // dev_info =  + "!" +  + "!" + to_string(device_props.camera_type);
+        sprintf(info_buffer, "#%s!%s!%s\0", device_props.camera_name.c_str(), device_props.mount_point.c_str(), to_string(device_props.camera_type).c_str());
         // cout << dev_info;
-        printf("SERIALIST!! %s", dev_info.c_str());
-        return dev_info;
+        printf("SERIALIST!! %s", info_buffer);
+        return string(info_buffer);
     }
 
     bool send_string(string data)
