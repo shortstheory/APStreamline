@@ -39,6 +39,7 @@ private:
     string serialise_device_props(vector<v4l2_info> device_props)
     {
         string list;
+        list = RTSPMessageHeader[RTSPMessageType::GET_DEVICE_PROPS];
         for (auto it = device_props.begin(); it != device_props.end(); it++) {
             string dev_info;
             // weird hack to work around \0?
@@ -66,7 +67,6 @@ private:
         vector<v4l2_info> device_props;
         device_props = rtsp_stream_server->get_device_properties();
         device_list = serialise_device_props(device_props);
-        cout << "DEVICE LIST - " << device_list << endl;
         return send_string(device_list);
     }
 
