@@ -17,23 +17,43 @@ typedef struct v4l2_info {
     CameraType camera_type;
 } v4l2_info;
 
+const char RTSPMessageHeader[][3] = {
+    "GDP", "TMP", "RES"
+};
+
+
 void print_v4l2_info(v4l2_info* info)
 {
     printf("\n camname - %s // mountpt -  %s // cam_type - %d\n", info->camera_name, info->mount_point, info->mount_point);
+}
+
+RTSPMessageType get_message_type(char* buf)
+{
+    for (int i = 0; i < COUNT; i++) {
+        if (!strcmp(buf, RTSPMessageHeader[i])) {
+            printf("\nMSG TYPE - %s", RTSPMessageHeader[i]);
+            // cout << "Message type - " << RTSPMessageHeader[i] << " " << static_cast<RTSPMessageType>(i);
+            return i;
+        }
+    }
+    return ERR;
 }
 
 void process_msg(char* read_buffer)
 {
     printf("%s\n\n", read_buffer);
     char* p = strtok(read_buffer, "|");
+
     char* msg_header = strdup(p);
+    RTSPMessageType message_type;
+    message_type = get_message_type(msg_header);
+
     p = strtok(NULL, "!");
     char* camera_name = strdup(p);
     p = strtok(NULL, "!");
     char* mount_pt = strdup(p);
     p = strtok(NULL, "!");
     char* cam_type = strdup(p);
-
     // // char msg;
     // char* tok;
     // while (tok!=NULL) {
