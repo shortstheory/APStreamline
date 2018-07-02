@@ -26,9 +26,10 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     }
 
     bitrate_presets[ResolutionPresets::LOW] = 500;
-    bitrate_presets[ResolutionPresets::MED] = 1500;
+    bitrate_presets[ResolutionPresets::MED] = 1000;
     bitrate_presets[ResolutionPresets::HIGH] = 3500;
     text_overlay = NULL;
+    res_inc = false;
     // if (link_all_elements()) {
     //     g_warning("goodlink");
     // } else {
@@ -135,7 +136,11 @@ void GenericAdaptiveStreaming::adapt_stream()
         }
     }
     else {
-        decrease_resolution();
+        if (res_inc) {
+            res_inc = false;
+        } else {
+            decrease_resolution();
+        }
     }
 }
 
@@ -224,6 +229,7 @@ void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
 
 void GenericAdaptiveStreaming::increase_resolution()
 {
+    res_inc = true;
     switch (current_res) {
     case ResolutionPresets::LOW:
         set_resolution(ResolutionPresets::MED);

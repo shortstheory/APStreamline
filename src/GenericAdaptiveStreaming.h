@@ -29,6 +29,7 @@ private:
 #endif
 
     gint v4l2_cam_fd;
+    bool res_inc;
 
     string video_caps_string;
 
