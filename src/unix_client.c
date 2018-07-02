@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+char socket_path[80] = "mysocket";
+
 
 typedef enum CameraType {RAW_CAM, H264_CAM} CameraType;
 typedef enum RTSPMessageType {GET_DEVICE_PROPS, TMP, ERR, COUNT} RTSPMessageType;
@@ -12,8 +14,6 @@ typedef struct v4l2_info {
     char mount_point[100];
     CameraType camera_type;
 } v4l2_info;
-
-char socket_path[80] = "mysocket";
 
 void process_msg(char* read_buffer)
 {
@@ -53,9 +53,7 @@ int main()
                 perror("write error");
             }
         }
-        // use a non-blocking fd here?
         int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
-        // process_msg(read_buffer);
-        printf("read %u bytes: %s ", bytes_read, read_buffer);
+        printf("read %u bytes: %s\n", bytes_read, read_buffer);
     }
 }
