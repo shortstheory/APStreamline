@@ -7,9 +7,9 @@ using namespace std;
 
 enum CameraType {RAW_CAM, H264_CAM};
 enum ResolutionPresets {LOW, MED, HIGH};
-enum RTSPMessageType {GET_DEVICE_PROPS, TMP, ERR};
+enum RTSPMessageType {GET_DEVICE_PROPS, TMP, ERR, COUNT};
 
-static string RTSPMessageHeader[] = {
+const static vector<string> RTSPMessageHeader = {
     "GDP", "TMP"
 };
 

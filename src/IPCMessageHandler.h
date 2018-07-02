@@ -21,7 +21,7 @@ private:
     {
         string buffer(buf);
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < RTSPMessageHeader.size(); i++) {
             if (buffer.compare(0, RTSPMessageHeader[i].size(), RTSPMessageHeader[i])) {
                 return static_cast<RTSPMessageType>(i);
             }
@@ -60,6 +60,7 @@ private:
     {
         string device_list;
         vector<v4l2_info> device_props;
+        device_props = rtsp_stream_server->get_device_properties();
         device_list = serialise_device_props(device_props);
         return send_string(device_list);
     }
@@ -79,8 +80,12 @@ public:
         switch (msgtype) {
         case RTSPMessageType::GET_DEVICE_PROPS:
             send_device_props();
+            break;
+        case RTSPMessageType::TMP:
+            break;
         case RTSPMessageType::ERR:
             g_warning("Unrecognised header");
+            break;
         }
     }
 
