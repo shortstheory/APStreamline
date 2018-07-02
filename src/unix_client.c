@@ -40,6 +40,21 @@ RTSPMessageType get_message_type(char* buf)
     return ERR;
 }
 
+void process_device_props(char* p, v4l2_info* info)
+{
+    p = strtok(NULL, "!");
+    char* camera_name = strdup(p);
+    p = strtok(NULL, "!");
+    char* mount_pt = strdup(p);
+    p = strtok(NULL, "!");
+    char* cam_type = strdup(p);
+    printf("CAMTYPE%s strlen - %d", cam_type, strlen(cam_type));
+
+    strcpy(info->camera_name, camera_name);
+    strcpy(info->mount_point, mount_pt);
+    info->camera_type = atoi(cam_type);
+}
+
 void process_msg(char* read_buffer)
 {
     printf("%s\n\n", read_buffer);
@@ -51,19 +66,10 @@ void process_msg(char* read_buffer)
 
     switch (message_type) {
     case GET_DEVICE_PROPS:
-        p = strtok(NULL, "!");
-        char* camera_name = strdup(p);
-        p = strtok(NULL, "!");
-        char* mount_pt = strdup(p);
-        p = strtok(NULL, "!");
-        char* cam_type = strdup(p);
-        printf("CAMTYPE%s strlen - %d", cam_type, strlen(cam_type));
-
+        ; // so bizarre!!!
         // printf("header - %s // camera_name - %s // mountpt - %s // cam_type - %s\n", msg_header, camera_name, mount_pt, cam_type);
         v4l2_info cam0;
-        strcpy(cam0.camera_name, camera_name);
-        strcpy(cam0.mount_point, mount_pt);
-        cam0.camera_type = atoi(cam_type);
+        process_device_props(p, &cam0);
         print_v4l2_info(&cam0);
         break;
     case TMP:
