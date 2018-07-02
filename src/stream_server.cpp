@@ -1,4 +1,6 @@
 #include "RTSPStreamServer.h"
+#include "IPCMessageHandler.h"
+
 #include <iostream>
 #include <thread>
 #include <sys/socket.h>
@@ -8,54 +10,6 @@
 #include <unistd.h>
 
 char socket_path[80] = "mysocket";
-
-
-RTSPMessageType get_message_type(char* buf)
-{
-    string buffer(buf);
-
-    for (int i = 0; i < 2; i++) {
-        if (buffer.compare(0, RTSPMessageHeader[i].size(), RTSPMessageHeader[i])) {
-            return static_cast<RTSPMessageType>(i);
-        }
-    }
-    return RTSPMessageType::ERR;
-}
-
-string get_message_payload(char* buf)
-{
-    string buffer(buf);
-    return buffer.substr(3);
-}
-
-string serialise_device_props(vector<v4l2_info> device_props)
-{
-    string list;
-    for (auto it = device_props.begin(); it != device_props.end(); it++) {
-        string dev_info;
-        dev_info = it->camera_name + "::" + it->mount_point + "::" + to_string(it->camera_type);
-        list = list + "||" + dev_info;
-    }
-    return list;
-}
-
-// bool send_device_props(vector<v4l2_info> device_props)
-// {
-//     // string
-//     string device_list;
-//     device_list = serialise_device_props(device_props);
-//     return send_string(device)
-// }
-
-bool send_string(string data, int cli_fd)
-{
-    int numbytes;
-    numbytes = send(cli_fd, data.c_str(), data.length(), 0);
-    if (numbytes > 0) {
-        return true;
-    }
-    return false;
-}
 
 void ipc_loop(RTSPStreamServer* streamer)
 {
@@ -83,13 +37,16 @@ void ipc_loop(RTSPStreamServer* streamer)
         return;
     }
 
+    if ((client_fd = accept(socket_fd, NULL, NULL)) == -1) {
+        g_warning("Connection failed");
+    }
+
+    IPCMessageHandler message_handler(client_fd, streamer);
+
     while (true) {
-        if ((client_fd = accept(socket_fd, NULL, NULL)) == -1) {
-            g_warning("Connection failed");
-            continue;
-        }
         g_warning("Connection accepted!");
         while ((bytes_read=read(client_fd,buf,sizeof(buf))) > 0) {
+            // process_msg(buf, client_fd);
             printf("read %u bytes: %s\n", bytes_read, buf);
         }
         if (bytes_read == -1) {

@@ -8,7 +8,7 @@ gst_rtsp_server_dep = dependency('gstreamer-rtsp-server-1.0')
 thread_dep = dependency('threads')
 src = ['src/main.cpp', 'src/GenericAdaptiveStreaming.cpp', 'src/QoSEstimator.cpp', 'src/UDPAdaptiveStreaming.cpp', 'src/RTSPAdaptiveStreaming.cpp']
 rtsp_src = ['src/rtsp_streamer.cpp', 'src/GenericAdaptiveStreaming.cpp', 'src/QoSEstimator.cpp', 'src/UDPAdaptiveStreaming.cpp', 'src/RTSPAdaptiveStreaming.cpp']
-ss_src = ['src/stream_server.cpp', 'src/GenericAdaptiveStreaming.cpp', 'src/QoSEstimator.cpp', 'src/UDPAdaptiveStreaming.cpp', 'src/RTSPAdaptiveStreaming.cpp', 'src/RTSPStreamServer.cpp']
+ss_src = ['src/stream_server.cpp', 'src/IPCMessageHandler.h', 'src/GenericAdaptiveStreaming.cpp', 'src/QoSEstimator.cpp', 'src/UDPAdaptiveStreaming.cpp', 'src/RTSPAdaptiveStreaming.cpp', 'src/RTSPStreamServer.cpp']
 unix_client = ['src/unix_client.c']
 
 executable('adaptive_streaming', sources: src, dependencies: [gst_dep, gst_rtp_dep, gst_rtsp_dep, gst_rtsp_server_dep], cpp_args : '-std=c++14', install : true)
