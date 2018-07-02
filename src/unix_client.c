@@ -17,7 +17,9 @@ char socket_path[80] = "mysocket";
 
 void process_msg(char* read_buffer)
 {
-
+    char* msg_header = strtok(read_buffer, "||");
+    char* msg = strtok(read_buffer, "||");
+    printf("header - %s msg - %s", msg_header, msg);
 }
 
 int main()
@@ -53,7 +55,7 @@ int main()
         }
         // use a non-blocking fd here?
         int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
-        process_msg(read_buffer);
+        // process_msg(read_buffer);
         printf("read %u bytes: %s ", bytes_read, read_buffer);
     }
 }
