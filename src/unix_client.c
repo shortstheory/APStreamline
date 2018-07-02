@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
 
 char socket_path[80] = "mysocket";
 
@@ -16,22 +17,37 @@ typedef struct v4l2_info {
     CameraType camera_type;
 } v4l2_info;
 
+void print_v4l2_info(v4l2_info* info)
+{
+    printf("\n camname - %s // mountpt -  %s // cam_type - %d\n", info->camera_name, info->mount_point, info->mount_point);
+}
+
 void process_msg(char* read_buffer)
 {
     printf("%s\n\n", read_buffer);
-    char* msg_header = strtok(read_buffer, "|");
-    // car* msg = strtok(L, "::");
-    char camera_name[100];//= strtok(NULL, "::");
-    char mount_pt   [100];//= strtok(NULL, "::");
-    char cam_type   [100];//= strtok(NULL, "::");
-    // char msg;
-    char* tok;
-    while (tok!=NULL) {
-        tok = strtok(NULL, "!");
-        printf("val - %s\n", tok);
-    }
+    char* p = strtok(read_buffer, "|");
+    char* msg_header = strdup(p);
+    p = strtok(NULL, "!");
+    char* camera_name = strdup(p);
+    p = strtok(NULL, "!");
+    char* mount_pt = strdup(p);
+    p = strtok(NULL, "!");
+    char* cam_type = strdup(p);
+
+    // // char msg;
+    // char* tok;
+    // while (tok!=NULL) {
+    //     tok = strtok(NULL, "!");0
+    //     printf("val - %s\n", tok);
+    // }
+    printf("CAMTYPE%s strlen - %d", cam_type, strlen(cam_type));
 
     // printf("header - %s // camera_name - %s // mountpt - %s // cam_type - %s\n", msg_header, camera_name, mount_pt, cam_type);
+    v4l2_info cam0;
+    strcpy(cam0.camera_name, camera_name);
+    strcpy(cam0.mount_point, mount_pt);
+    cam0.camera_type = atoi(cam_type);
+    print_v4l2_info(&cam0);
 }
 
 int main()
