@@ -117,7 +117,7 @@ int main()
     //     printf("\nread %u bytes: %s\n", bytes_read, read_buffer);
     // }
     write(fd, "GDP", 4);
-    while (read(fd,read_buffer,sizeof(read_buffer) > 0)) {
+    while (1) {
         int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
         process_msg(read_buffer);
         printf("\nread %u bytes: %s\n", bytes_read, read_buffer);
