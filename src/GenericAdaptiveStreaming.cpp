@@ -2,6 +2,7 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <linux/videodev2.h>
+#include <linux/v4l2-controls.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -136,12 +137,22 @@ void GenericAdaptiveStreaming::adapt_stream()
         }
     }
     else {
-        if (res_inc) {
-            res_inc = false;
-        } else {
+        if (!res_inc) {
             decrease_resolution();
         }
+        // needs to be worked out for x264enc as well
+        if (camera_type == CameraType::H264_CAM) {
+            g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
+            v4l2_control force_keyframe;
+            force_keyframe.id = V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME; //value is ignored
+            if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &force_keyframe) == -1) {
+                g_warning("Keyframe ioctl failed");
+            } else {
+                g_warning("New keyframe requested");
+            }
+        }
     }
+    res_inc = false;
 }
 
 void GenericAdaptiveStreaming::improve_quality()
@@ -185,6 +196,7 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
         }
         else if (camera_type == CameraType::H264_CAM) {
             g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
+
             if (v4l2_cam_fd > 0) {
                 v4l2_control bitrate_ctrl;
                 v4l2_control veritcal_flip;

@@ -32,7 +32,7 @@ RTSPMessageType get_message_type(char* buf)
     printf("gettingmsgtype\n");
     for (int i = 0; i < COUNT; i++) {
         if (!strcmp(buf, RTSPMessageHeader[i])) {
-            printf("\nMSG TYPE - %s", RTSPMessageHeader[i]);
+            // printf("\nMSG TYPE - %s", RTSPMessageHeader[i]);
             // cout << "Message type - " << RTSPMessageHeader[i] << " " << static_cast<RTSPMessageType>(i);
             return i;
         }
@@ -49,7 +49,7 @@ void process_device_props(char* p, v4l2_info* info)
     char* mount_pt = strdup(p);
     p = strtok(NULL, "!");
     char* cam_type = strdup(p);
-    printf("CAMTYPE%s strlen - %d", cam_type, strlen(cam_type));
+    // printf("CAMTYPE%s strlen - %d", cam_type, strlen(cam_type));
 
     strcpy(info->camera_name, camera_name);
     strcpy(info->mount_point, mount_pt);
@@ -69,9 +69,9 @@ void process_msg(char* read_buffer)
     case GET_DEVICE_PROPS:
         ; // so bizarre!!!
         // printf("header - %s // camera_name - %s // mountpt - %s // cam_type - %s\n", msg_header, camera_name, mount_pt, cam_type);
-        v4l2_info cam0;
-        process_device_props(p, &cam0);
-        print_v4l2_info(&cam0);
+        v4l2_info cam_info;
+        process_device_props(p, &cam_info);
+        print_v4l2_info(&cam_info);
         break;
     case TMP:
         break;
@@ -120,6 +120,5 @@ int main()
     while (1) {
         int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
         process_msg(read_buffer);
-        printf("\nread %u bytes: %s\n", bytes_read, read_buffer);
     }
 }

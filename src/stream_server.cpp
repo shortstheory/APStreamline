@@ -62,8 +62,8 @@ int main(int argc, char *argv[])
     RTSPStreamServer* rtsp_stream_server = RTSPStreamServer::get_instance();
     gst_rtsp_server_attach(rtsp_stream_server->get_server(), NULL);
 
-    // thread t(&ipc_loop, rtsp_stream_server);
-    // t.detach();
+    thread t(&ipc_loop, rtsp_stream_server);
+    t.detach();
 
     g_main_loop_run(loop);
     return 0;
