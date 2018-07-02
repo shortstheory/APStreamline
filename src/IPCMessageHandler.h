@@ -1,3 +1,7 @@
+
+#ifndef IPC_MESSAGE_HANDLER_H
+#define IPC_MESSAGE_HANDLER_H
+
 #include "RTSPStreamServer.h"
 #include <iostream>
 #include <thread>
@@ -8,17 +12,11 @@
 #include <unistd.h>
 #include <assert.h>
 
-class MessageHandler {
+class IPCMessageHandler {
 private:
     int client_fd;
     RTSPStreamServer* rtsp_stream_server;
-public:
-    MessageHandler(int fd, RTSPStreamServer* _rtsp_stream_server)
-    {
-        assert(_rtsp_stream_server);
-        assert(client_fd != -1);
-        rtsp_stream_server = _rtsp_stream_server;
-    }
+
     RTSPMessageType get_message_type(char* buf)
     {
         string buffer(buf);
@@ -48,33 +46,44 @@ public:
         return list;
     }
 
-    bool send_device_props(vector<v4l2_info> device_props, int client_fd)
-    {
-        string device_list;
-        device_list = serialise_device_props(device_props);
-        return send_string(device, client_fd);
-    }
-
     bool send_string(string data)
     {
-        int numbytes;, int cli_fd
-        numbytes = send(cli_fd, data.c_str(), data.length(), 0);
+        int numbytes;
+        numbytes = send(client_fd, data.c_str(), data.length(), 0);
         if (numbytes > 0) {
             return true;
         }
         return false;
     }
 
-    void process_msg(char* buf, int client_fd)
+    bool send_device_props()
+    {
+        string device_list;
+        vector<v4l2_info> device_props;
+        device_list = serialise_device_props(device_props);
+        return send_string(device_list);
+    }
+
+public:
+    IPCMessageHandler(int fd, RTSPStreamServer* _rtsp_stream_server) : client_fd(fd)
+    {
+        assert(_rtsp_stream_server);
+        assert(client_fd != -1);
+        rtsp_stream_server = _rtsp_stream_server;
+    }
+
+    void process_msg(char* buf)
     {
         RTSPMessageType msgtype;
         msgtype = get_message_type(buf);
         switch (msgtype) {
         case RTSPMessageType::GET_DEVICE_PROPS:
-            send_device_props(client_fd);
+            send_device_props();
         case RTSPMessageType::ERR:
             g_warning("Unrecognised header");
         }
     }
 
 };
+
+#endif
