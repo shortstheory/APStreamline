@@ -20,9 +20,11 @@ private:
     RTSPMessageType get_message_type(char* buf)
     {
         string buffer(buf);
-
+        cout << "Recevied buffer - " << buf << endl;
         for (int i = 0; i < RTSPMessageHeader.size(); i++) {
-            if (buffer.compare(0, RTSPMessageHeader[i].size(), RTSPMessageHeader[i])) {
+            if (!buffer.compare(0, RTSPMessageHeader[i].size(), RTSPMessageHeader[i])) {
+            // if (buffer == RTSPMessageHeader[i]) {
+                cout << "Message type - " << RTSPMessageHeader[i] << " " << static_cast<RTSPMessageType>(i);
                 return static_cast<RTSPMessageType>(i);
             }
         }

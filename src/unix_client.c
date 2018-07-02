@@ -16,7 +16,7 @@ int main()
         perror("socket error");
         exit(-1);
     }
-    fprintf(stderr, "Socket fd - %d", fd);
+    fprintf(stderr, "Socket fd - %d\n", fd);
 
     memset(&addr, 0, sizeof(addr));
     addr.sun_family = AF_UNIX;

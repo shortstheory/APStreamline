@@ -10,7 +10,7 @@ enum ResolutionPresets {LOW, MED, HIGH};
 enum RTSPMessageType {GET_DEVICE_PROPS, TMP, ERR, COUNT};
 
 const static vector<string> RTSPMessageHeader = {
-    "GDP", "TMP"
+    "GDP", "TMP", "RES"
 };
 
 struct v4l2_info {

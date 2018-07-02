@@ -42,16 +42,16 @@ void ipc_loop(RTSPStreamServer* streamer)
     }
 
     IPCMessageHandler message_handler(client_fd, streamer);
+    g_warning("Connection accepted!");
 
-    while (true) {
-        g_warning("Connection accepted!");
+    // while (true) {
         while ((bytes_read=read(client_fd,buf,sizeof(buf))) > 0) {
             message_handler.process_msg(buf);
             printf("read %u bytes: %s\n", bytes_read, buf);
         }
         if (bytes_read == -1) {
         }
-    }
+    // }
 }
 
 int main(int argc, char *argv[])
