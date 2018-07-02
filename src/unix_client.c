@@ -17,7 +17,7 @@ typedef struct v4l2_info {
     CameraType camera_type;
 } v4l2_info;
 
-const char RTSPMessageHeader[][3] = {
+const char* RTSPMessageHeader[] = {
     "GDP", "TMP", "RES"
 };
 
@@ -29,6 +29,7 @@ void print_v4l2_info(v4l2_info* info)
 
 RTSPMessageType get_message_type(char* buf)
 {
+    printf("gettingmsgtype\n");
     for (int i = 0; i < COUNT; i++) {
         if (!strcmp(buf, RTSPMessageHeader[i])) {
             printf("\nMSG TYPE - %s", RTSPMessageHeader[i]);
@@ -48,26 +49,29 @@ void process_msg(char* read_buffer)
     RTSPMessageType message_type;
     message_type = get_message_type(msg_header);
 
-    p = strtok(NULL, "!");
-    char* camera_name = strdup(p);
-    p = strtok(NULL, "!");
-    char* mount_pt = strdup(p);
-    p = strtok(NULL, "!");
-    char* cam_type = strdup(p);
-    // // char msg;
-    // char* tok;
-    // while (tok!=NULL) {
-    //     tok = strtok(NULL, "!");0
-    //     printf("val - %s\n", tok);
-    // }
-    printf("CAMTYPE%s strlen - %d", cam_type, strlen(cam_type));
+    switch (message_type) {
+    case GET_DEVICE_PROPS:
+        p = strtok(NULL, "!");
+        char* camera_name = strdup(p);
+        p = strtok(NULL, "!");
+        char* mount_pt = strdup(p);
+        p = strtok(NULL, "!");
+        char* cam_type = strdup(p);
+        printf("CAMTYPE%s strlen - %d", cam_type, strlen(cam_type));
 
-    // printf("header - %s // camera_name - %s // mountpt - %s // cam_type - %s\n", msg_header, camera_name, mount_pt, cam_type);
-    v4l2_info cam0;
-    strcpy(cam0.camera_name, camera_name);
-    strcpy(cam0.mount_point, mount_pt);
-    cam0.camera_type = atoi(cam_type);
-    print_v4l2_info(&cam0);
+        // printf("header - %s // camera_name - %s // mountpt - %s // cam_type - %s\n", msg_header, camera_name, mount_pt, cam_type);
+        v4l2_info cam0;
+        strcpy(cam0.camera_name, camera_name);
+        strcpy(cam0.mount_point, mount_pt);
+        cam0.camera_type = atoi(cam_type);
+        print_v4l2_info(&cam0);
+        break;
+    case TMP:
+        break;
+    case ERR:
+        break;
+    }
+
 }
 
 int main()
