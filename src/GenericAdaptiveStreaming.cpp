@@ -8,7 +8,9 @@
 #include <stdio.h>
 
 // not sure why this isn't included in some pacakges?!
-#define V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME		(V4L2_CID_MPEG_BASE+229)
+#ifndef V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME
+    #define V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME		(V4L2_CID_MPEG_BASE+229)
+#endif
 
 // GenericAdaptiveStreaming::GenericAdaptiveStreaming() : camera_type(CameraType::RAW_CAM)
 // {
@@ -203,6 +205,7 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
             if (v4l2_cam_fd > 0) {
                 v4l2_control bitrate_ctrl;
                 v4l2_control veritcal_flip;
+                v4l2_control horizontal_flip;
 
                 bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
                 bitrate_ctrl.value = bitrate*1000;
@@ -210,8 +213,12 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
                 veritcal_flip.id = V4L2_CID_VFLIP;
                 veritcal_flip.value = TRUE;
 
+                horizontal_flip.id = V4L2_CID_HFLIP;
+                horizontal_flip.value = TRUE;
+
                 if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
-                    ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &veritcal_flip) == -1) {
+                    ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &veritcal_flip) == -1 ||
+                    ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1) {
                     g_warning("ioctl fail :/");
                 }
             }
