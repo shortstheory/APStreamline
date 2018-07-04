@@ -130,9 +130,25 @@ GstBus* GenericAdaptiveStreaming::get_pipeline_bus()
     return gst_element_get_bus(pipeline);
 }
 
+void GenericAdaptiveStreaming::set_state_constants()
+{
+    if (network_state == NetworkState::STEADY) {
+        MAX_BITRATE = MAX_STEADY_BITRATE;
+        MIN_BITRATE = MIN_STEADY_BITRATE;
+        INC_BITRATE = INC_STEADY_BITRATE;
+        DEC_BITRATE = DEC_STEADY_BITRATE;
+    } else if (network_state == NetworkState::CONGESTION) {
+        MAX_BITRATE = MAX_CONGESTION_BITRATE;
+        MIN_BITRATE = MIN_CONGESTION_BITRATE;
+        INC_BITRATE = INC_CONGESTION_BITRATE;
+        DEC_BITRATE = DEC_CONGESTION_BITRATE;
+    }
+}
+
 void GenericAdaptiveStreaming::adapt_stream()
 {
     QoSReport qos_report = qos_estimator.get_qos_report();
+    set_state_constants();
     // adapt according to the information in this report
     if (qos_report.get_fraction_lost() == 0) {
         if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
@@ -164,7 +180,7 @@ void GenericAdaptiveStreaming::adapt_stream()
 
 void GenericAdaptiveStreaming::improve_quality()
 {
-    set_encoding_bitrate(h264_bitrate+bitrate_inc);
+    set_encoding_bitrate(h264_bitrate + INC_BITRATE);
     if (current_res == ResolutionPresets::LOW &&
         h264_bitrate > bitrate_presets[ResolutionPresets::MED]) {
         set_resolution(ResolutionPresets::MED);
@@ -177,7 +193,7 @@ void GenericAdaptiveStreaming::improve_quality()
 
 void GenericAdaptiveStreaming::degrade_quality()
 {
-    set_encoding_bitrate(h264_bitrate-bitrate_dec);
+    set_encoding_bitrate(h264_bitrate - DEC_BITRATE);
     if (current_res == ResolutionPresets::HIGH &&
         h264_bitrate < bitrate_presets[ResolutionPresets::MED]) {
         set_resolution(ResolutionPresets::MED);
@@ -190,48 +206,49 @@ void GenericAdaptiveStreaming::degrade_quality()
 
 void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 {
-    if (bitrate >= min_bitrate && bitrate <= max_bitrate) {
+    if (bitrate >= MIN_BITRATE && bitrate <= MAX_BITRATE) {
         h264_bitrate = bitrate;
-       if (text_overlay) {
-            QoSReport qos_report = qos_estimator.get_qos_report();
-            string stats = "BR: " + to_string(h264_bitrate) + " H264: " + to_string(qos_report.get_encoding_bitrate())
-                            + " BW: " + to_string(qos_report.get_estimated_bitrate());
-            g_object_set(G_OBJECT(text_overlay), "text", stats.c_str(), NULL);
-        }
-        if (camera_type == CameraType::RAW_CAM) {
-            g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
-        }
-        else if (camera_type == CameraType::H264_CAM) {
-            g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
+    } else if (h264_bitrate > MAX_BITRATE) {
+        h264_bitrate = MAX_BITRATE;
+    } else if (h264_bitrate < MIN_BITRATE) {
+        h264_bitrate = MIN_BITRATE;
+    }
 
-            if (v4l2_cam_fd > 0) {
-                v4l2_control bitrate_ctrl;
-                v4l2_control veritcal_flip;
-                v4l2_control horizontal_flip;
+    if (text_overlay) {
+        QoSReport qos_report = qos_estimator.get_qos_report();
 
-                bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
-                bitrate_ctrl.value = bitrate*1000;
+        string stats = "BR: " + to_string(h264_bitrate) + " H264: " + 
+                        to_string(qos_report.get_encoding_bitrate())
+                        + " BW: " + to_string(qos_report.get_estimated_bitrate());
 
-                veritcal_flip.id = V4L2_CID_VFLIP;
-                veritcal_flip.value = TRUE;
+        g_object_set(G_OBJECT(text_overlay), "text", stats.c_str(), NULL);
+    }
+    if (camera_type == CameraType::RAW_CAM) {
+        g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
+    } else if (camera_type == CameraType::H264_CAM) {
+        g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
+        if (v4l2_cam_fd > 0) {
+            v4l2_control bitrate_ctrl;
+            v4l2_control veritcal_flip;
+            v4l2_control horizontal_flip;
 
-                horizontal_flip.id = V4L2_CID_HFLIP;
-                horizontal_flip.value = TRUE;
+            bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
+            bitrate_ctrl.value = bitrate*1000;
 
-                if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
-                    ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &veritcal_flip) == -1 ||
-                    ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1) {
-                    g_warning("ioctl fail :/");
-                }
+            veritcal_flip.id = V4L2_CID_VFLIP;
+            veritcal_flip.value = TRUE;
+
+            horizontal_flip.id = V4L2_CID_HFLIP;
+            horizontal_flip.value = TRUE;
+
+            if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
+                ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &veritcal_flip) == -1 ||
+                ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1) {
+                g_warning("ioctl fail :/");
             }
         }
     }
 }
-
-// presets
-// LOW - 500kbps
-// MED - 1500kbps
-// HIGH - 3500kbps
 
 void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {

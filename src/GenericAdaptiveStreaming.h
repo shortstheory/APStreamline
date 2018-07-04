@@ -17,18 +17,12 @@ using namespace std;
 
 class GenericAdaptiveStreaming {
 private:
-    const int bitrate_dec = 1000;
-    static const int min_bitrate = 50;
+    guint32 MIN_BITRATE;
+    guint32 MAX_BITRATE;
+    guint32 DEC_BITRATE;
+    guint32 INC_BITRATE; 
 
-#ifdef __amd64__
-    static const int max_bitrate = 8000;
-    const int bitrate_inc = 250;
-#endif
-#ifdef __arm__
-    const int bitrate_inc = 125;
-    static const int max_bitrate = 3200;
-#endif
-    enum NetworkState {STEADY, CONGESTED} network_state;
+    enum NetworkState {STEADY, CONGESTION} network_state;
     guint32 successive_transmissions;
 
     gint v4l2_cam_fd;
@@ -41,6 +35,8 @@ private:
     guint32 bitrate_presets[3];
 
     void set_encoding_bitrate(guint32 bitrate);
+    void set_state_constants();
+
     void increase_resolution();
     void decrease_resolution();
 
