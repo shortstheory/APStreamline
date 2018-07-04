@@ -11,6 +11,7 @@
 
 #include "QoSEstimator.h"
 #include "DeviceDatatypes.h"
+#include "Constants.h"
 
 using namespace std;
 
@@ -27,6 +28,8 @@ private:
     const int bitrate_inc = 125;
     static const int max_bitrate = 3200;
 #endif
+    enum NetworkState {STEADY, CONGESTED} network_state;
+    guint32 successive_transmissions;
 
     gint v4l2_cam_fd;
     bool res_inc;

@@ -17,9 +17,10 @@
 //     g_warning("noparmctr");
 // }
 
-GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType type) : device(_device), camera_type(type)
+GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType type) : 
+                                                    device(_device), camera_type(type),
+                                                    network_state(STEADY), successive_transmissions(0)
 {
-    g_warning("param ctr");
     if (camera_type == CameraType::RAW_CAM) {
         video_presets[ResolutionPresets::LOW] = "video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1";
         video_presets[ResolutionPresets::MED] = "video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1";
@@ -31,9 +32,10 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
         video_presets[ResolutionPresets::HIGH] = "video/x-h264, width=(int)1280, height=(int)720, framerate=(fraction)30/1";
     }
 
-    bitrate_presets[ResolutionPresets::LOW] = 500;
-    bitrate_presets[ResolutionPresets::MED] = 1000;
-    bitrate_presets[ResolutionPresets::HIGH] = 3500;
+    bitrate_presets[ResolutionPresets::LOW] = LOW_QUAL_BITRATE;
+    bitrate_presets[ResolutionPresets::MED] = MED_QUAL_BITRATE;
+    bitrate_presets[ResolutionPresets::HIGH] = HIGH_QUAL_BITRATE;
+
     text_overlay = NULL;
     res_inc = false;
     // if (link_all_elements()) {
