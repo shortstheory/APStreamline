@@ -16,6 +16,6 @@ static const guint32 LOW_QUAL_BITRATE = 500;
 static const guint32 MED_QUAL_BITRATE = 1000;
 static const guint32 HIGH_QUAL_BITRATE = 3000;
 
-static const guint32 SUCCESSFUL_TRANSMISSION = 3;
+static const guint32 SUCCESSFUL_TRANSMISSION = 5;
 
 #endif

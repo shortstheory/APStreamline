@@ -19,7 +19,7 @@
 
 GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType type) : 
                                                     device(_device), camera_type(type),
-                                                    network_state(STEADY), successive_transmissions(0)
+                                                    network_state(NetworkState::STEADY), successive_transmissions(0)
 {
     if (camera_type == CameraType::RAW_CAM) {
         video_presets[ResolutionPresets::LOW] = "video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1";
@@ -212,6 +212,9 @@ void GenericAdaptiveStreaming::degrade_quality()
 
 void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 {
+    string currstate = (network_state == NetworkState::STEADY) ? "STEADY" : "CONGESTED";
+    g_warning("Curr state %s %d", currstate.c_str(), successive_transmissions);
+
     if (bitrate >= MIN_BITRATE && bitrate <= MAX_BITRATE) {
         h264_bitrate = bitrate;
     } else if (h264_bitrate > MAX_BITRATE) {
@@ -223,9 +226,10 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
     if (text_overlay) {
         QoSReport qos_report = qos_estimator.get_qos_report();
 
+        string state = (network_state == NetworkState::STEADY) ? "STEADY" : "CONGESTED";
         string stats = "BR: " + to_string(h264_bitrate) + " H264: " + 
                         to_string(qos_report.get_encoding_bitrate())
-                        + " BW: " + to_string(qos_report.get_estimated_bitrate());
+                        + " BW: " + to_string(qos_report.get_estimated_bitrate()) + " STATE: " + state;
 
         g_object_set(G_OBJECT(text_overlay), "text", stats.c_str(), NULL);
     }
