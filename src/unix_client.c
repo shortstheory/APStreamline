@@ -6,6 +6,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define MAX_CAMERAS 8
+
 char socket_path[80] = "mysocket";
 
 
@@ -21,6 +23,8 @@ const char* RTSPMessageHeader[] = {
     "GDP", "TMP", "RES"
 };
 
+v4l2_info info_objs[MAX_CAMERAS];
+int camera_count = 0;
 
 void print_v4l2_info(v4l2_info* info)
 {
@@ -56,6 +60,19 @@ void process_device_props(char* p, v4l2_info* info)
     info->camera_type = atoi(cam_type);
 }
 
+int curr_counter=0;
+void store_cam_info(v4l2_info info)
+{
+    if (strcmp(info.mount_point,"NULL")) {
+        info_objs[curr_counter++] = info;
+        printf("Saving obj %s\n", info.mount_point);
+    } else {
+        printf("Done saving objs @count of %d", camera_count);
+        camera_count = curr_counter+1;
+        curr_counter = 0;
+    }
+}
+
 void process_msg(char* read_buffer)
 {
     printf("%s\n\n", read_buffer);
@@ -72,6 +89,7 @@ void process_msg(char* read_buffer)
         v4l2_info cam_info;
         process_device_props(p, &cam_info);
         print_v4l2_info(&cam_info);
+        store_cam_info(cam_info);
         break;
     case TMP:
         break;
@@ -85,7 +103,6 @@ int main()
 {
     struct sockaddr_un addr;
     char buf[100];
-    char read_buffer[100];
     int fd,rc;
 
     if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
@@ -118,7 +135,10 @@ int main()
     // }
     write(fd, "GDP", 4);
     while (1) {
+        printf("\nBack to scanning....\n");
+        char read_buffer[100];
         int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
         process_msg(read_buffer);
+        printf("\nDone here....\n");
     }
 }

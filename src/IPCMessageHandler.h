@@ -73,6 +73,7 @@ private:
             device_list = serialise_device_props(info);
             send_string(device_list);
         }
+        send_string("GDP$NULL!NULL!NULL");
     }
 
 public:
