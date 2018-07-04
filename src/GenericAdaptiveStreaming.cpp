@@ -149,7 +149,7 @@ void GenericAdaptiveStreaming::adapt_stream()
 {
     QoSReport qos_report = qos_estimator.get_qos_report();
     // adapt according to the information in this report
-    if (successive_transmissions > SUCCESSFUL_TRANSMISSION) {
+    if (successive_transmissions >= SUCCESSFUL_TRANSMISSION) {
         network_state = NetworkState::STEADY;
     }
 
@@ -242,6 +242,7 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
             v4l2_control bitrate_ctrl;
             v4l2_control veritcal_flip;
             v4l2_control horizontal_flip;
+            v4l2_control i_frame_interval;
 
             bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
             bitrate_ctrl.value = bitrate*1000;
@@ -252,9 +253,13 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
             horizontal_flip.id = V4L2_CID_HFLIP;
             horizontal_flip.value = TRUE;
 
+            i_frame_interval.id = V4L2_CID_MPEG_VIDEO_H264_I_PERIOD;
+            i_frame_interval.value = I_FRAME_INTERVAL;
+
             if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
                 ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &veritcal_flip) == -1 ||
-                ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1) {
+                ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1 ||
+                ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1) {
                 g_warning("ioctl fail :/");
             }
         }
