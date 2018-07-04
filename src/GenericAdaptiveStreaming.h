@@ -25,9 +25,6 @@ private:
     enum NetworkState {STEADY, CONGESTION} network_state;
     guint32 successive_transmissions;
 
-    gint v4l2_cam_fd;
-    bool res_inc;
-
     string video_caps_string;
 
     // better off as a char array, change it later

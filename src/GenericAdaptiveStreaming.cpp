@@ -36,8 +36,8 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     bitrate_presets[ResolutionPresets::MED] = MED_QUAL_BITRATE;
     bitrate_presets[ResolutionPresets::HIGH] = HIGH_QUAL_BITRATE;
 
+    set_state_constants();
     text_overlay = NULL;
-    res_inc = false;
     // if (link_all_elements()) {
     //     g_warning("goodlink");
     // } else {
@@ -148,9 +148,15 @@ void GenericAdaptiveStreaming::set_state_constants()
 void GenericAdaptiveStreaming::adapt_stream()
 {
     QoSReport qos_report = qos_estimator.get_qos_report();
-    set_state_constants();
     // adapt according to the information in this report
+    if (successive_transmissions > SUCCESSFUL_TRANSMISSION) {
+        network_state = NetworkState::STEADY;
+    }
+
+    set_state_constants();
+
     if (qos_report.get_fraction_lost() == 0) {
+        successive_transmissions++;
         if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
             improve_quality();
         }
@@ -160,11 +166,12 @@ void GenericAdaptiveStreaming::adapt_stream()
         }
     }
     else {
-        if (!res_inc) {
-            decrease_resolution();
-        }
-        // needs to be worked out for x264enc as well
+        network_state = NetworkState::CONGESTION;
+        successive_transmissions = 0;
+        decrease_resolution();
+        // Force key-frame on hardware encoders. Doesn't always work if the IOCTL isn't supported
         if (camera_type == CameraType::H264_CAM) {
+            int v4l2_cam_fd;
             g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
             v4l2_control force_keyframe;
             force_keyframe.id = V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME; //value is ignored
@@ -175,7 +182,6 @@ void GenericAdaptiveStreaming::adapt_stream()
             }
         }
     }
-    res_inc = false;
 }
 
 void GenericAdaptiveStreaming::improve_quality()
@@ -226,6 +232,7 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
     if (camera_type == CameraType::RAW_CAM) {
         g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
     } else if (camera_type == CameraType::H264_CAM) {
+        int v4l2_cam_fd;
         g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
         if (v4l2_cam_fd > 0) {
             v4l2_control bitrate_ctrl;
@@ -270,7 +277,6 @@ void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
 
 void GenericAdaptiveStreaming::increase_resolution()
 {
-    res_inc = true;
     switch (current_res) {
     case ResolutionPresets::LOW:
         set_resolution(ResolutionPresets::MED);
