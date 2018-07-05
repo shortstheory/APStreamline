@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-char socket_path[80] = "mysocket";
+char socket_path[80] = "/tmp/mysocket";
 
 void ipc_loop(RTSPStreamServer* streamer)
 {

@@ -8,7 +8,7 @@
 
 #define MAX_CAMERAS 8
 
-char socket_path[80] = "mysocket";
+char socket_path[80] = "/tmp/mysocket";
 
 
 typedef enum CameraType {RAW_CAM, H264_CAM} CameraType;
@@ -159,7 +159,7 @@ int main()
     //     printf("\nread %u bytes: %s\n", bytes_read, read_buffer);
     // }
     write(fd, "GDP", 4);
-    while (1) {
+    // while (1) {
         printf("\nBack to scanning....\n");
         char read_buffer[1000];
         // read_buffer[0] = '\0';
@@ -168,5 +168,5 @@ int main()
         process_msg(read_buffer);
 
         printf("\nRead buffer - %s\n", read_buffer);
-    }
+    // }
 }
