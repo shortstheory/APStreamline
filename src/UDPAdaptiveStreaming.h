@@ -19,6 +19,8 @@ private:
     GstElement* rtcp_udp_src;
     string rtcp_caps_string;
 
+    bool init_elements();
+    void init_element_properties();
     bool init_rtp_elements();
     bool link_all_elements();
 

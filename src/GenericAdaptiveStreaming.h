@@ -60,8 +60,6 @@ public:
 
     virtual ~GenericAdaptiveStreaming();
 
-    bool init_elements();
-    void init_element_properties();
     void pipeline_add_elements();
 
     void set_resolution(ResolutionPresets setting);

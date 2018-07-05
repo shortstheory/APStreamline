@@ -19,6 +19,51 @@ UDPAdaptiveStreaming::~UDPAdaptiveStreaming()
 {
 }
 
+bool UDPAdaptiveStreaming::init_elements()
+{
+    pipeline = gst_pipeline_new("adaptive-pipeline");
+    src_capsfilter = gst_element_factory_make("capsfilter", NULL);
+
+    // choose encoder according to ctr next time
+    h264_parser = gst_element_factory_make("h264parse", NULL);
+    v4l2_src = gst_element_factory_make("v4l2src", NULL);
+    text_overlay = gst_element_factory_make("textoverlay", NULL);
+    if (camera_type == CameraType::RAW_CAM) {
+        h264_encoder = gst_element_factory_make("x264enc", NULL);
+        videoconvert = gst_element_factory_make("videoconvert", NULL);
+    }
+    else if (camera_type == CameraType::H264_CAM) {
+        // do nothing
+    }
+
+    rtph264_payloader = gst_element_factory_make("rtph264pay", "pay0");
+    // FIXME: Update this soon!!!
+    if (!pipeline && !src_capsfilter && !rtph264_payloader && !h264_parser && !v4l2_src) {
+        if (camera_type == CameraType::RAW_CAM && !h264_encoder) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void UDPAdaptiveStreaming::init_element_properties()
+{
+    set_resolution(ResolutionPresets::LOW);
+
+    g_object_set(G_OBJECT(v4l2_src), "device", device.c_str(), NULL);
+    g_object_set(G_OBJECT(text_overlay), "text", device.c_str(), NULL);
+    g_object_set(G_OBJECT(text_overlay), "valignment", 2, NULL); //top
+    g_object_set(G_OBJECT(text_overlay), "halignment", 0, NULL); //left
+    g_object_set(G_OBJECT(text_overlay), "font-desc", "Sans, 9", NULL);
+    // valignment=2 halignment=0
+    if (camera_type == CameraType::RAW_CAM) {
+        g_object_set(G_OBJECT(h264_encoder), "tune", 0x00000004, "threads", 4, NULL);
+    }
+    else if (camera_type == CameraType::H264_CAM) {
+        // g_object_set(G_OBJECT(H264_CAM_src), "bitrate", 1000000, NULL);
+    }
+}
+
 bool UDPAdaptiveStreaming::init_rtp_elements()
 {
     rtpbin = gst_element_factory_make("rtpbin", NULL);
@@ -51,6 +96,8 @@ void UDPAdaptiveStreaming::pipeline_add_rtp_elements()
     gst_bin_add_many(GST_BIN(pipeline), rtpbin, rr_rtcp_identity,
                      sr_rtcp_identity, video_udp_sink, rtcp_udp_sink, rtcp_udp_src, NULL);
 }
+
+
 
 bool UDPAdaptiveStreaming::link_all_elements()
 {
