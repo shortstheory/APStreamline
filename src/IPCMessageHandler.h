@@ -25,7 +25,7 @@ private:
         cout << "Recevied buffer - " << buf << endl;
         for (int i = 0; i < RTSPMessageHeader.size(); i++) {
             if (!buffer.compare(0, RTSPMessageHeader[i].size(), RTSPMessageHeader[i])) {
-                cout << "Message type - " << RTSPMessageHeader[i] << " " << static_cast<RTSPMessageType>(i);
+                cout << "Message type - " << RTSPMessageHeader[i] << " " << static_cast<RTSPMessageType>(i) << endl;
                 return static_cast<RTSPMessageType>(i);
             }
         }
@@ -45,11 +45,12 @@ private:
         string dev_info;
         // weird hack to work around \0?
         // dev_info = device_props.camera_name.substr(0, device_props.camera_name.size()-1) + "!" + device_props.mount_point + "!" + to_string(device_props.camera_type);
-        char info_buffer[100];
+        char info_buffer[1000];
+        info_buffer[0] = '\0';
         // dev_info =  + "!" +  + "!" + to_string(device_props.camera_type);
-        sprintf(info_buffer, "GDP$%s!%s!%s\0", device_props.camera_name.c_str(), device_props.mount_point.c_str(), to_string(device_props.camera_type).c_str());
+        sprintf(info_buffer, "{\"name\": \"%s\", \"mount\": \"%s\", \"type\": \"%s\"}", device_props.camera_name.c_str(), device_props.mount_point.c_str(), to_string(device_props.camera_type).c_str());
         // cout << dev_info;
-        printf("SERIALIST!! %s", info_buffer);
+        // printf("SERIALIST!! %s", info_buffer);
         return string(info_buffer);
     }
 
@@ -68,12 +69,30 @@ private:
     {
         vector<v4l2_info> device_props;
         device_props = rtsp_stream_server->get_device_properties();
-        for (v4l2_info info : device_props) {
-            string device_list;
-            device_list = serialise_device_props(info);
-            send_string(device_list);
+        string json_message;
+        json_message = "GDP$[";
+        // for (v4l2_info info : device_props) {
+        //     string device_list;
+        //     device_list = serialise_device_props(info);
+        //     send_string(device_list);
+        // }
+        for (int i = 0; i < device_props.size(); i++) {
+            if (i == 0) {
+                json_message = json_message + serialise_device_props(device_props.at(i));
+            } else {
+                json_message = json_message + ", " + serialise_device_props(device_props.at(i));
+            }
         }
-        send_string("GDP$NULL!NULL!NULL");
+        json_message = json_message + "]";
+        cout << "\n\nJSON Msg" << json_message << endl;
+
+        send_string(json_message);
+        // v4l2_info sentinel;
+        // sentinel.camera_name = "NULL";
+        // sentinel.mount_point = "NULL";
+        // sentinel.camera_type = CameraType::RAW_CAM;
+        // send_string(serialise_device_props(sentinel));
+        // send_string("GDP$NULL!NULL!NULL");
     }
 
 public:

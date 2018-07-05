@@ -28,7 +28,7 @@ int camera_count = 0;
 
 void print_v4l2_info(v4l2_info* info)
 {
-    printf("\n camname - %s // mountpt -  %s // cam_type - %d\n", info->camera_name, info->mount_point, info->mount_point);
+    printf("camname - %s // mountpt -  %s // cam_type - %d\n", info->camera_name, info->mount_point, info->mount_point);
 }
 
 void v4l2_info_json(v4l2_info info, char* json)
@@ -60,7 +60,6 @@ void v4l2_array_json()
 
 RTSPMessageType get_message_type(char* buf)
 {
-    printf("gettingmsgtype\n");
     for (int i = 0; i < COUNT; i++) {
         if (!strcmp(buf, RTSPMessageHeader[i])) {
             // printf("\nMSG TYPE - %s", RTSPMessageHeader[i]);
@@ -110,15 +109,12 @@ void process_msg(char* read_buffer)
     RTSPMessageType message_type;
     message_type = get_message_type(msg_header);
 
+    p = strtok(NULL, "$");
+
     switch (message_type) {
     case GET_DEVICE_PROPS:
         ; // so bizarre!!!
-        // printf("header - %s // camera_name - %s // mountpt - %s // cam_type - %s\n", msg_header, camera_name, mount_pt, cam_type);
-        v4l2_info cam_info;
-        process_device_props(p, &cam_info);
-        print_v4l2_info(&cam_info);
-        // v4l2_info_json(cam_info);
-        store_cam_info(cam_info);
+        printf("Got JSON - %s", p);
         break;
     case TMP:
         break;
@@ -165,9 +161,12 @@ int main()
     write(fd, "GDP", 4);
     while (1) {
         printf("\nBack to scanning....\n");
-        char read_buffer[100];
-        int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
+        char read_buffer[1000];
+        // read_buffer[0] = '\0';
+        // int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
+        int bytes_read = recv(fd, read_buffer, sizeof(read_buffer), 0);
         process_msg(read_buffer);
-        printf("\nDone here....\n");
+
+        printf("\nRead buffer - %s\n", read_buffer);
     }
 }
