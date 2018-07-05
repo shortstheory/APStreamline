@@ -31,6 +31,31 @@ void print_v4l2_info(v4l2_info* info)
     printf("\n camname - %s // mountpt -  %s // cam_type - %d\n", info->camera_name, info->mount_point, info->mount_point);
 }
 
+void v4l2_info_json(v4l2_info info, char* json)
+{
+    sprintf(json, "{\"name\": \"%s\", \"mount\": \"%s\", \"type\": \"%s\"}", info.camera_name, info.mount_point, info.camera_type);
+    printf("JSON Str: %s\n", json);
+}
+
+void v4l2_array_json()
+{
+    char jsonarray[1000];
+    strcat(jsonarray, "[");
+    for (int i = 0; i < camera_count; i++) {
+        char tmp[1000];
+        v4l2_info_json(info_objs[i], tmp);
+        if (i == 0) {
+            strcat(jsonarray, tmp);
+        } else {
+            strcat(jsonarray, ", ");
+            strcat(jsonarray, tmp);
+        }
+    }
+    strcat(jsonarray, "]");
+    printf("JSON Array: %s\n", jsonarray);
+
+}
+
 RTSPMessageType get_message_type(char* buf)
 {
     printf("gettingmsgtype\n");
@@ -70,6 +95,7 @@ void store_cam_info(v4l2_info info)
         printf("Done saving objs @count of %d", camera_count);
         camera_count = curr_counter+1;
         curr_counter = 0;
+        v4l2_array_json();
     }
 }
 
@@ -89,6 +115,7 @@ void process_msg(char* read_buffer)
         v4l2_info cam_info;
         process_device_props(p, &cam_info);
         print_v4l2_info(&cam_info);
+        // v4l2_info_json(cam_info);
         store_cam_info(cam_info);
         break;
     case TMP:
