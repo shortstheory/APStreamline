@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     GMainLoop* loop = g_main_loop_new(NULL, FALSE);
     GstRTSPServer* server = gst_rtsp_server_new();
     gst_rtsp_server_set_service(server, "8554");
-    gst_rtsp_server_set_address(server, "172.17.0.2");
+    gst_rtsp_server_set_address(server, "192.168.1.3");
     g_print("custom Stream ready at rtsp://172.17.0.2:8554/test");
     //     RTSPAdaptiveStreaming rtsp_adaptive_streaming0("/dev/video1", GenericAdaptiveStreaming::CameraType::RAW_CAM,
     //             "/logitech", server);

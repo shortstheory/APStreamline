@@ -37,21 +37,18 @@ void ipc_loop(RTSPStreamServer* streamer)
         return;
     }
 
-    if ((client_fd = accept(socket_fd, NULL, NULL)) == -1) {
-        g_warning("Connection failed");
-    }
-
-    IPCMessageHandler message_handler(client_fd, streamer);
-    g_warning("Connection accepted!");
-
-    // while (true) {
+    // if ((client_fd = accept(socket_fd, NULL, NULL)) == -1) {
+    //     g_warning("Connection failed");
+    
+    while (client_fd = accept(socket_fd, NULL, NULL)) {
+        IPCMessageHandler message_handler(client_fd, streamer);
+        g_warning("Connection accepted!");
         while ((bytes_read=read(client_fd,buf,sizeof(buf))) > 0) {
             message_handler.process_msg(buf);
             printf("read %u bytes: %s\n", bytes_read, buf);
         }
-        if (bytes_read == -1) {
-        }
-    // }
+        g_warning("Disconnected from loop!");
+    }
 }
 
 int main(int argc, char *argv[])
