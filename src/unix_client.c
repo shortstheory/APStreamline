@@ -40,6 +40,7 @@ void v4l2_info_json(v4l2_info info, char* json)
 void v4l2_array_json()
 {
     char jsonarray[1000];
+    jsonarray[0] = '\0';
     strcat(jsonarray, "[");
     for (int i = 0; i < camera_count; i++) {
         char tmp[1000];
@@ -52,6 +53,7 @@ void v4l2_array_json()
         }
     }
     strcat(jsonarray, "]");
+    // sprintf(jsonarray, "%s]", jsonarray);
     printf("JSON Array: %s\n", jsonarray);
 
 }
