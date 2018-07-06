@@ -48,7 +48,7 @@ private:
         char info_buffer[1000];
         info_buffer[0] = '\0';
         // dev_info =  + "!" +  + "!" + to_string(device_props.camera_type);
-        sprintf(info_buffer, "{\"name\": \"%s\", \"mount\": \"%s\", \"type\": \"%s\"}", device_props.camera_name.c_str(), device_props.mount_point.c_str(), to_string(device_props.camera_type).c_str());
+        sprintf(info_buffer, "{\"name\": \"%s\", \"mount\": \"%s\", \"camtype\": \"%s\"}", device_props.camera_name.c_str(), device_props.mount_point.c_str(), to_string(device_props.camera_type).c_str());
         // cout << dev_info;
         // printf("SERIALIST!! %s", info_buffer);
         return string(info_buffer);

@@ -127,8 +127,7 @@ void process_msg(char* read_buffer)
 int main()
 {
     struct sockaddr_un addr;
-    char buf[100];
-    int fd,rc;
+    int fd;
 
     if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
         perror("socket error");
@@ -145,28 +144,10 @@ int main()
         exit(-1);
     }
 
-    // while ((rc=read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
-    //     if (write(fd, buf, rc) != rc) {
-    //         if (rc > 0) {
-    //             fprintf(stderr,"partial write");
-    //         }
-    //         else {
-    //             perror("write error");
-    //         }
-    //     }
-    //     int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
-    //     process_msg(read_buffer);
-    //     printf("\nread %u bytes: %s\n", bytes_read, read_buffer);
-    // }
     write(fd, "GDP", 4);
-    // while (1) {
-        printf("\nBack to scanning....\n");
-        char read_buffer[1000];
-        // read_buffer[0] = '\0';
-        // int bytes_read=read(fd,read_buffer,sizeof(read_buffer));
-        int bytes_read = recv(fd, read_buffer, sizeof(read_buffer), 0);
-        process_msg(read_buffer);
+    char read_buffer[1000];
+    int bytes_read = recv(fd, read_buffer, sizeof(read_buffer), 0);
+    process_msg(read_buffer);
 
-        printf("\nRead buffer - %s\n", read_buffer);
-    // }
+    printf("\nRead buffer - %s\n", read_buffer);
 }
