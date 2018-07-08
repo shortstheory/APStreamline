@@ -79,23 +79,65 @@ void RTSPStreamServer::get_v4l2_devices_info()
                 frmsize.pixel_format = fmt.pixelformat;
                 frmsize.index = 0;
                 printf("%s\n", fmt.description);
-                while (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0) {
+                // while (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0) {
+                for (frmsize.index = 0; ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0; frmsize.index++) {
                     if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
+                        FramePresets preset;
+                        if (frmsize.discrete.width == 320 && frmsize.discrete.height == 240) {
+                            preset = FRAME_320x240;
+                        } else if (frmsize.discrete.width == 640 && frmsize.discrete.height == 480) {
+                            preset = FRAME_640x480;
+                        } else if (frmsize.discrete.width == 1280 && frmsize.discrete.height == 720) {
+                            preset = FRAME_1280x720;
+                        } else {
+                            continue;
+                        }
+
                         printf("%dx%d\n", 
                                         frmsize.discrete.width,
                                         frmsize.discrete.height);
-                            frmival.pixel_format = fmt.pixelformat;
-                            frmival.index = 0;
-                            frmival.width = frmsize.discrete.width;
-                            frmival.height = frmsize.discrete.height;
-                            while (ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) >= 0) {
-                                    printf("%d/%d\n", 
-                                                    frmival.discrete.numerator,
-                                                    frmival.discrete.denominator);
-                                frmival.index++;
+
+                        frmival.pixel_format = fmt.pixelformat;
+                        frmival.width = frmsize.discrete.width;
+                        frmival.height = frmsize.discrete.height;
+
+                        for (frmival.index = 0; ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) >= 0; frmival.index++) {
+                            int framerate  = frmival.discrete.denominator;
+                            VideoPresets video_preset;
+                            printf("%d\n", framerate);
+                            switch (preset) {
+                            case FRAME_320x240:
+                                if (framerate == 15) {
+
+                                } else if (framerate == 30) {
+
+                                } else if (framerate == 60) {
+
+                                }
+                                break;
+                            case FRAME_640x480:
+                                if (framerate == 15) {
+
+                                } else if (framerate == 30) {
+
+                                } else if (framerate == 60) {
+
+                                }
+                                break;
+                            case FRAME_1280x720:
+                                if (framerate == 15) {
+
+                                } else if (framerate == 30) {
+
+                                } else if (framerate == 60) {
+
+                                }
+                                break;
+                            default:
+                                ;
                             }
+                        }
                     }
-                    frmsize.index++;
                 }
                 fmt.index++;
             }
