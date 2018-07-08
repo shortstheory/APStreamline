@@ -3,10 +3,10 @@
 #include <gst/gst.h>
 
 #ifdef __amd64__
-    static const guint32 MAX_STEADY_BITRATE = 6000;
+static const guint32 MAX_STEADY_BITRATE = 6000;
 #endif
 #ifdef __arm__
-    static const guint32 MAX_STEADY_BITRATE = 2500;
+static const guint32 MAX_STEADY_BITRATE = 2500;
 #endif
 
 static const guint32 MIN_STEADY_BITRATE = 500;

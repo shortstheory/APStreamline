@@ -9,7 +9,7 @@
 
 // not sure why this isn't included in some pacakges?!
 #ifndef V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME
-    #define V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME		(V4L2_CID_MPEG_BASE+229)
+#define V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME		(V4L2_CID_MPEG_BASE+229)
 #endif
 
 // GenericAdaptiveStreaming::GenericAdaptiveStreaming() : camera_type(CameraType::RAW_CAM)
@@ -17,9 +17,9 @@
 //     g_warning("noparmctr");
 // }
 
-GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType type) : 
-                                                    device(_device), camera_type(type),
-                                                    network_state(NetworkState::STEADY), successive_transmissions(0)
+GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType type) :
+    device(_device), camera_type(type),
+    network_state(NetworkState::STEADY), successive_transmissions(0)
 {
     if (camera_type == CameraType::RAW_CAM) {
         video_presets[ResolutionPresets::LOW] = "video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1";
@@ -91,7 +91,8 @@ void GenericAdaptiveStreaming::set_state_constants()
         MIN_BITRATE = MIN_STEADY_BITRATE;
         INC_BITRATE = INC_STEADY_BITRATE;
         DEC_BITRATE = DEC_STEADY_BITRATE;
-    } else if (network_state == NetworkState::CONGESTION) {
+    }
+    else if (network_state == NetworkState::CONGESTION) {
         MAX_BITRATE = MAX_CONGESTION_BITRATE;
         MIN_BITRATE = MIN_CONGESTION_BITRATE;
         INC_BITRATE = INC_CONGESTION_BITRATE;
@@ -171,9 +172,11 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
     if (bitrate >= MIN_BITRATE && bitrate <= MAX_BITRATE) {
         h264_bitrate = bitrate;
-    } else if (h264_bitrate > MAX_BITRATE) {
+    }
+    else if (h264_bitrate > MAX_BITRATE) {
         h264_bitrate = MAX_BITRATE;
-    } else if (h264_bitrate < MIN_BITRATE) {
+    }
+    else if (h264_bitrate < MIN_BITRATE) {
         h264_bitrate = MIN_BITRATE;
     }
 
@@ -181,15 +184,16 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
         QoSReport qos_report = qos_estimator.get_qos_report();
 
         string state = (network_state == NetworkState::STEADY) ? "STEADY" : "CONGESTED";
-        string stats = "BR: " + to_string(h264_bitrate) + " H264: " + 
-                        to_string(qos_report.get_encoding_bitrate())
-                        + " BW: " + to_string(qos_report.get_estimated_bitrate()) + " STATE: " + state;
+        string stats = "BR: " + to_string(h264_bitrate) + " H264: " +
+                       to_string(qos_report.get_encoding_bitrate())
+                       + " BW: " + to_string(qos_report.get_estimated_bitrate()) + " STATE: " + state;
 
         g_object_set(G_OBJECT(text_overlay), "text", stats.c_str(), NULL);
     }
     if (camera_type == CameraType::RAW_CAM) {
         g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
-    } else if (camera_type == CameraType::H264_CAM) {
+    }
+    else if (camera_type == CameraType::H264_CAM) {
         int v4l2_cam_fd;
         g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
         if (v4l2_cam_fd > 0) {

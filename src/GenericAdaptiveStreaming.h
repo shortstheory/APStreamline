@@ -20,7 +20,7 @@ private:
     guint32 MIN_BITRATE;
     guint32 MAX_BITRATE;
     guint32 DEC_BITRATE;
-    guint32 INC_BITRATE; 
+    guint32 INC_BITRATE;
 
     enum NetworkState {STEADY, CONGESTION} network_state;
     guint32 successive_transmissions;

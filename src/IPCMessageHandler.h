@@ -79,7 +79,8 @@ private:
         for (int i = 0; i < device_props.size(); i++) {
             if (i == 0) {
                 json_message = json_message + serialise_device_props(device_props.at(i));
-            } else {
+            }
+            else {
                 json_message = json_message + ", " + serialise_device_props(device_props.at(i));
             }
         }

@@ -68,17 +68,17 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         if (str.find("pipeline") != std::string::npos) {
 #endif
 #ifdef __arm__
-        if (str.find("bin") != std::string::npos) {
+            if (str.find("bin") != std::string::npos) {
 #endif
-            pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
-        }
-        if (str.find("rtpbin") != std::string::npos) {
-            rtpbin = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
-        }
-        if (str.find("multiudpsink") != std::string::npos) {
-            g_warning("Identified %s", str.c_str());
-            multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
-        }
+                pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+            }
+            if (str.find("rtpbin") != std::string::npos) {
+                rtpbin = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+            }
+            if (str.find("multiudpsink") != std::string::npos) {
+                g_warning("Identified %s", str.c_str());
+                multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+            }
             // g_warning("element name = %s", str.c_str());
         }
 

@@ -39,7 +39,7 @@ void ipc_loop(RTSPStreamServer* streamer)
 
     // if ((client_fd = accept(socket_fd, NULL, NULL)) == -1) {
     //     g_warning("Connection failed");
-    
+
     while (client_fd = accept(socket_fd, NULL, NULL)) {
         IPCMessageHandler message_handler(client_fd, streamer);
         g_warning("Connection accepted!");

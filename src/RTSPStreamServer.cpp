@@ -85,17 +85,20 @@ void RTSPStreamServer::get_v4l2_devices_info()
                         FramePresets preset;
                         if (frmsize.discrete.width == 320 && frmsize.discrete.height == 240) {
                             preset = FRAME_320x240;
-                        } else if (frmsize.discrete.width == 640 && frmsize.discrete.height == 480) {
+                        }
+                        else if (frmsize.discrete.width == 640 && frmsize.discrete.height == 480) {
                             preset = FRAME_640x480;
-                        } else if (frmsize.discrete.width == 1280 && frmsize.discrete.height == 720) {
+                        }
+                        else if (frmsize.discrete.width == 1280 && frmsize.discrete.height == 720) {
                             preset = FRAME_1280x720;
-                        } else {
+                        }
+                        else {
                             continue;
                         }
 
-                        printf("%dx%d\n", 
-                                        frmsize.discrete.width,
-                                        frmsize.discrete.height);
+                        printf("%dx%d\n",
+                               frmsize.discrete.width,
+                               frmsize.discrete.height);
 
                         frmival.pixel_format = fmt.pixelformat;
                         frmival.width = frmsize.discrete.width;
@@ -109,27 +112,33 @@ void RTSPStreamServer::get_v4l2_devices_info()
                             case FRAME_320x240:
                                 if (framerate == 15) {
 
-                                } else if (framerate == 30) {
+                                }
+                                else if (framerate == 30) {
 
-                                } else if (framerate == 60) {
+                                }
+                                else if (framerate == 60) {
 
                                 }
                                 break;
                             case FRAME_640x480:
                                 if (framerate == 15) {
 
-                                } else if (framerate == 30) {
+                                }
+                                else if (framerate == 30) {
 
-                                } else if (framerate == 60) {
+                                }
+                                else if (framerate == 60) {
 
                                 }
                                 break;
                             case FRAME_1280x720:
                                 if (framerate == 15) {
 
-                                } else if (framerate == 30) {
+                                }
+                                else if (framerate == 30) {
 
-                                } else if (framerate == 60) {
+                                }
+                                else if (framerate == 60) {
 
                                 }
                                 break;
