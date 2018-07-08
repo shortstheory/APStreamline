@@ -67,6 +67,33 @@ void RTSPStreamServer::get_v4l2_devices_info()
             info.mount_point = mount_point_prefix + to_string(i);
             device_properties_map.insert(pair<string, v4l2_info>(dev, info));
             fprintf(stderr, "name - %s driver - %s\n", caps.card, caps.driver);
+
+            v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+            v4l2_fmtdesc fmt;
+            v4l2_frmsizeenum frmsize;
+            v4l2_frmivalenum frmival;
+
+            fmt.index = 0;
+            fmt.type = type;
+            while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
+                frmsize.pixel_format = fmt.pixelformat;
+                frmsize.index = 0;
+                printf("%s\n", fmt.description);
+                while (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0) {
+                    if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
+                        printf("%dx%d\n", 
+                                        frmsize.discrete.width,
+                                        frmsize.discrete.height);
+                    } else if (frmsize.type == V4L2_FRMSIZE_TYPE_STEPWISE) {
+                        printf("%dx%d\n", 
+                                        frmsize.stepwise.max_width,
+                                        frmsize.stepwise.max_height);
+                    }
+                        frmsize.index++;
+                }
+                fmt.index++;
+            }
+
             close(fd);
         }
         i++;
