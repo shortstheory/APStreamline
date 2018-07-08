@@ -84,16 +84,21 @@ void RTSPStreamServer::get_v4l2_devices_info()
                         printf("%dx%d\n", 
                                         frmsize.discrete.width,
                                         frmsize.discrete.height);
-                    } else if (frmsize.type == V4L2_FRMSIZE_TYPE_STEPWISE) {
-                        printf("%dx%d\n", 
-                                        frmsize.stepwise.max_width,
-                                        frmsize.stepwise.max_height);
+                            frmival.pixel_format = fmt.pixelformat;
+                            frmival.index = 0;
+                            frmival.width = frmsize.discrete.width;
+                            frmival.height = frmsize.discrete.height;
+                            while (ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) >= 0) {
+                                    printf("%d/%d\n", 
+                                                    frmival.discrete.numerator,
+                                                    frmival.discrete.denominator);
+                                frmival.index++;
+                            }
                     }
-                        frmsize.index++;
+                    frmsize.index++;
                 }
                 fmt.index++;
             }
-
             close(fd);
         }
         i++;
