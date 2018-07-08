@@ -129,11 +129,11 @@ void GenericAdaptiveStreaming::adapt_stream()
             g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
             v4l2_control force_keyframe;
             force_keyframe.id = V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME; //value is ignored
-            if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &force_keyframe) == -1) {
-                g_warning("Keyframe ioctl failed");
-            } else {
-                g_warning("New keyframe requested");
-            }
+            // if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &force_keyframe) == -1) {
+            //     g_warning("Keyframe ioctl failed");
+            // } else {
+            //     g_warning("New keyframe requested");
+            // }
         }
     }
 }
