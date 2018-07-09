@@ -62,9 +62,12 @@ void RTSPStreamServer::get_v4l2_devices_info()
         if (fd != -1) {
             v4l2_capability caps;
             ioctl(fd, VIDIOC_QUERYCAP, &caps);
+
             info.camera_name = string(caps.card, caps.card + sizeof caps.card / sizeof caps.card[0]);
             info.camera_type = CameraType::RAW_CAM;
             info.mount_point = mount_point_prefix + to_string(i);
+            info.frame_property_bitmask = 0;
+
             device_properties_map.insert(pair<string, v4l2_info>(dev, info));
             fprintf(stderr, "name - %s driver - %s\n", caps.card, caps.driver);
 
@@ -111,35 +114,35 @@ void RTSPStreamServer::get_v4l2_devices_info()
                             switch (preset) {
                             case FRAME_320x240:
                                 if (framerate == 15) {
-
+                                    info.frame_property_bitmask |= (1 << VIDEO_320x240x15);
                                 }
                                 else if (framerate == 30) {
-
+                                    info.frame_property_bitmask |= (1 << VIDEO_320x240x30);
                                 }
                                 else if (framerate == 60) {
-
+                                    info.frame_property_bitmask |= (1 << VIDEO_320x240x60);
                                 }
                                 break;
                             case FRAME_640x480:
                                 if (framerate == 15) {
-
+                                    info.frame_property_bitmask |= (1 << VIDEO_640x480x15);
                                 }
                                 else if (framerate == 30) {
-
+                                    info.frame_property_bitmask |= (1 << VIDEO_640x480x30);
                                 }
                                 else if (framerate == 60) {
-
+                                    info.frame_property_bitmask |= (1 << VIDEO_640x480x60);
                                 }
                                 break;
                             case FRAME_1280x720:
                                 if (framerate == 15) {
-
+                                    info.frame_property_bitmask |= (1 << VIDEO_1280x720x15);
                                 }
                                 else if (framerate == 30) {
-
+                                    info.frame_property_bitmask |= (1 << VIDEO_1280x720x30);
                                 }
                                 else if (framerate == 60) {
-
+                                    info.frame_property_bitmask |= (1 << VIDEO_1280x720x60);
                                 }
                                 break;
                             default:
@@ -150,6 +153,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
                 }
                 fmt.index++;
             }
+            cout << "Cam Bitmask - " << info.frame_property_bitmask << endl;
             close(fd);
         }
         i++;
