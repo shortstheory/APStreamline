@@ -5,7 +5,7 @@
 
 using namespace std;
 
-enum CameraType {RAW_CAM, RAW_H264_CAM, H264_CAM};
+enum CameraType {RAW_CAM, RAW_H264_CAM, H264_CAM, MANUAL_CAM};
 enum ResolutionPresets {LOW, MED, HIGH};
 enum RTSPMessageType {GET_DEVICE_PROPS, TMP, ERR, COUNT};
 enum FramePresets {FRAME_320x240, FRAME_640x480, FRAME_1280x720, FRAME_COUNT};

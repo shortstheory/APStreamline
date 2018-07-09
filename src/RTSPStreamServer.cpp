@@ -52,6 +52,21 @@ void RTSPStreamServer::get_v4l2_devices()
     closedir(dp);
 }
 
+bool RTSPStreamServer::check_h264_ioctls(int fd)
+{
+    v4l2_queryctrl bitrate_ctrl;
+    v4l2_queryctrl i_frame_interval;
+
+    bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
+    i_frame_interval.id = V4L2_CID_MPEG_VIDEO_H264_I_PERIOD;
+
+    // i_frame interval is nice to have, but not a must have, might do special handling later
+    if (ioctl(fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1) {
+        return false;
+    }
+    return true;
+}
+
 void RTSPStreamServer::get_v4l2_devices_info()
 {
     int i = 0;
@@ -64,7 +79,6 @@ void RTSPStreamServer::get_v4l2_devices_info()
             ioctl(fd, VIDIOC_QUERYCAP, &caps);
 
             info.camera_name = string(caps.card, caps.card + sizeof caps.card / sizeof caps.card[0]);
-            info.camera_type = CameraType::RAW_CAM;
             info.mount_point = mount_point_prefix + to_string(i);
             info.frame_property_bitmask = 0;
 
@@ -75,83 +89,110 @@ void RTSPStreamServer::get_v4l2_devices_info()
             v4l2_frmsizeenum frmsize;
             v4l2_frmivalenum frmival;
 
+            int mjpg_index = -1;
+            int h264_index = -1;
+
             fmt.index = 0;
             fmt.type = type;
+
             while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
-                frmsize.pixel_format = fmt.pixelformat;
-                frmsize.index = 0;
                 printf("%s\n", fmt.description);
-                // while (ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0) {
-                for (frmsize.index = 0; ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0; frmsize.index++) {
-                    if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
-                        FramePresets preset;
-                        if (frmsize.discrete.width == 320 && frmsize.discrete.height == 240) {
-                            preset = FRAME_320x240;
-                        }
-                        else if (frmsize.discrete.width == 640 && frmsize.discrete.height == 480) {
-                            preset = FRAME_640x480;
-                        }
-                        else if (frmsize.discrete.width == 1280 && frmsize.discrete.height == 720) {
-                            preset = FRAME_1280x720;
-                        }
-                        else {
-                            continue;
-                        }
-
-                        printf("%dx%d\n",
-                               frmsize.discrete.width,
-                               frmsize.discrete.height);
-
-                        frmival.pixel_format = fmt.pixelformat;
-                        frmival.width = frmsize.discrete.width;
-                        frmival.height = frmsize.discrete.height;
-
-                        for (frmival.index = 0; ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) >= 0; frmival.index++) {
-                            int framerate  = frmival.discrete.denominator;
-                            VideoPresets video_preset;
-                            printf("%d\n", framerate);
-                            switch (preset) {
-                            case FRAME_320x240:
-                                if (framerate == 15) {
-                                    info.frame_property_bitmask |= (1 << VIDEO_320x240x15);
-                                }
-                                else if (framerate == 30) {
-                                    info.frame_property_bitmask |= (1 << VIDEO_320x240x30);
-                                }
-                                else if (framerate == 60) {
-                                    info.frame_property_bitmask |= (1 << VIDEO_320x240x60);
-                                }
-                                break;
-                            case FRAME_640x480:
-                                if (framerate == 15) {
-                                    info.frame_property_bitmask |= (1 << VIDEO_640x480x15);
-                                }
-                                else if (framerate == 30) {
-                                    info.frame_property_bitmask |= (1 << VIDEO_640x480x30);
-                                }
-                                else if (framerate == 60) {
-                                    info.frame_property_bitmask |= (1 << VIDEO_640x480x60);
-                                }
-                                break;
-                            case FRAME_1280x720:
-                                if (framerate == 15) {
-                                    info.frame_property_bitmask |= (1 << VIDEO_1280x720x15);
-                                }
-                                else if (framerate == 30) {
-                                    info.frame_property_bitmask |= (1 << VIDEO_1280x720x30);
-                                }
-                                else if (framerate == 60) {
-                                    info.frame_property_bitmask |= (1 << VIDEO_1280x720x60);
-                                }
-                                break;
-                            default:
-                                ;
-                            }
-                        }
-                    }
+                if (!strcmp((char*)fmt.description, "Motion-JPEG")) {
+                    mjpg_index = fmt.index;
+                }
+                if (!strcmp((char*)fmt.description, "H264")) {
+                    h264_index = fmt.index;
                 }
                 fmt.index++;
             }
+
+            if (mjpg_index != -1) {
+                fmt.index = mjpg_index;
+            }
+
+            // only take h264 caps if the camera support it, mjpg will have the same caps
+            if (h264_index != -1) {
+                fmt.index = h264_index;
+                if (check_h264_ioctls(fd)) {
+                    info.camera_type = H264_CAM;
+                } else {
+                    info.camera_type = RAW_H264_CAM;
+                }
+            } else {
+                info.camera_type = RAW_CAM;
+            }
+
+            frmsize.pixel_format = fmt.pixelformat;
+
+            for (frmsize.index = 0; ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0; frmsize.index++) {
+                if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
+                    FramePresets preset;
+                    if (frmsize.discrete.width == 320 && frmsize.discrete.height == 240) {
+                        preset = FRAME_320x240;
+                    }
+                    else if (frmsize.discrete.width == 640 && frmsize.discrete.height == 480) {
+                        preset = FRAME_640x480;
+                    }
+                    else if (frmsize.discrete.width == 1280 && frmsize.discrete.height == 720) {
+                        preset = FRAME_1280x720;
+                    }
+                    else {
+                        continue;
+                    }
+
+                    // printf("%dx%d\n",
+                    //         frmsize.discrete.width,
+                    //         frmsize.discrete.height);
+
+                    frmival.pixel_format = fmt.pixelformat;
+                    frmival.width = frmsize.discrete.width;
+                    frmival.height = frmsize.discrete.height;
+
+                    for (frmival.index = 0; ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) >= 0; frmival.index++) {
+                        int framerate  = frmival.discrete.denominator;
+                        VideoPresets video_preset;
+                        // printf("%d\n", framerate);
+                        switch (preset) {
+                        case FRAME_320x240:
+                            if (framerate == 15) {
+                                info.frame_property_bitmask |= (1 << VIDEO_320x240x15);
+                            }
+                            else if (framerate == 30) {
+                                info.frame_property_bitmask |= (1 << VIDEO_320x240x30);
+                            }
+                            else if (framerate == 60) {
+                                info.frame_property_bitmask |= (1 << VIDEO_320x240x60);
+                            }
+                            break;
+                        case FRAME_640x480:
+                            if (framerate == 15) {
+                                info.frame_property_bitmask |= (1 << VIDEO_640x480x15);
+                            }
+                            else if (framerate == 30) {
+                                info.frame_property_bitmask |= (1 << VIDEO_640x480x30);
+                            }
+                            else if (framerate == 60) {
+                                info.frame_property_bitmask |= (1 << VIDEO_640x480x60);
+                            }
+                            break;
+                        case FRAME_1280x720:
+                            if (framerate == 15) {
+                                info.frame_property_bitmask |= (1 << VIDEO_1280x720x15);
+                            }
+                            else if (framerate == 30) {
+                                info.frame_property_bitmask |= (1 << VIDEO_1280x720x30);
+                            }
+                            else if (framerate == 60) {
+                                info.frame_property_bitmask |= (1 << VIDEO_1280x720x60);
+                            }
+                            break;
+                        default:
+                            ;
+                        }
+                    }
+                }
+            }
+
             cout << "Cam Bitmask - " << info.frame_property_bitmask << endl;
             device_properties_map.insert(pair<string, v4l2_info>(dev, info));
             close(fd);
