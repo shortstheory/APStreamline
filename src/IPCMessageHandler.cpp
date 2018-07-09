@@ -28,10 +28,15 @@ string IPCMessageHandler::serialise_device_props(v4l2_info device_props)
     // dev_info = device_props.camera_name.substr(0, device_props.camera_name.size()-1) + "!" + device_props.mount_point + "!" + to_string(device_props.camera_type);
     char info_buffer[1000];
     info_buffer[0] = '\0';
+    cout << "BITMASK - " << device_props.frame_property_bitmask;
     // dev_info =  + "!" +  + "!" + to_string(device_props.camera_type);
-    sprintf(info_buffer, "{\"name\": \"%s\", \"mount\": \"%s\", \"camtype\": \"%s\"}", device_props.camera_name.c_str(), device_props.mount_point.c_str(), to_string(device_props.camera_type).c_str());
+    sprintf(info_buffer, "{\"name\": \"%s\", \"mount\": \"%s\", \"camtype\": %d, \"frame_property_bitmask\": %llu}", 
+                            device_props.camera_name.c_str(),
+                            device_props.mount_point.c_str(),
+                            device_props.camera_type,
+                            device_props.frame_property_bitmask);
     // cout << dev_info;
-    // printf("SERIALIST!! %s", info_buffer);
+    printf("SERIALIST!! %s", info_buffer);
     return string(info_buffer);
 }
 

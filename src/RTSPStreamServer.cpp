@@ -68,7 +68,6 @@ void RTSPStreamServer::get_v4l2_devices_info()
             info.mount_point = mount_point_prefix + to_string(i);
             info.frame_property_bitmask = 0;
 
-            device_properties_map.insert(pair<string, v4l2_info>(dev, info));
             fprintf(stderr, "name - %s driver - %s\n", caps.card, caps.driver);
 
             v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -154,6 +153,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
                 fmt.index++;
             }
             cout << "Cam Bitmask - " << info.frame_property_bitmask << endl;
+            device_properties_map.insert(pair<string, v4l2_info>(dev, info));
             close(fd);
         }
         i++;
