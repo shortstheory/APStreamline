@@ -10,7 +10,7 @@ RTSPMessageType IPCMessageHandler::get_message_type(char* buf)
             return static_cast<RTSPMessageType>(i);
         }
     }
-    return RTSPMessageType::ERR;
+    return ERROR;
 }
 
 string IPCMessageHandler::get_message_payload(char* buf)
@@ -90,12 +90,13 @@ void IPCMessageHandler::process_msg(char* buf)
     RTSPMessageType msgtype;
     msgtype = get_message_type(buf);
     switch (msgtype) {
-    case RTSPMessageType::GET_DEVICE_PROPS:
+    case GET_DEVICE_PROPS:
         send_device_props();
         break;
-    case RTSPMessageType::TMP:
+    case SET_DEVICE_PROPS:
+        // set_device_props
         break;
-    case RTSPMessageType::ERR:
+    case ERROR:
         g_warning("Unrecognised header");
         break;
     }
