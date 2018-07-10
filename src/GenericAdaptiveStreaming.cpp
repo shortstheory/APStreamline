@@ -22,14 +22,14 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     network_state(NetworkState::STEADY), successive_transmissions(0)
 {
     if (camera_type == CameraType::RAW_CAM) {
-        video_presets[ResolutionPresets::LOW] = "video/x-raw, width=(int)320, height=(int)240, framerate=(fraction)30/1";
-        video_presets[ResolutionPresets::MED] = "video/x-raw, width=(int)640, height=(int)480, framerate=(fraction)30/1";
-        video_presets[ResolutionPresets::HIGH] = "video/x-raw, width=(int)1280, height=(int)720, framerate=(fraction)30/1";
+        video_presets[ResolutionPresets::LOW] = RAW_CAPS_FILTERS[VIDEO_320x240x30];
+        video_presets[ResolutionPresets::MED] = RAW_CAPS_FILTERS[VIDEO_640x480x30];
+        video_presets[ResolutionPresets::HIGH] = RAW_CAPS_FILTERS[VIDEO_1280x720x30];
     }
     else if (camera_type == CameraType::H264_CAM) {
-        video_presets[ResolutionPresets::LOW] = "video/x-h264, width=(int)320, height=(int)240, framerate=(fraction)30/1";
-        video_presets[ResolutionPresets::MED] = "video/x-h264, width=(int)640, height=(int)480, framerate=(fraction)30/1";
-        video_presets[ResolutionPresets::HIGH] = "video/x-h264, width=(int)1280, height=(int)720, framerate=(fraction)30/1";
+        video_presets[ResolutionPresets::LOW] = H264_CAPS_FILTERS[VIDEO_320x240x30];
+        video_presets[ResolutionPresets::MED] = H264_CAPS_FILTERS[VIDEO_640x480x30];
+        video_presets[ResolutionPresets::HIGH] = H264_CAPS_FILTERS[VIDEO_1280x720x30];
     }
 
     bitrate_presets[ResolutionPresets::LOW] = LOW_QUAL_BITRATE;
