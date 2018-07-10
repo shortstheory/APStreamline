@@ -42,7 +42,6 @@ public:
     GstRTSPServer* get_server();
 
     map<string, v4l2_info> get_device_map();
-    vector<v4l2_info> get_device_properties();
 };
 
 #endif

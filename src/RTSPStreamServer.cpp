@@ -214,15 +214,6 @@ map<string, v4l2_info> RTSPStreamServer::get_device_map()
     return device_properties_map;
 }
 
-vector<v4l2_info> RTSPStreamServer::get_device_properties()
-{
-    vector<v4l2_info> device_properties;
-    for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++) {
-        device_properties.push_back(it->second);
-    }
-    return device_properties;
-}
-
 GstRTSPServer* RTSPStreamServer::get_server()
 {
     return server;

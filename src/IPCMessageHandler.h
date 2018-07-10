@@ -21,7 +21,7 @@ private:
 
     RTSPMessageType get_message_type(char* buf);
     string get_message_payload(char* buf);
-    string serialise_device_props(v4l2_info device_props);
+    string serialise_device_props(pair<string, v4l2_info> device_props);
     bool send_string(string data);
     void send_device_props();
 
