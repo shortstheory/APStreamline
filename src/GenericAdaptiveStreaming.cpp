@@ -317,7 +317,4 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
             }
         }
     }
-
-
-    }
 }
