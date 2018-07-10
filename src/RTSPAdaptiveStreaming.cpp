@@ -49,14 +49,6 @@ void RTSPAdaptiveStreaming::static_media_prepared_callback(GstRTSPMedia* media, 
     ptr->media_prepared_callback(media);
 }
 
-void RTSPAdaptiveStreaming::change_quality(int quality)
-{
-    current_quality = quality;
-    if (quality == AUTO_PRESET) {
-
-    }
-}
-
 void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
 {
     GstElement* e = gst_rtsp_media_get_element(media);
@@ -154,7 +146,9 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
             //same buffer can have an SDES and an RTCP pkt
             while (more) {
                 qos_estimator.handle_rtcp_packet(packet);
-                adapt_stream();
+                if (quality == AUTO_PRESET) {
+                    adapt_stream();
+                }
                 more = gst_rtcp_packet_move_to_next(packet);
             }
             free(rtcp_buffer);

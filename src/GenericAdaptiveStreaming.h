@@ -39,6 +39,7 @@ private:
 
     void improve_quality();
     void degrade_quality();
+    void change_quality_preset(int quality);
 
 public:
     int current_quality;

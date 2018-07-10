@@ -285,3 +285,39 @@ bool GenericAdaptiveStreaming::change_source(string _device)
     }
     return false;
 }
+
+void GenericAdaptiveStreaming::change_quality_preset(int quality)
+{
+    current_quality = quality;
+    if (quality == AUTO_PRESET) {
+        h264_bitrate = MIN_BITRATE;
+        network_state = CONGESTION;
+        successive_transmissions = 0;
+    } else {
+        if (camera_type == CameraType::RAW_CAM) {
+            // set it to x264enc defaults
+            g_object_set(G_OBJECT(h264_encoder), "bitrate", 2048, NULL);
+        } else if (camera_type == CameraType::H264_CAM) {
+            int v4l2_cam_fd;
+            g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
+            if (v4l2_cam_fd > 0) {
+                v4l2_control bitrate_ctrl;
+                v4l2_control i_frame_interval;
+
+                bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
+                bitrate_ctrl.value = 2000000;
+
+                i_frame_interval.id = V4L2_CID_MPEG_VIDEO_H264_I_PERIOD;
+                i_frame_interval.value = 60;
+
+                if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
+                    ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1) {
+                    g_warning("ioctl fail :/");
+                }
+            }
+        }
+    }
+
+
+    }
+}
