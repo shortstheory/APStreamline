@@ -94,6 +94,7 @@ void IPCMessageHandler::process_msg(char* buf)
         send_device_props();
         break;
     case SET_DEVICE_PROPS:
+        cout << "Got an SDP message!" << buf << endl;
         // set_device_props
         break;
     case ERROR:

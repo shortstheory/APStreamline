@@ -14,7 +14,7 @@ char socket_path[80] = "/tmp/rtsp_server";
 void ipc_loop(RTSPStreamServer* streamer)
 {
     struct sockaddr_un addr;
-    char buf[100];
+    char buf[1000];
     int socket_fd, client_fd, bytes_read;
 
     if ((socket_fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
@@ -44,6 +44,7 @@ void ipc_loop(RTSPStreamServer* streamer)
         IPCMessageHandler message_handler(client_fd, streamer);
         g_warning("Connection accepted!");
         while ((bytes_read=read(client_fd,buf,sizeof(buf))) > 0) {
+            buf[bytes_read] = '\0';
             message_handler.process_msg(buf);
             printf("read %u bytes: %s\n", bytes_read, buf);
         }
