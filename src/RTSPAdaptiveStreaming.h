@@ -20,6 +20,7 @@ private:
     void init_media_factory();
     void add_rtpbin_probes();
     void media_prepared_callback(GstRTSPMedia* media);
+    void change_quality(int quality);
 
     GstPadProbeReturn rtcp_callback(GstPad* pad, GstPadProbeInfo* info);
     GstPadProbeReturn payloader_callback(GstPad* pad, GstPadProbeInfo* info);
@@ -32,7 +33,7 @@ private:
 
 public:
     RTSPAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM,
-                          string _uri = "/test", GstRTSPServer* server = nullptr);
+                          string _uri = "/test", GstRTSPServer* server = nullptr, int quality = AUTO_PRESET);
     ~RTSPAdaptiveStreaming() override;
 };
 

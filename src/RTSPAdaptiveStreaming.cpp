@@ -2,9 +2,10 @@
 #include <iostream>
 
 
-RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device, CameraType type, string _uri, GstRTSPServer* server):
+RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device, CameraType type, string _uri, GstRTSPServer* server, int quality):
     GenericAdaptiveStreaming(_device, type), uri(_uri), rtsp_server(server)
 {
+    current_quality = quality;
     init_media_factory();
 }
 
@@ -46,6 +47,14 @@ void RTSPAdaptiveStreaming::static_media_prepared_callback(GstRTSPMedia* media, 
 {
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
     ptr->media_prepared_callback(media);
+}
+
+void RTSPAdaptiveStreaming::change_quality(int quality)
+{
+    current_quality = quality;
+    if (quality == AUTO_PRESET) {
+
+    }
 }
 
 void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)

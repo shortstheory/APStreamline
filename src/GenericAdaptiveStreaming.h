@@ -41,6 +41,7 @@ private:
     void degrade_quality();
 
 public:
+    int current_quality;
     string device;
     ResolutionPresets current_res;
     guint32 h264_bitrate;
