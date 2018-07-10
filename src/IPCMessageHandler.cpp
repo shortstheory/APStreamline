@@ -30,10 +30,12 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     info_buffer[0] = '\0';
     cout << "BITMASK - " << device_props.second.frame_property_bitmask;
     // dev_info =  + "!" +  + "!" + to_string(device_props.camera_type);
-    sprintf(info_buffer, "{\"name\": \"%s\", "
+    sprintf(info_buffer, "{\"dev_mount\": \"%s\", "
+                          "\"name\": \"%s\", "
                           "\"mount\": \"%s\", "
                           "\"camtype\": %d, "
                           "\"frame_property_bitmask\": %llu}", 
+                            device_props.first.c_str(),
                             device_props.second.camera_name.c_str(),
                             device_props.second.mount_point.c_str(),
                             device_props.second.camera_type,
