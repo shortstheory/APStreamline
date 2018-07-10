@@ -34,12 +34,14 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
                           "\"name\": \"%s\", "
                           "\"mount\": \"%s\", "
                           "\"camtype\": %d, "
-                          "\"frame_property_bitmask\": %llu}", 
+                          "\"frame_property_bitmask\": %llu, "
+                          "\"current_quality\": %u}", 
                             device_props.first.c_str(),
                             device_props.second.camera_name.c_str(),
                             device_props.second.mount_point.c_str(),
                             device_props.second.camera_type,
-                            device_props.second.frame_property_bitmask);
+                            device_props.second.frame_property_bitmask,
+                            device_props.second.current_quality);
     // cout << dev_info;
     printf("SERIALIST!! %s", info_buffer);
     return string(info_buffer);

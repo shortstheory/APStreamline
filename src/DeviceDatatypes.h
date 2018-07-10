@@ -13,7 +13,7 @@ enum VideoPresets {VIDEO_320x240x15, VIDEO_640x480x15, VIDEO_1280x720x15,
                    VIDEO_320x240x30, VIDEO_640x480x30, VIDEO_1280x720x30,
                    VIDEO_320x240x60, VIDEO_640x480x60, VIDEO_1280x720x60
                   };
-
+const static int AUTO_PRESET = 1024;
 const static vector<string> RTSPMessageHeader = {
     "GDP", "TMP", "RES"
 };
@@ -22,6 +22,7 @@ struct v4l2_info {
     string camera_name;
     string mount_point;
     CameraType camera_type;
+    guint32 current_quality;
     guint64 frame_property_bitmask;
 };
 

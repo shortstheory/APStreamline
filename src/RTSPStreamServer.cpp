@@ -81,6 +81,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
             info.camera_name = string(caps.card, caps.card + sizeof caps.card / sizeof caps.card[0]);
             info.mount_point = mount_point_prefix + to_string(i);
             info.frame_property_bitmask = 0;
+            info.current_quality = AUTO_PRESET;
 
             fprintf(stderr, "name - %s driver - %s\n", caps.card, caps.driver);
 
