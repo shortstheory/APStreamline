@@ -16,7 +16,7 @@ RTSPMessageType IPCMessageHandler::get_message_type(char* buf)
 string IPCMessageHandler::get_message_payload(char* buf)
 {
     string buffer(buf);
-    return buffer.substr(3);
+    return buffer.substr(4);
 }
 
 string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_props)
@@ -85,6 +85,18 @@ IPCMessageHandler::IPCMessageHandler(int fd, RTSPStreamServer* _rtsp_stream_serv
     rtsp_stream_server = _rtsp_stream_server;
 }
 
+void IPCMessageHandler::set_device_quality(char* buffer)
+{
+    string msg_payload;
+    cout << "Got an SDP message! " << buffer << endl;
+    char video_device[20];
+    int camera_setting;
+
+    msg_payload = get_message_payload(buffer);
+    cout << "Payload string - " << msg_payload << endl;
+    sscanf(msg_payload.c_str(), "%s %d", video_device, &camera_setting);
+}
+
 void IPCMessageHandler::process_msg(char* buf)
 {
     RTSPMessageType msgtype;
@@ -94,8 +106,7 @@ void IPCMessageHandler::process_msg(char* buf)
         send_device_props();
         break;
     case SET_DEVICE_PROPS:
-        cout << "Got an SDP message!" << buf << endl;
-        // set_device_props
+        set_device_quality(buf);
         break;
     case ERROR:
         g_warning("Unrecognised header");

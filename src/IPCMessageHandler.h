@@ -24,6 +24,7 @@ private:
     string serialise_device_props(pair<string, v4l2_info> device_props);
     bool send_string(string data);
     void send_device_props();
+    void set_device_quality(char* buffer);
 
 public:
     IPCMessageHandler(int fd, RTSPStreamServer* _rtsp_stream_server);
