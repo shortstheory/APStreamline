@@ -15,7 +15,7 @@ RTSPAdaptiveStreaming::~RTSPAdaptiveStreaming()
 void RTSPAdaptiveStreaming::init_media_factory()
 {
     GstRTSPMediaFactory* media_factory;
-    GstRTSPMountPoints *mounts;
+    GstRTSPMountPoints* mounts;
     mounts = gst_rtsp_server_get_mount_points(rtsp_server);
     media_factory = gst_rtsp_media_factory_new();
 

@@ -29,6 +29,7 @@ private:
     void get_v4l2_devices();
     void get_v4l2_devices_info();
     void setup_streams();
+    void remove_mount_point(string mount_point);
     bool check_h264_ioctls(int fd);
 
     static bool initialised;

@@ -202,6 +202,13 @@ void RTSPStreamServer::get_v4l2_devices_info()
     }
 }
 
+void RTSPStreamServer::remove_mount_point(string mount_point)
+{
+    GstRTSPMountPoints* mounts;
+    mounts = gst_rtsp_server_get_mount_points(server);
+    gst_rtsp_mount_points_remove_factory(mounts, mount_point.c_str());
+}
+
 void RTSPStreamServer::setup_streams()
 {
     for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++) {
