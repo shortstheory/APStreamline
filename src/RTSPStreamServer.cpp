@@ -234,10 +234,10 @@ GstRTSPServer* RTSPStreamServer::get_server()
     return server;
 }
 
-RTSPStreamServer* RTSPStreamServer::get_instance()
+RTSPStreamServer* RTSPStreamServer::get_instance(string _ip_addr, string _port)
 {
     if (!initialised) {
-        instance = new RTSPStreamServer();
+        instance = new RTSPStreamServer(_ip_addr, _port);
         initialised = true;
     }
     return instance;

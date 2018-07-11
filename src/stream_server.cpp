@@ -56,7 +56,7 @@ void ipc_loop(RTSPStreamServer* streamer)
     }
 }
 
-string get_ip_address()
+string get_ip_address(string interface = "lo")
 {
     struct ifaddrs *ifaddr, *ifa;
     int family, s;
@@ -71,16 +71,21 @@ string get_ip_address()
         if (ifa->ifa_addr == NULL) {
             continue;
         }
-        s=getnameinfo(ifa->ifa_addr,sizeof(struct sockaddr_in),host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-        if ((strcmp(ifa->ifa_name,"wlp3s0")==0)&&(ifa->ifa_addr->sa_family==AF_INET)) {
+        s=getnameinfo(ifa->ifa_addr,sizeof(struct sockaddr_in), host, NI_MAXHOST,
+                      NULL, 0, NI_NUMERICHOST);
+        if ((strcmp(ifa->ifa_name, interface.c_str()) == 0) && (ifa->ifa_addr->sa_family==AF_INET)) {
             if (s != 0) {
                 printf("getnameinfo() failed: %s\n", gai_strerror(s));
             }
-            printf("\tInterface : <%s>\n",ifa->ifa_name);
-            printf("\t  Address : <%s>\n", host);
+            printf("Interface : <%s>\n",ifa->ifa_name);
+            printf("Address : <%s>\n", host);
+            freeifaddrs(ifaddr);
+            return string(host);
         }
     }
     freeifaddrs(ifaddr);
+    g_warning("No IP found for given interface");
+    return string("127.0.0.1");
 }
 
 int main(int argc, char *argv[])
@@ -88,7 +93,14 @@ int main(int argc, char *argv[])
     gst_init(&argc, &argv);
     GMainLoop* loop = g_main_loop_new(NULL, FALSE);
 
-    RTSPStreamServer* rtsp_stream_server = RTSPStreamServer::get_instance();
+    string ip_addr;
+    if (argc > 1) {
+        ip_addr = get_ip_address(argv[1]);
+    } else {
+        ip_addr = "127.0.0.1";
+    }
+    RTSPStreamServer* rtsp_stream_server;
+    rtsp_stream_server = RTSPStreamServer::get_instance(ip_addr, "8554");
     gst_rtsp_server_attach(rtsp_stream_server->get_server(), NULL);
 
     thread t(&ipc_loop, rtsp_stream_server);
