@@ -20,7 +20,6 @@ string RTSPStreamServer::mount_point_prefix = "/cam";
 
 RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_addr), port(_port)
 {
-
     server = gst_rtsp_server_new();
     gst_rtsp_server_set_address(server, ip_addr.c_str());
     gst_rtsp_server_set_service(server, port.c_str());
@@ -115,10 +114,12 @@ void RTSPStreamServer::get_v4l2_devices_info()
                 fmt.index = h264_index;
                 if (check_h264_ioctls(fd)) {
                     info.camera_type = H264_CAM;
-                } else {
+                }
+                else {
                     info.camera_type = RAW_H264_CAM;
                 }
-            } else {
+            }
+            else {
                 info.camera_type = RAW_CAM;
             }
 
@@ -211,10 +212,10 @@ void RTSPStreamServer::remove_mount_point(string mount_point)
 void RTSPStreamServer::setup_streams()
 {
     for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++) {
-        adaptive_streams_map.insert(pair<string,RTSPAdaptiveStreaming*>(it->first, 
-                                        new RTSPAdaptiveStreaming(it->first,
-                                        it->second.camera_type,
-                                        it->second.mount_point, server)));
+        adaptive_streams_map.insert(pair<string,RTSPAdaptiveStreaming*>(it->first,
+                                    new RTSPAdaptiveStreaming(it->first,
+                                            it->second.camera_type,
+                                            it->second.mount_point, server)));
     }
 }
 

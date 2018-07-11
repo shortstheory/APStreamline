@@ -5,11 +5,11 @@
 #include <vector>
 
 #ifdef __amd64__
-    static const guint32 MAX_STEADY_BITRATE = 6000;
+static const guint32 MAX_STEADY_BITRATE = 6000;
 #endif
 
 #ifdef __arm__
-    static const guint32 MAX_STEADY_BITRATE = 2500;
+static const guint32 MAX_STEADY_BITRATE = 2500;
 #endif
 
 static const guint32 MIN_STEADY_BITRATE = 500;
@@ -54,7 +54,7 @@ static const vector<string> H264_CAPS_FILTERS = {
     "video/x-h264, width=(int)320, height=(int)240, framerate=(fraction)60/1",
     "video/x-h264, width=(int)640, height=(int)480, framerate=(fraction)60/1",
     "video/x-h264, width=(int)1280, height=(int)720, framerate=(fraction)60/1"
-}; 
+};
 
 static const int AUTO_PRESET = 1024;
 

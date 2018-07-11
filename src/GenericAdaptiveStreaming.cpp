@@ -296,7 +296,8 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
         h264_bitrate = MIN_BITRATE;
         set_resolution(ResolutionPresets::LOW);
         successive_transmissions = 0;
-    } else {
+    }
+    else {
         string caps_filter_string;
         GstCaps* src_caps;
         if (camera_type == CameraType::RAW_CAM) {
@@ -306,7 +307,8 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
             caps_filter_string = RAW_CAPS_FILTERS[current_quality];
             src_caps = gst_caps_from_string(caps_filter_string.c_str());
             g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
-        } else if (camera_type == CameraType::H264_CAM) {
+        }
+        else if (camera_type == CameraType::H264_CAM) {
             int v4l2_cam_fd;
             g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
             if (v4l2_cam_fd > 0) {
