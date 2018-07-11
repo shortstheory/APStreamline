@@ -16,6 +16,7 @@ private:
     GstElement* rtpbin;
     GstElement* multi_udp_sink;
     const string uri;
+    bool media_prepared;
 
     void init_media_factory();
     void add_rtpbin_probes();
@@ -34,6 +35,7 @@ public:
     RTSPAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM,
                           string _uri = "/test", GstRTSPServer* server = nullptr, int quality = AUTO_PRESET);
     ~RTSPAdaptiveStreaming() override;
+    bool get_media_prepared();
 };
 
 #endif
