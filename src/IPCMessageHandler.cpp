@@ -25,7 +25,6 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     list = RTSPMessageHeader[RTSPMessageType::GET_DEVICE_PROPS] + "$";
     string dev_info;
     // weird hack to work around \0?
-    // dev_info = device_props.camera_name.substr(0, device_props.camera_name.size()-1) + "!" + device_props.mount_point + "!" + to_string(device_props.camera_type);
     char info_buffer[1000];
     info_buffer[0] = '\0';
     cout << "BITMASK - " << device_props.second.frame_property_bitmask;
@@ -33,7 +32,6 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     RTSPAdaptiveStreaming* stream;
     stream = rtsp_stream_server->get_stream_map().at(device_props.first);
 
-    // dev_info =  + "!" +  + "!" + to_string(device_props.camera_type);
     sprintf(info_buffer, "{\"dev_mount\": \"%s\", "
                           "\"name\": \"%s\", "
                           "\"mount\": \"%s\", "

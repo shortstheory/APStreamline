@@ -52,7 +52,6 @@ struct v4l2_info {
     string camera_name;
     string mount_point;
     CameraType camera_type;
-    guint32 current_quality;
     guint64 frame_property_bitmask;
 };
 
