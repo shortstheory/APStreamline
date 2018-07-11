@@ -212,8 +212,10 @@ void RTSPStreamServer::remove_mount_point(string mount_point)
 void RTSPStreamServer::setup_streams()
 {
     for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++) {
-        adaptive_streams.push_back(new RTSPAdaptiveStreaming(it->first, it->second.camera_type,
-                                   it->second.mount_point, server));
+        adaptive_streams_map.insert(pair<string,RTSPAdaptiveStreaming*>(it->first, 
+                                        new RTSPAdaptiveStreaming(it->first,
+                                        it->second.camera_type,
+                                        it->second.mount_point, server)));
     }
 }
 
@@ -238,8 +240,8 @@ RTSPStreamServer* RTSPStreamServer::get_instance()
 
 RTSPStreamServer::~RTSPStreamServer()
 {
-    for (RTSPAdaptiveStreaming* stream : adaptive_streams) {
-        free(stream);
+    for (auto stream_pair : adaptive_streams_map) {
+        free(stream_pair.second);
     }
     free(instance);
     initialised = false;

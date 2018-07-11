@@ -22,7 +22,7 @@ private:
     GstRTSPServer* server;
 
     vector<string> device_list;
-    vector<RTSPAdaptiveStreaming*> adaptive_streams;
+    map<string, RTSPAdaptiveStreaming*> adaptive_streams_map;
 
     map<string, v4l2_info> device_properties_map;
 
