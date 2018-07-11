@@ -287,6 +287,7 @@ bool GenericAdaptiveStreaming::change_source(string _device)
 
 void GenericAdaptiveStreaming::change_quality_preset(int quality)
 {
+    g_warning("Changing quality!");
     current_quality = quality;
     if (quality == AUTO_PRESET) {
         h264_bitrate = MIN_BITRATE;

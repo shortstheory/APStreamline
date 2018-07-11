@@ -39,7 +39,6 @@ private:
 
     void improve_quality();
     void degrade_quality();
-    void change_quality_preset(int quality);
 
 public:
     int current_quality;
@@ -64,6 +63,7 @@ public:
 
     void pipeline_add_elements();
 
+    void change_quality_preset(int quality);
     void set_resolution(ResolutionPresets setting);
     void adapt_stream();
     bool play_pipeline();
