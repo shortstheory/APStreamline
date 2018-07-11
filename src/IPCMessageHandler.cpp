@@ -32,12 +32,19 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     RTSPAdaptiveStreaming* stream;
     stream = rtsp_stream_server->get_stream_map().at(device_props.first);
 
-    sprintf(info_buffer, "{\"dev_mount\": \"%s\", "
+    string ip_address;
+    ip_address = rtsp_stream_server->get_ip_address();
+
+    sprintf(info_buffer, "{"
+            "\"ip\": \"%s\", "
+            "\"dev_mount\": \"%s\", "
             "\"name\": \"%s\", "
             "\"mount\": \"%s\", "
             "\"camtype\": %d, "
             "\"frame_property_bitmask\": %llu, "
-            "\"current_quality\": %u}",
+            "\"current_quality\": %u"
+            "}",
+            ip_address.c_str(),
             device_props.first.c_str(),
             device_props.second.camera_name.c_str(),
             device_props.second.mount_point.c_str(),

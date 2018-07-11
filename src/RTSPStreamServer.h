@@ -42,6 +42,7 @@ public:
     static RTSPStreamServer* get_instance(string _ip_addr, string _port);
     GstRTSPServer* get_server();
 
+    string get_ip_address();
     map<string, v4l2_info> get_device_map();
     map<string, RTSPAdaptiveStreaming*> get_stream_map();
 };
