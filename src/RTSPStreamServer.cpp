@@ -219,6 +219,11 @@ void RTSPStreamServer::setup_streams()
     }
 }
 
+map<string, RTSPAdaptiveStreaming*> RTSPStreamServer::get_stream_map()
+{
+    return adaptive_streams_map;
+}
+
 map<string, v4l2_info> RTSPStreamServer::get_device_map()
 {
     return device_properties_map;

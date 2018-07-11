@@ -96,8 +96,8 @@ void IPCMessageHandler::set_device_quality(char* buffer)
     cout << "Payload string - " << msg_payload << endl;
     sscanf(msg_payload.c_str(), "%s %d", video_device, &camera_setting);
     RTSPAdaptiveStreaming* stream;
-    // stream = rtsp_stream_server->get_device_map.
-    // change_quality_preset(camera_setting);
+    stream = rtsp_stream_server->get_stream_map().at(string(video_device));
+    stream->change_quality_preset(camera_setting);
 }
 
 void IPCMessageHandler::process_msg(char* buf)
