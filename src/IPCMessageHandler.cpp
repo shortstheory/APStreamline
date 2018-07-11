@@ -29,6 +29,10 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     char info_buffer[1000];
     info_buffer[0] = '\0';
     cout << "BITMASK - " << device_props.second.frame_property_bitmask;
+
+    RTSPAdaptiveStreaming* stream;
+    stream = rtsp_stream_server->get_stream_map().at(device_props.first);
+
     // dev_info =  + "!" +  + "!" + to_string(device_props.camera_type);
     sprintf(info_buffer, "{\"dev_mount\": \"%s\", "
                           "\"name\": \"%s\", "
@@ -41,7 +45,7 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
                             device_props.second.mount_point.c_str(),
                             device_props.second.camera_type,
                             device_props.second.frame_property_bitmask,
-                            device_props.second.current_quality);
+                            stream->current_quality);
     // cout << dev_info;
     printf("SERIALIST!! %s", info_buffer);
     return string(info_buffer);
@@ -95,13 +99,17 @@ void IPCMessageHandler::set_device_quality(char* buffer)
     msg_payload = get_message_payload(buffer);
     cout << "Payload string - " << msg_payload << endl;
     sscanf(msg_payload.c_str(), "%s %d", video_device, &camera_setting);
+
     RTSPAdaptiveStreaming* stream;
+    v4l2_info* info = &rtsp_stream_server->get_device_map().at(string(video_device));
     stream = rtsp_stream_server->get_stream_map().at(string(video_device));
     if (stream->get_media_prepared()) {
         stream->change_quality_preset(camera_setting);
+        cout << "NewQualVal " << serialise_device_props(*rtsp_stream_server->get_device_map().begin());
     } else {
         g_warning("Stream not connected yet");
     }
+
 }
 
 void IPCMessageHandler::process_msg(char* buf)
