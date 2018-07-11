@@ -1,6 +1,6 @@
 #include "RTSPAdaptiveStreaming.h"
-#include <iostream>
 
+#include <iostream>
 
 RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device, CameraType type, string _uri, GstRTSPServer* server, int quality):
     GenericAdaptiveStreaming(_device, type), uri(_uri), rtsp_server(server), media_prepared(false)
@@ -69,7 +69,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         if (str.find("pipeline") != std::string::npos) {
 #endif
 #ifdef __arm__
-            if (str.find("bin") != std::string::npos) {
+        if (str.find("bin") != std::string::npos) {
 #endif
                 pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
             }

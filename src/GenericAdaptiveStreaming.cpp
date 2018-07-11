@@ -1,4 +1,5 @@
 #include "GenericAdaptiveStreaming.h"
+
 #include <dirent.h>
 #include <fcntl.h>
 #include <linux/videodev2.h>

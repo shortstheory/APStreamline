@@ -1,5 +1,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
+
 #include <gst/gst.h>
 #include <vector>
 
