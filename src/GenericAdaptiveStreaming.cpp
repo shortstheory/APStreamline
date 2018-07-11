@@ -289,9 +289,11 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
 {
     g_warning("Changing quality!");
     current_quality = quality;
-    if (quality == AUTO_PRESET) {
+    if (current_quality == AUTO_PRESET) {
+        network_state = STEADY;
+        set_state_constants();
         h264_bitrate = MIN_BITRATE;
-        network_state = CONGESTION;
+        set_resolution(ResolutionPresets::LOW);
         successive_transmissions = 0;
     } else {
         string caps_filter_string;
