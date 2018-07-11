@@ -1,10 +1,11 @@
 #include "UDPAdaptiveStreaming.h"
 
 UDPAdaptiveStreaming::UDPAdaptiveStreaming(string _device, CameraType type, string _ip_addr,
-        gint _video_port, gint _rtcp_port) :
+        gint _video_port, gint _rtcp_port, int quality) :
     receiver_ip_addr(_ip_addr), video_sink_port(_video_port),
     rtcp_port(_rtcp_port), GenericAdaptiveStreaming(_device, type)
 {
+    current_quality = quality;
     init_elements();
     init_element_properties();
     pipeline_add_elements();

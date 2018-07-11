@@ -35,7 +35,7 @@ private:
 public:
     UDPAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM,
                          string _ip_addr = "127.0.0.1", gint _video_port = 5000,
-                         gint _rtcp_port = 5001);
+                         gint _rtcp_port = 5001, int quality = AUTO_PRESET);
     ~UDPAdaptiveStreaming() override;
 };
 
