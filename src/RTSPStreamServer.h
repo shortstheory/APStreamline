@@ -43,6 +43,7 @@ public:
     GstRTSPServer* get_server();
 
     string get_ip_address();
+    string get_port();
     map<string, v4l2_info> get_device_map();
     map<string, RTSPAdaptiveStreaming*> get_stream_map();
 };

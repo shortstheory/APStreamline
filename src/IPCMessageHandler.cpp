@@ -35,8 +35,12 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     string ip_address;
     ip_address = rtsp_stream_server->get_ip_address();
 
+    string port;
+    port = rtsp_stream_server->get_port();
+
     sprintf(info_buffer, "{"
             "\"ip\": \"%s\", "
+            "\"port\": \"%s\", "
             "\"dev_mount\": \"%s\", "
             "\"name\": \"%s\", "
             "\"mount\": \"%s\", "
@@ -45,6 +49,7 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
             "\"current_quality\": %u"
             "}",
             ip_address.c_str(),
+            port.c_str(),
             device_props.first.c_str(),
             device_props.second.camera_name.c_str(),
             device_props.second.mount_point.c_str(),

@@ -239,6 +239,11 @@ string RTSPStreamServer::get_ip_address()
     return ip_addr;
 }
 
+string RTSPStreamServer::get_port()
+{
+    return port;
+}
+
 RTSPStreamServer* RTSPStreamServer::get_instance(string _ip_addr, string _port)
 {
     if (!initialised) {
