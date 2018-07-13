@@ -1,5 +1,6 @@
 2DO:
 
+* get framerates for stepwise cams
 * Work on RAW/H264 cams eg C920
 * Write comments in headers
 * Update README.md

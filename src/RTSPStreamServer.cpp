@@ -193,6 +193,20 @@ void RTSPStreamServer::get_v4l2_devices_info()
                             ;
                         }
                     }
+                } else if (frmsize.type == V4L2_FRMSIZE_TYPE_STEPWISE) {
+                    // How do I get the framerates for stepwise cams?
+                    info.frame_property_bitmask |= (1 << VIDEO_320x240x15);
+                    info.frame_property_bitmask |= (1 << VIDEO_320x240x30);
+                    // info.frame_property_bitmask |= (1 << VIDEO_320x240x60);
+
+                    info.frame_property_bitmask |= (1 << VIDEO_640x480x15);
+                    info.frame_property_bitmask |= (1 << VIDEO_640x480x30);
+                    // info.frame_property_bitmask |= (1 << VIDEO_640x480x60);
+
+                    info.frame_property_bitmask |= (1 << VIDEO_1280x720x15);
+                    info.frame_property_bitmask |= (1 << VIDEO_1280x720x30);
+                    // info.frame_property_bitmask |= (1 << VIDEO_1280x720x60);
+                    break;
                 }
             }
 
