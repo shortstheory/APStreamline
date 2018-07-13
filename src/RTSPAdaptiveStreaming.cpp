@@ -1,6 +1,9 @@
 #include "RTSPAdaptiveStreaming.h"
 
 #include <iostream>
+#include <iomanip>
+#include <ctime>
+#include <sstream>
 
 RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device, CameraType type, string _uri, GstRTSPServer* server, int quality):
     GenericAdaptiveStreaming(_device, type), uri(_uri), rtsp_server(server), media_prepared(false)
@@ -23,8 +26,21 @@ void RTSPAdaptiveStreaming::init_media_factory()
     string launch_string;
 
     if (camera_type == CameraType::RAW_CAM) {
-        launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! videoconvert ! textoverlay ! "
-                        " x264enc tune=zerolatency threads=4 bitrate=500 ! tee name=t t. ! queue ! h264parse ! rtph264pay name=pay0 t. ! queue ! h264parse ! matroskamux ! filesink location=test.mkv";
+        if (RECORD_VIDEO) {
+            string file_path;
+            auto t = std::time(nullptr);
+            auto tm = *std::localtime(&t);
+            std::stringstream ss;
+            ss << std::put_time(&tm, "%d-%m-%Y_%H:%M:%S") << std::endl;
+            file_path =  ss.str();
+            file_path = "~/Video_" + file_path + ".mkv";
+
+            launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! videoconvert ! textoverlay ! "
+                            " x264enc tune=zerolatency threads=4 bitrate=500 ! tee name=t t. ! queue ! h264parse ! rtph264pay name=pay0 t. ! queue ! h264parse ! matroskamux ! filesink location=" + file_path;
+        } else {
+            launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! videoconvert ! textoverlay ! "
+                            " x264enc tune=zerolatency threads=4 bitrate=500 ! h264parse ! rtph264pay name=pay0";
+        }
     }
     else if (camera_type == CameraType::H264_CAM) {
         launch_string = "v4l2src device=" + device + " ! video/x-h264, width=320, height=240, framerate=30/1 ! textoverlay ! "
