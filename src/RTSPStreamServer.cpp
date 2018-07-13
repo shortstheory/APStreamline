@@ -100,7 +100,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
                     cout << "FOUND MJPEG";
                     mjpg_index = fmt.index;
                 }
-                if (!strcmp((char*)fmt.description, "H264")) {
+                if (!strcmp((char*)fmt.description, "H264") || !strcmp((char*)fmt.description, "H.264")) {
                     cout << "FOUND H264!";
                     h264_index = fmt.index;
                 }
