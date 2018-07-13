@@ -326,7 +326,7 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
                     g_warning("ioctl fail :/");
                 }
             }
-            caps_filter_string = RAW_CAPS_FILTERS[current_quality];
+            caps_filter_string = H264_CAPS_FILTERS[current_quality];
             src_caps = gst_caps_from_string(caps_filter_string.c_str());
             g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
         }
