@@ -1,9 +1,9 @@
-#include "RTSPAdaptiveStreaming.h"
-
 #include <iostream>
 #include <iomanip>
 #include <ctime>
 #include <sstream>
+
+#include "RTSPAdaptiveStreaming.h"
 
 RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device, CameraType type, string _uri, GstRTSPServer* server, int quality):
     GenericAdaptiveStreaming(_device, type), uri(_uri), rtsp_server(server), media_prepared(false)

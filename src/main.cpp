@@ -1,5 +1,6 @@
-#include "UDPAdaptiveStreaming.h"
 #include <unistd.h>
+
+#include "UDPAdaptiveStreaming.h"
 
 int main(int argc, char *argv[])
 {

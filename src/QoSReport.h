@@ -2,6 +2,7 @@
 #define QOS_REPORT_H
 
 #include <gst/gst.h>
+
 class QoSReport {
 private:
     guint8 fraction_lost;

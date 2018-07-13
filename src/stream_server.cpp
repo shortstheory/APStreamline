@@ -1,6 +1,3 @@
-#include "RTSPStreamServer.h"
-#include "IPCMessageHandler.h"
-
 #include <iostream>
 #include <thread>
 #include <sys/socket.h>
@@ -11,6 +8,9 @@
 #include <netdb.h>
 #include <ifaddrs.h>
 #include <arpa/inet.h>
+
+#include "RTSPStreamServer.h"
+#include "IPCMessageHandler.h"
 
 // char socket_path[80] = "/tmp/rtsp_server";
 char socket_path[80] = "../../rtsp_server";

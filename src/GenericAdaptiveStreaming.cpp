@@ -1,5 +1,3 @@
-#include "GenericAdaptiveStreaming.h"
-
 #include <dirent.h>
 #include <fcntl.h>
 #include <linux/videodev2.h>
@@ -7,6 +5,8 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <stdio.h>
+
+#include "GenericAdaptiveStreaming.h"
 
 // not sure why this isn't included in some pacakges?!
 #ifndef V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME

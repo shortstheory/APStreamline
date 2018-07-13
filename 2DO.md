@@ -1,6 +1,6 @@
 2DO:
 
-* get framerates for stepwise cams
+* add scripts
 * Work on RAW/H264 cams eg C920
 * Write comments in headers
 * Update README.md
@@ -8,6 +8,7 @@
 * UDPStreaming handle args better
 
 PARTIAL:
+* get framerates for stepwise cams
 * Record on CC
 
 DONE:

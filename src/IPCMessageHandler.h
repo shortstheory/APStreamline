@@ -2,10 +2,7 @@
 #ifndef IPC_MESSAGE_HANDLER_H
 #define IPC_MESSAGE_HANDLER_H
 
-#include "RTSPStreamServer.h"
-
 #include <iostream>
-// #include <stdlib.h>
 #include <thread>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -13,6 +10,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <assert.h>
+
+#include "RTSPStreamServer.h"
 
 class IPCMessageHandler {
 private:

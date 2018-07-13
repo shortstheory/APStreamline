@@ -1,12 +1,13 @@
 #ifndef RTSP_ADAPTIVE_STREAMING_H
 #define RTSP_ADAPTIVE_STREAMING_H
 
-#include "GenericAdaptiveStreaming.h"
 #include <gst/gst.h>
 #include <gst/rtp/gstrtcpbuffer.h>
 #include <gst/rtsp-server/rtsp-server.h>
 #include <unistd.h>
 #include <stdlib.h>
+
+#include "GenericAdaptiveStreaming.h"
 
 using namespace std;
 
