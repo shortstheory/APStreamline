@@ -109,14 +109,17 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
                     h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
                 }
             }
-            if (str.find("capsfilter") != std::string::npos) {
-                src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+            if (str.find("v4l2src") != std::string::npos) {
+                v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
             if (str.find("textoverlay") != std::string::npos) {
                 text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
                 g_object_set(G_OBJECT(text_overlay), "valignment", 2, NULL); //top
                 g_object_set(G_OBJECT(text_overlay), "halignment", 0, NULL); //left
                 g_object_set(G_OBJECT(text_overlay), "font-desc", "Sans, 9", NULL);
+            }
+            if (str.find("capsfilter") != std::string::npos) {
+                src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
             // there should be only 1 payloader, but just check later on
             if (str.find("pay") != std::string::npos) {
