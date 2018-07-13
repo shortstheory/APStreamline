@@ -111,16 +111,17 @@ void IPCMessageHandler::set_device_quality(char* buffer)
     sscanf(msg_payload.c_str(), "%s %d", video_device, &camera_setting);
 
     RTSPAdaptiveStreaming* stream;
-    v4l2_info* info = &rtsp_stream_server->get_device_map().at(string(video_device));
-    stream = rtsp_stream_server->get_stream_map().at(string(video_device));
-    if (stream->get_media_prepared()) {
-        stream->change_quality_preset(camera_setting);
-        cout << "NewQualVal " << serialise_device_props(*rtsp_stream_server->get_device_map().begin());
+    try {
+        stream = rtsp_stream_server->get_stream_map().at(string(video_device));
+        if (stream->get_media_prepared()) {
+            stream->change_quality_preset(camera_setting);
+        }
+        else {
+            g_warning("Stream not connected yet");
+        }
+    } catch (const out_of_range& err) {
+        cerr << err.what();
     }
-    else {
-        g_warning("Stream not connected yet");
-    }
-
 }
 
 void IPCMessageHandler::process_msg(char* buf)
