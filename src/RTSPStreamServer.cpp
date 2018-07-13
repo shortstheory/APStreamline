@@ -97,9 +97,11 @@ void RTSPStreamServer::get_v4l2_devices_info()
             while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
                 printf("%s\n", fmt.description);
                 if (!strcmp((char*)fmt.description, "Motion-JPEG")) {
+                    cout << "FOUND MJPEG";
                     mjpg_index = fmt.index;
                 }
                 if (!strcmp((char*)fmt.description, "H264")) {
+                    cout << "FOUND H264!";
                     h264_index = fmt.index;
                 }
                 fmt.index++;
