@@ -43,7 +43,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
         }
     }
     else if (camera_type == CameraType::H264_CAM) {
-        launch_string = "v4l2src device=" + device + " ! video/x-h264, width=320, height=240, framerate=30/1 ! textoverlay ! "
+        launch_string = "v4l2src device=" + device + " ! video/x-h264, width=320, height=240, framerate=30/1 ! "
                         " h264parse ! rtph264pay name=pay0";
     }
     gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
