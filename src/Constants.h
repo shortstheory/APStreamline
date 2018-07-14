@@ -12,7 +12,7 @@ static const guint32 MAX_STEADY_BITRATE = 6000;
 static const guint32 MAX_STEADY_BITRATE = 2500;
 #endif
 
-static const bool RECORD_VIDEO = false;
+static const bool RECORD_VIDEO = true;
 
 static const guint32 MIN_STEADY_BITRATE = 500;
 static const guint32 INC_STEADY_BITRATE = 250;

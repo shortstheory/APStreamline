@@ -1,5 +1,6 @@
 2DO:
 
+* use static element names instead in rtspstreamer
 * add scripts
 * Work on RAW/H264 cams eg C920
 * Write comments in headers
