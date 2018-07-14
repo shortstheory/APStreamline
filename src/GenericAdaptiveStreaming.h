@@ -8,6 +8,9 @@
 #include <vector>
 #include <gst/rtp/gstrtcpbuffer.h>
 #include <time.h>
+#include <sstream>
+#include <iomanip>
+#include <ctime>
 
 #include "QoSEstimator.h"
 #include "DeviceDatatypes.h"
@@ -45,6 +48,7 @@ public:
     string device;
     ResolutionPresets current_res;
     guint32 h264_bitrate;
+
     GstElement* pipeline;
     GstElement* v4l2_src;
     GstElement* src_capsfilter;
@@ -53,6 +57,12 @@ public:
     GstElement* h264_parser;
     GstElement* rtph264_payloader;
     GstElement* text_overlay;
+
+    GstElement* file_recorder_bin;
+    GstElement* file_sink;
+    GstElement* file_queue;
+    GstElement* file_h264_parser;
+    GstElement* mux;
 
     QoSEstimator qos_estimator;
     const CameraType camera_type;
@@ -69,6 +79,7 @@ public:
     bool play_pipeline();
     bool pause_pipeline();
     bool change_source(string _device);
+    bool init_file_recorder();
     GstBus* get_pipeline_bus();
 };
 

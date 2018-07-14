@@ -23,3 +23,7 @@ c920 needs a queue for receiving streams: gst-launch-1.0 -v udpsrc caps="applica
 for sending: 
 
 gst-launch-1.0 v4l2src device=/dev/video1 ! video/x-h264, width=1280, height=720, framerate=30/1 ! queue ! rtph264pay ! udpsink port=5000
+
+c920 is badly behaved, sends empty buffers which are detected as eos: https://bugzilla.gnome.org/show_bug.cgi?id=794842
+
+it can behave as a sw adaptive encoder and a hardware single res encoder? not much point of swapping around bitrates for it

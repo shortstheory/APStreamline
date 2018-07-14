@@ -125,6 +125,14 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
             if (str.find("pay") != std::string::npos) {
                 rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
+            if (str.find("filesink") != std::string::npos) {
+                cout << "Found file sink";
+                file_sink = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+            }
+            if (str.find("mux") != std::string::npos) {
+                cout << "Found Muxer";
+                mux = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+            }
         }
         set_resolution(ResolutionPresets::LOW);
         add_rtpbin_probes();
