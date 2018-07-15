@@ -26,8 +26,7 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
         video_presets[ResolutionPresets::LOW] = RAW_CAPS_FILTERS[VIDEO_320x240x30];
         video_presets[ResolutionPresets::MED] = RAW_CAPS_FILTERS[VIDEO_640x480x30];
         video_presets[ResolutionPresets::HIGH] = RAW_CAPS_FILTERS[VIDEO_1280x720x30];
-    }
-    else if (camera_type == CameraType::H264_CAM) {
+    } else if (camera_type == CameraType::H264_CAM) {
         video_presets[ResolutionPresets::LOW] = H264_CAPS_FILTERS[VIDEO_320x240x30];
         video_presets[ResolutionPresets::MED] = H264_CAPS_FILTERS[VIDEO_640x480x30];
         video_presets[ResolutionPresets::HIGH] = H264_CAPS_FILTERS[VIDEO_1280x720x30];
@@ -65,8 +64,7 @@ void GenericAdaptiveStreaming::pipeline_add_elements()
     gst_bin_add_many(GST_BIN(pipeline), v4l2_src, src_capsfilter, text_overlay, rtph264_payloader, h264_parser, NULL);
     if (camera_type == CameraType::RAW_CAM) {
         gst_bin_add_many(GST_BIN(pipeline), h264_encoder, videoconvert, NULL);
-    }
-    else if (camera_type == CameraType::H264_CAM) {
+    } else if (camera_type == CameraType::H264_CAM) {
     }
 }
 
@@ -92,8 +90,7 @@ void GenericAdaptiveStreaming::set_state_constants()
         MIN_BITRATE = MIN_STEADY_BITRATE;
         INC_BITRATE = INC_STEADY_BITRATE;
         DEC_BITRATE = DEC_STEADY_BITRATE;
-    }
-    else if (network_state == NetworkState::CONGESTION) {
+    } else if (network_state == NetworkState::CONGESTION) {
         MAX_BITRATE = MAX_CONGESTION_BITRATE;
         MIN_BITRATE = MIN_CONGESTION_BITRATE;
         INC_BITRATE = INC_CONGESTION_BITRATE;
@@ -115,13 +112,11 @@ void GenericAdaptiveStreaming::adapt_stream()
         successive_transmissions++;
         if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
             improve_quality();
-        }
-        else {
+        } else {
             g_warning("Buffer overflow possible!");
             degrade_quality();
         }
-    }
-    else {
+    } else {
         network_state = NetworkState::CONGESTION;
         successive_transmissions = 0;
         decrease_resolution();
@@ -146,9 +141,8 @@ void GenericAdaptiveStreaming::improve_quality()
     if (current_res == ResolutionPresets::LOW &&
         h264_bitrate > bitrate_presets[ResolutionPresets::MED]) {
         set_resolution(ResolutionPresets::MED);
-    }
-    else if (current_res == ResolutionPresets::MED &&
-             h264_bitrate > bitrate_presets[ResolutionPresets::HIGH]) {
+    } else if (current_res == ResolutionPresets::MED &&
+               h264_bitrate > bitrate_presets[ResolutionPresets::HIGH]) {
         set_resolution(ResolutionPresets::HIGH);
     }
 }
@@ -159,9 +153,8 @@ void GenericAdaptiveStreaming::degrade_quality()
     if (current_res == ResolutionPresets::HIGH &&
         h264_bitrate < bitrate_presets[ResolutionPresets::MED]) {
         set_resolution(ResolutionPresets::MED);
-    }
-    else if (current_res == ResolutionPresets::MED &&
-             h264_bitrate < bitrate_presets[ResolutionPresets::LOW]) {
+    } else if (current_res == ResolutionPresets::MED &&
+               h264_bitrate < bitrate_presets[ResolutionPresets::LOW]) {
         set_resolution(ResolutionPresets::LOW);
     }
 }
@@ -173,11 +166,9 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
     if (bitrate >= MIN_BITRATE && bitrate <= MAX_BITRATE) {
         h264_bitrate = bitrate;
-    }
-    else if (h264_bitrate > MAX_BITRATE) {
+    } else if (h264_bitrate > MAX_BITRATE) {
         h264_bitrate = MAX_BITRATE;
-    }
-    else if (h264_bitrate < MIN_BITRATE) {
+    } else if (h264_bitrate < MIN_BITRATE) {
         h264_bitrate = MIN_BITRATE;
     }
 
@@ -193,8 +184,7 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
     }
     if (camera_type == CameraType::RAW_CAM) {
         g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
-    }
-    else if (camera_type == CameraType::H264_CAM) {
+    } else if (camera_type == CameraType::H264_CAM) {
         int v4l2_cam_fd;
         g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
         if (v4l2_cam_fd > 0) {
@@ -296,8 +286,7 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
         h264_bitrate = MIN_BITRATE;
         set_resolution(ResolutionPresets::LOW);
         successive_transmissions = 0;
-    }
-    else {
+    } else {
         string caps_filter_string;
         GstCaps* src_caps;
         if (camera_type == CameraType::RAW_CAM) {
@@ -307,8 +296,7 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
             caps_filter_string = RAW_CAPS_FILTERS[current_quality];
             src_caps = gst_caps_from_string(caps_filter_string.c_str());
             g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
-        }
-        else if (camera_type == CameraType::H264_CAM) {
+        } else if (camera_type == CameraType::H264_CAM) {
             int v4l2_cam_fd;
             g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
             if (v4l2_cam_fd > 0) {

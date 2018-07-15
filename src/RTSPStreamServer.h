@@ -10,7 +10,8 @@
 // Singleton class, we will never need more than one in a context
 using namespace std;
 
-class RTSPStreamServer {
+class RTSPStreamServer
+{
 private:
     static string v4l2_device_path;
     static string v4l2_device_prefix;

@@ -120,8 +120,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
                 // else {
                 //     info.camera_type = RAW_H264_CAM;
                 // }
-            }
-            else {
+            } else {
                 info.camera_type = RAW_CAM;
             }
 
@@ -132,14 +131,11 @@ void RTSPStreamServer::get_v4l2_devices_info()
                     FramePresets preset;
                     if (frmsize.discrete.width == 320 && frmsize.discrete.height == 240) {
                         preset = FRAME_320x240;
-                    }
-                    else if (frmsize.discrete.width == 640 && frmsize.discrete.height == 480) {
+                    } else if (frmsize.discrete.width == 640 && frmsize.discrete.height == 480) {
                         preset = FRAME_640x480;
-                    }
-                    else if (frmsize.discrete.width == 1280 && frmsize.discrete.height == 720) {
+                    } else if (frmsize.discrete.width == 1280 && frmsize.discrete.height == 720) {
                         preset = FRAME_1280x720;
-                    }
-                    else {
+                    } else {
                         continue;
                     }
 
@@ -159,33 +155,27 @@ void RTSPStreamServer::get_v4l2_devices_info()
                         case FRAME_320x240:
                             if (framerate == 15) {
                                 info.frame_property_bitmask |= (1 << VIDEO_320x240x15);
-                            }
-                            else if (framerate == 30) {
+                            } else if (framerate == 30) {
                                 info.frame_property_bitmask |= (1 << VIDEO_320x240x30);
-                            }
-                            else if (framerate == 60) {
+                            } else if (framerate == 60) {
                                 info.frame_property_bitmask |= (1 << VIDEO_320x240x60);
                             }
                             break;
                         case FRAME_640x480:
                             if (framerate == 15) {
                                 info.frame_property_bitmask |= (1 << VIDEO_640x480x15);
-                            }
-                            else if (framerate == 30) {
+                            } else if (framerate == 30) {
                                 info.frame_property_bitmask |= (1 << VIDEO_640x480x30);
-                            }
-                            else if (framerate == 60) {
+                            } else if (framerate == 60) {
                                 info.frame_property_bitmask |= (1 << VIDEO_640x480x60);
                             }
                             break;
                         case FRAME_1280x720:
                             if (framerate == 15) {
                                 info.frame_property_bitmask |= (1 << VIDEO_1280x720x15);
-                            }
-                            else if (framerate == 30) {
+                            } else if (framerate == 30) {
                                 info.frame_property_bitmask |= (1 << VIDEO_1280x720x30);
-                            }
-                            else if (framerate == 60) {
+                            } else if (framerate == 60) {
                                 info.frame_property_bitmask |= (1 << VIDEO_1280x720x60);
                             }
                             break;

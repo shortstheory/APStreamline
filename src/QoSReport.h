@@ -3,7 +3,8 @@
 
 #include <gst/gst.h>
 
-class QoSReport {
+class QoSReport
+{
 private:
     guint8 fraction_lost;
     gfloat estimated_bitrate;

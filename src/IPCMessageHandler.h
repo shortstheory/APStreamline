@@ -13,7 +13,8 @@
 
 #include "RTSPStreamServer.h"
 
-class IPCMessageHandler {
+class IPCMessageHandler
+{
 private:
     int client_fd;
     RTSPStreamServer* rtsp_stream_server;

@@ -11,7 +11,8 @@
 #include "QoSReport.h"
 #include "NTPTime.h"
 
-class QoSEstimator {
+class QoSEstimator
+{
 private:
     gfloat smooth_rtt;
     guint64 prev_rr_time;

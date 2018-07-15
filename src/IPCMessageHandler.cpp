@@ -81,8 +81,7 @@ void IPCMessageHandler::send_device_props()
     for (auto it = device_map.begin(); it != device_map.end(); it++) {
         if (it == device_map.begin()) {
             json_message = json_message + serialise_device_props(*it);
-        }
-        else {
+        } else {
             json_message = json_message + ", " + serialise_device_props(*it);
         }
     }
@@ -115,8 +114,7 @@ void IPCMessageHandler::set_device_quality(char* buffer)
         stream = rtsp_stream_server->get_stream_map().at(string(video_device));
         if (stream->get_media_prepared()) {
             stream->change_quality_preset(camera_setting);
-        }
-        else {
+        } else {
             g_warning("Stream not connected yet");
         }
     } catch (const out_of_range& err) {

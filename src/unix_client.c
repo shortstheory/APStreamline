@@ -47,8 +47,7 @@ void v4l2_array_json()
         v4l2_info_json(info_objs[i], tmp);
         if (i == 0) {
             strcat(jsonarray, tmp);
-        }
-        else {
+        } else {
             strcat(jsonarray, ", ");
             strcat(jsonarray, tmp);
         }
@@ -93,8 +92,7 @@ void store_cam_info(v4l2_info info)
     if (strcmp(info.mount_point,"NULL")) {
         info_objs[curr_counter++] = info;
         printf("Saving obj %s\n", info.mount_point);
-    }
-    else {
+    } else {
         printf("Done saving objs @count of %d", camera_count);
         camera_count = curr_counter+1;
         curr_counter = 0;

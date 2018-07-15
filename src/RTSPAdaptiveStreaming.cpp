@@ -41,8 +41,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
             launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! videoconvert ! textoverlay ! "
                             " x264enc tune=zerolatency threads=4 bitrate=500 ! h264parse ! rtph264pay name=pay0";
         }
-    }
-    else if (camera_type == CameraType::H264_CAM) {
+    } else if (camera_type == CameraType::H264_CAM) {
         launch_string = "v4l2src device=" + device + " ! video/x-h264, width=320, height=240, framerate=30/1 ! "
                         " h264parse ! rtph264pay name=pay0";
     }

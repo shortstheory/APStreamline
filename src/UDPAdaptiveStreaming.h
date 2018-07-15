@@ -5,7 +5,8 @@
 
 using namespace std;
 
-class UDPAdaptiveStreaming : public GenericAdaptiveStreaming {
+class UDPAdaptiveStreaming : public GenericAdaptiveStreaming
+{
 private:
     const gint video_sink_port;
     const gint rtcp_port;

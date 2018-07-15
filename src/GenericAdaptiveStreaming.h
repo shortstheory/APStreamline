@@ -18,7 +18,8 @@
 
 using namespace std;
 
-class GenericAdaptiveStreaming {
+class GenericAdaptiveStreaming
+{
 private:
     guint32 MIN_BITRATE;
     guint32 MAX_BITRATE;

@@ -11,7 +11,8 @@
 
 using namespace std;
 
-class RTSPAdaptiveStreaming : public GenericAdaptiveStreaming {
+class RTSPAdaptiveStreaming : public GenericAdaptiveStreaming
+{
 private:
     GstRTSPServer* rtsp_server;
     GstElement* rtpbin;

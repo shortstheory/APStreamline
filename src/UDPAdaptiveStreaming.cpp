@@ -32,8 +32,7 @@ bool UDPAdaptiveStreaming::init_elements()
     if (camera_type == CameraType::RAW_CAM) {
         h264_encoder = gst_element_factory_make("x264enc", NULL);
         videoconvert = gst_element_factory_make("videoconvert", NULL);
-    }
-    else if (camera_type == CameraType::H264_CAM) {
+    } else if (camera_type == CameraType::H264_CAM) {
         // do nothing
     }
 
@@ -59,8 +58,7 @@ void UDPAdaptiveStreaming::init_element_properties()
     // valignment=2 halignment=0
     if (camera_type == CameraType::RAW_CAM) {
         g_object_set(G_OBJECT(h264_encoder), "tune", 0x00000004, "threads", 4, NULL);
-    }
-    else if (camera_type == CameraType::H264_CAM) {
+    } else if (camera_type == CameraType::H264_CAM) {
         // g_object_set(G_OBJECT(H264_CAM_src), "bitrate", 1000000, NULL);
     }
 }
@@ -108,8 +106,7 @@ bool UDPAdaptiveStreaming::link_all_elements()
               gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
             return false;
         }
-    }
-    else if (camera_type == CameraType::H264_CAM) {
+    } else if (camera_type == CameraType::H264_CAM) {
         if (!(gst_element_link_many(v4l2_src, src_capsfilter, h264_parser, rtph264_payloader, NULL) &&
               gst_element_link(rtcp_udp_src, rr_rtcp_identity))) {
             return false;

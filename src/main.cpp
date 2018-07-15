@@ -15,8 +15,7 @@ int main(int argc, char *argv[])
         dev = "/dev/video0";
         receiver_ip_addr = "127.0.0.1";
         cam_type = "raw";
-    }
-    else {
+    } else {
         dev = argv[1];
         receiver_ip_addr = argv[2];
         cam_type = argv[3];
@@ -31,11 +30,9 @@ int main(int argc, char *argv[])
     UDPAdaptiveStreaming* adaptiveStreaming;
     if (cam_type == "h264") {
         adaptiveStreaming = new UDPAdaptiveStreaming(dev, CameraType::H264_CAM, receiver_ip_addr);
-    }
-    else if (cam_type == "raw") {
+    } else if (cam_type == "raw") {
         adaptiveStreaming = new UDPAdaptiveStreaming(dev, CameraType::RAW_CAM, receiver_ip_addr);
-    }
-    else {
+    } else {
         g_warning("Camera type not recognised - use `raw` or `h264`");
     }
     adaptiveStreaming->play_pipeline();

@@ -100,8 +100,7 @@ void QoSEstimator::calculate_bitrates(const guint64 &bytes_sent, const guint32 &
         last_bytes_sent = bytes_sent;
         rtph_bytes_interval = 0;
         // exp_smooth_val(encoding_bitrate, smooth_enc_bitrate, 0.75);
-    }
-    else {
+    } else {
         rtph_bytes_interval += buffer_size;
     }
 }
