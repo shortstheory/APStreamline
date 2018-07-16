@@ -33,6 +33,7 @@ public:
 
     bool init_file_recorder(GstElement* _pipeline, GstElement* _tee)
     {
+        g_warning("init of FR");
         if (recording) {
             g_warning("Recording in progress");
             return false;
@@ -78,21 +79,19 @@ public:
             g_warning("Recording not started");
             return false;
         }
+
         recording = false;
-        gst_bin_remove(GST_BIN(pipeline), file_queue);
-        gst_bin_remove(GST_BIN(pipeline), file_h264_parser);
-        gst_bin_remove(GST_BIN(pipeline), mux);
-        gst_bin_remove(GST_BIN(pipeline), file_sink);
 
         gst_element_set_state(file_queue, GST_STATE_NULL);
         gst_element_set_state(file_h264_parser, GST_STATE_NULL);
         gst_element_set_state(mux, GST_STATE_NULL);
         gst_element_set_state(file_sink, GST_STATE_NULL);
 
-        gst_object_unref(file_h264_parser);
-        gst_object_unref(file_queue);
-        gst_object_unref(mux);
-        gst_object_unref(file_sink);
+        gst_bin_remove(GST_BIN(pipeline), file_queue);
+        gst_bin_remove(GST_BIN(pipeline), file_h264_parser);
+        gst_bin_remove(GST_BIN(pipeline), mux);
+        gst_bin_remove(GST_BIN(pipeline), file_sink);
+
         return true;
     }
 };
