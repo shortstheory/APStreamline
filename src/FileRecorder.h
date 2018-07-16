@@ -58,10 +58,10 @@ public:
         file_path = "Video_" + file_path + ".mkv";
 
         g_object_set(G_OBJECT(file_sink), "location", file_path.c_str(), NULL);
-        g_warning("Elements iInit");
+        g_warning("Elements iInit %p", pipeline);
         gst_bin_add_many(GST_BIN(pipeline), file_queue, file_h264_parser, mux, file_sink, NULL);
+        g_warning(":add done");
         gst_element_link_many(file_queue, file_h264_parser, mux, file_sink, NULL);
-        g_warning(":ink done");
 
         gst_element_sync_state_with_parent(file_queue);
         gst_element_sync_state_with_parent(file_h264_parser);

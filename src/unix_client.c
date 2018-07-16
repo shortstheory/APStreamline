@@ -143,8 +143,8 @@ int main()
         perror("connect error");
         exit(-1);
     }
-    // write(fd, "RTF$/dev/video0 0", 19);
-    write(fd, "RTF$/dev/video0 1", 19);
+    write(fd, "RTF$/dev/video0 0", 19);
+    // write(fd, "RTF$/dev/video0 1", 19);
 
     char read_buffer[1000];
     int bytes_read = recv(fd, read_buffer, sizeof(read_buffer), 0);

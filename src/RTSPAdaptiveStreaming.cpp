@@ -57,7 +57,6 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     GstElement* parent = (GstElement*)gst_object_get_parent(GST_OBJECT(e));
     g_warning("got parent!");
     GstElement* element;
-    GstElement* pipeline;
 
     multi_udp_sink = NULL;
 
@@ -124,6 +123,8 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         //                   static_probe_block_callback, this, NULL);
         // file_recorder.init_file_recorder(pipeline, tee);
     }
+    g_warning("PPLP %p", pipeline);
+
     set_resolution(ResolutionPresets::LOW);
     add_rtpbin_probes();
     media_prepared = true;
