@@ -131,12 +131,13 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
                 rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
         }
-        FileRecorder file_recorder;
-        file_recorder.init_file_recorder(pipeline);
-        GstPad* tee_file_pad = gst_element_get_request_pad(tee, "src_%u");
-        GstPad* queue_pad = gst_element_get_static_pad (file_recorder.file_queue, "sink");
-        gst_pad_link(tee_file_pad, queue_pad);
-
+        if (RECORD_VIDEO) {
+            FileRecorder file_recorder;
+            file_recorder.init_file_recorder(pipeline);
+            GstPad* tee_file_pad = gst_element_get_request_pad(tee, "src_%u");
+            GstPad* queue_pad = gst_element_get_static_pad (file_recorder.file_queue, "sink");
+            gst_pad_link(tee_file_pad, queue_pad);
+        }
         set_resolution(ResolutionPresets::LOW);
         add_rtpbin_probes();
         media_prepared = true;
