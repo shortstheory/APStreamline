@@ -1,5 +1,6 @@
 2DO:
 
+* remove void IPCMessageHandler::set_file_recording(char* buffer)
 * use static element names instead in rtspstreamer
 * add scripts
 * Work on RAW/H264 cams eg C920
@@ -7,13 +8,14 @@
 * Update README.md
 * Do APSync integration
 * UDPStreaming handle args better
+* Add licenses
 
 PARTIAL:
 * get framerates for stepwise cams
-* Record on CC
 
 DONE:
 * Get IP Addr of device
+* Record on CC
 
 SKIP:
 * Put V4L2 info fields into RTSPAdaptiveStreaming

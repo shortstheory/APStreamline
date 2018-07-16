@@ -131,6 +131,7 @@ void IPCMessageHandler::set_device_quality(char* buffer)
     }
 }
 
+// 2DO: get rid of this
 void IPCMessageHandler::set_file_recording(char* buffer)
 {
     string msg_payload;
