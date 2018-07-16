@@ -13,17 +13,16 @@
 #include <ctime>
 
 class FileRecorder {
+public:
     GstElement* file_recorder_bin;
     GstElement* file_sink;
     GstElement* file_queue;
     GstElement* file_h264_parser;
     GstElement* mux;
-public:
     void init_file_recorder()
     {
         // this gets linked to tee, but doesn't get deinitialised
         file_queue = gst_element_factory_make("queue", NULL);
-
         file_h264_parser = gst_element_factory_make("h264parse", NULL);
         mux = gst_element_factory_make("matroskamux", NULL);
         file_sink = gst_element_factory_make("filesink", NULL);
@@ -39,7 +38,7 @@ public:
 
         g_object_set(G_OBJECT(file_sink), "location", file_path.c_str(), NULL);
 
-        gst_bin_add_many(GST_BIN(file_recorder_bin), file_h264_parser, mux, file_sink, NULL);
+        gst_bin_add_many(GST_BIN(file_recorder_bin), file_queue, file_h264_parser, mux, file_sink, NULL);
         // // see if we need ghost pads or if we can get away without it here
         gst_element_link_many(file_queue, file_h264_parser, mux, file_sink, NULL);
     }

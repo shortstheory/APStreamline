@@ -134,8 +134,11 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         FileRecorder file_recorder;
         file_recorder.init_file_recorder();
 
-        // gst_bin_add(GST_BIN(pipeline), file_recorder.file_recorder_bin);
-        // gst_element_sync_state_with_parent(file_recorder.file_recorder_bin);
+        gst_element_sync_state_with_parent(file_recorder.file_recorder_bin);
+        gst_bin_add(GST_BIN(pipeline), file_recorder.file_recorder_bin);
+        GstPad* tee_file_pad = gst_element_get_request_pad(tee, "src_%u");
+        GstPad* queue_pad = gst_element_get_static_pad (file_recorder.file_queue, "sink");
+        gst_pad_link (tee_file_pad, queue_pad);
 
         // GstPad* queue_src_pad = gst_element_get_static_pad(file_queue, "sink");
         // gst_pad_add_probe(queue_src_pad, GST_PAD_PROBE_TYPE_BLOCK, NULL, NULL, NULL);
