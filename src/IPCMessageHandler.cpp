@@ -38,6 +38,8 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     string port;
     port = rtsp_stream_server->get_port();
 
+    g_warning("IP %s PORT %s", ip_address.c_str(), port.c_str());
+
     sprintf(info_buffer, "{"
             "\"ip\": \"%s\", "
             "\"port\": \"%s\", "
@@ -46,7 +48,8 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
             "\"mount\": \"%s\", "
             "\"camtype\": %d, "
             "\"frame_property_bitmask\": %llu, "
-            "\"current_quality\": %u"
+            "\"current_quality\": %u, "
+            "\"recording\": %d"
             "}",
             ip_address.c_str(),
             port.c_str(),
@@ -55,7 +58,8 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
             device_props.second.mount_point.c_str(),
             device_props.second.camera_type,
             device_props.second.frame_property_bitmask,
-            stream->current_quality);
+            stream->current_quality,
+            stream->file_recorder.get_recording());
     // cout << dev_info;
     printf("SERIALIST!! %s", info_buffer);
     return string(info_buffer);

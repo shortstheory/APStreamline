@@ -97,6 +97,11 @@ public:
 
         return true;
     }
+
+    bool get_recording()
+    {
+        return recording;
+    }
 };
 
 #endif
