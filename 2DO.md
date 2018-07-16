@@ -19,6 +19,8 @@ SKIP:
 * Put V4L2 info fields into RTSPAdaptiveStreaming
 
 NOTES:
+it's safe to unlink the pads on the cb of a blocking probe
+
 c920 needs a queue for receiving streams: gst-launch-1.0 -v udpsrc caps="application/x-rtp" port=5000 ! queue ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink
 
 for sending: 

@@ -15,6 +15,7 @@
 #include "QoSEstimator.h"
 #include "DeviceDatatypes.h"
 #include "Constants.h"
+#include "FileRecorder.h"
 
 using namespace std;
 
