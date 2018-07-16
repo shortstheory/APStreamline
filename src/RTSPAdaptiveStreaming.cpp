@@ -134,11 +134,15 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         FileRecorder file_recorder;
         file_recorder.init_file_recorder();
 
-        gst_element_sync_state_with_parent(file_recorder.file_recorder_bin);
-        gst_bin_add(GST_BIN(pipeline), file_recorder.file_recorder_bin);
+        gst_bin_add_many(GST_BIN(pipeline), file_recorder.file_queue, file_recorder.file_h264_parser, file_recorder.mux, file_recorder.file_sink, NULL);
+        gst_element_link_many(file_recorder.file_queue, file_recorder.file_h264_parser, file_recorder.mux, file_recorder.file_sink, NULL);
+        gst_element_sync_state_with_parent(file_recorder.file_queue);
+        gst_element_sync_state_with_parent(file_recorder.file_h264_parser);
+        gst_element_sync_state_with_parent(file_recorder.mux);
+        gst_element_sync_state_with_parent(file_recorder.file_sink);
         GstPad* tee_file_pad = gst_element_get_request_pad(tee, "src_%u");
         GstPad* queue_pad = gst_element_get_static_pad (file_recorder.file_queue, "sink");
-        gst_pad_link (tee_file_pad, queue_pad);
+        gst_pad_link(tee_file_pad, queue_pad);
 
         // GstPad* queue_src_pad = gst_element_get_static_pad(file_queue, "sink");
         // gst_pad_add_probe(queue_src_pad, GST_PAD_PROBE_TYPE_BLOCK, NULL, NULL, NULL);
