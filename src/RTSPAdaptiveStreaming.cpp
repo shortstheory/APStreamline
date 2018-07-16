@@ -117,108 +117,100 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
             rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
         }
     }
-    if (RECORD_VIDEO) {
-        // file_recorder.init_file_recorder(pipeline, tee);
-        // gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
-        //                   static_probe_block_callback, this, NULL);
-        // file_recorder.init_file_recorder(pipeline, tee);
-    }
-    g_warning("PPLP %p", pipeline);
 
     set_resolution(ResolutionPresets::LOW);
     add_rtpbin_probes();
     media_prepared = true;
 }
 
-    GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data) {
-        RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
-        return ptr->probe_block_callback(pad, info);
-    }
+GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data) {
+    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    return ptr->probe_block_callback(pad, info);
+}
 
-    GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPadProbeInfo* info) {
-        // pad is blocked, so it's ok to unlink
-        gst_pad_unlink(file_recorder.tee_file_pad, file_recorder.queue_pad);
-        file_recorder.disable_recorder();
-        gst_element_release_request_pad(tee, file_recorder.tee_file_pad);
-        g_warning("Pad Removed");
-        return GST_PAD_PROBE_REMOVE;
-    }
+GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPadProbeInfo* info) {
+    // pad is blocked, so it's ok to unlink
+    gst_pad_unlink(file_recorder.tee_file_pad, file_recorder.queue_pad);
+    file_recorder.disable_recorder();
+    gst_element_release_request_pad(tee, file_recorder.tee_file_pad);
+    g_warning("Pad Removed");
+    return GST_PAD_PROBE_REMOVE;
+}
 
-    void RTSPAdaptiveStreaming::add_rtpbin_probes() {
-        GstPad* rtcp_rr_pad;
-        GstPad* rtcp_sr_pad;
-        GstPad* payloader_pad;
+void RTSPAdaptiveStreaming::add_rtpbin_probes() {
+    GstPad* rtcp_rr_pad;
+    GstPad* rtcp_sr_pad;
+    GstPad* payloader_pad;
 
-        rtcp_rr_pad = gst_element_get_static_pad(rtpbin, "recv_rtcp_sink_0");
-        rtcp_sr_pad = gst_element_get_static_pad(rtpbin, "send_rtcp_src_0");
-        payloader_pad = gst_element_get_static_pad(rtph264_payloader, "sink");
+    rtcp_rr_pad = gst_element_get_static_pad(rtpbin, "recv_rtcp_sink_0");
+    rtcp_sr_pad = gst_element_get_static_pad(rtpbin, "send_rtcp_src_0");
+    payloader_pad = gst_element_get_static_pad(rtph264_payloader, "sink");
 
-        gst_pad_add_probe(rtcp_rr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
-        gst_pad_add_probe(rtcp_sr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
-        gst_pad_add_probe(payloader_pad, GST_PAD_PROBE_TYPE_BUFFER, static_payloader_callback, this, NULL);
+    gst_pad_add_probe(rtcp_rr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
+    gst_pad_add_probe(rtcp_sr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
+    gst_pad_add_probe(payloader_pad, GST_PAD_PROBE_TYPE_BUFFER, static_payloader_callback, this, NULL);
 
-        g_object_unref(rtcp_rr_pad);
-        g_object_unref(rtcp_sr_pad);
-        g_object_unref(payloader_pad);
-    }
+    g_object_unref(rtcp_rr_pad);
+    g_object_unref(rtcp_sr_pad);
+    g_object_unref(payloader_pad);
+}
 
-    bool RTSPAdaptiveStreaming::get_media_prepared() {
-        return media_prepared;
-    }
+bool RTSPAdaptiveStreaming::get_media_prepared() {
+    return media_prepared;
+}
 
-    GstPadProbeReturn RTSPAdaptiveStreaming::static_rtcp_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data) {
-        RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
-        return ptr->rtcp_callback(pad, info);
-    }
+GstPadProbeReturn RTSPAdaptiveStreaming::static_rtcp_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data) {
+    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    return ptr->rtcp_callback(pad, info);
+}
 
-    GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeInfo* info) {
-        g_warning("H264 rate - %d", h264_bitrate);
-        GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
-        if (buf != nullptr) {
-            GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
-            rtcp_buffer->buffer = NULL;
-            gst_rtcp_buffer_map(buf, GST_MAP_READ, rtcp_buffer);
-            GstRTCPPacket *packet = (GstRTCPPacket*)malloc(sizeof(GstRTCPPacket));
-            gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
-            //same buffer can have an SDES and an RTCP pkt
-            while (more) {
-                qos_estimator.handle_rtcp_packet(packet);
-                if (current_quality == AUTO_PRESET) {
-                    adapt_stream();
-                }
-                more = gst_rtcp_packet_move_to_next(packet);
+GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeInfo* info) {
+    g_warning("H264 rate - %d", h264_bitrate);
+    GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
+    if (buf != nullptr) {
+        GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
+        rtcp_buffer->buffer = NULL;
+        gst_rtcp_buffer_map(buf, GST_MAP_READ, rtcp_buffer);
+        GstRTCPPacket *packet = (GstRTCPPacket*)malloc(sizeof(GstRTCPPacket));
+        gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
+        //same buffer can have an SDES and an RTCP pkt
+        while (more) {
+            qos_estimator.handle_rtcp_packet(packet);
+            if (current_quality == AUTO_PRESET) {
+                adapt_stream();
             }
-            free(rtcp_buffer);
-            free(packet);
+            more = gst_rtcp_packet_move_to_next(packet);
         }
-        return GST_PAD_PROBE_OK;
+        free(rtcp_buffer);
+        free(packet);
     }
+    return GST_PAD_PROBE_OK;
+}
 
-    GstPadProbeReturn RTSPAdaptiveStreaming::static_payloader_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data) {
-        RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
-        return ptr->payloader_callback(pad, info);
-    }
+GstPadProbeReturn RTSPAdaptiveStreaming::static_payloader_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data) {
+    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    return ptr->payloader_callback(pad, info);
+}
 
-    GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadProbeInfo* info) {
-        guint32 buffer_size;
-        guint64 bytes_sent;
-        GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
-        if (buf != nullptr) {
-            buffer_size = gst_buffer_get_size(buf);
-            g_object_get(multi_udp_sink, "bytes-served", &bytes_sent, NULL);
-            qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
-        }
-        return GST_PAD_PROBE_OK;
+GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadProbeInfo* info) {
+    guint32 buffer_size;
+    guint64 bytes_sent;
+    GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
+    if (buf != nullptr) {
+        buffer_size = gst_buffer_get_size(buf);
+        g_object_get(multi_udp_sink, "bytes-served", &bytes_sent, NULL);
+        qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
     }
+    return GST_PAD_PROBE_OK;
+}
 
-    // make void
-    bool RTSPAdaptiveStreaming::record_stream(bool _record_stream) {
-        if (_record_stream) {
-            return file_recorder.init_file_recorder(pipeline, tee);
-        } else {
-            gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
-                              static_probe_block_callback, this, NULL);
-            return true;
-            // return file_recorder.disable_recorder();
-        }
+// make void
+bool RTSPAdaptiveStreaming::record_stream(bool _record_stream) {
+    if (_record_stream) {
+        return file_recorder.init_file_recorder(pipeline, tee);
+    } else {
+        gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
+                            static_probe_block_callback, this, NULL);
+        return true;
     }
+}
