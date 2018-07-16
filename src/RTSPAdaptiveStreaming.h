@@ -19,8 +19,6 @@ private:
     GstElement* multi_udp_sink;
     const string uri;
     bool media_prepared;
-    FileRecorder file_recorder;
-
 
     void init_media_factory();
     void add_rtpbin_probes();
@@ -28,7 +26,7 @@ private:
 
     GstPadProbeReturn rtcp_callback(GstPad* pad, GstPadProbeInfo* info);
     GstPadProbeReturn payloader_callback(GstPad* pad, GstPadProbeInfo* info);
-    GstPadProbeReturn probe_block_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data);
+    GstPadProbeReturn probe_block_callback(GstPad* pad, GstPadProbeInfo* info);
 
     static void static_media_constructed_callback(GstRTSPMediaFactory *media_factory, GstRTSPMedia *media,
             gpointer data);
@@ -38,6 +36,9 @@ private:
     static GstPadProbeReturn static_payloader_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data);
 
 public:
+    FileRecorder file_recorder;
+    GstPad* tee_file_pad;
+    GstPad* queue_pad;
     RTSPAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM,
                           string _uri = "/test", GstRTSPServer* server = nullptr, int quality = AUTO_PRESET);
     ~RTSPAdaptiveStreaming() override;

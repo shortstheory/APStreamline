@@ -133,11 +133,12 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         }
         if (RECORD_VIDEO) {
             file_recorder.init_file_recorder(pipeline);
-            GstPad* tee_file_pad = gst_element_get_request_pad(tee, "src_%u");
-            GstPad* queue_pad = gst_element_get_static_pad (file_recorder.file_queue, "sink");
+
+            tee_file_pad = gst_element_get_request_pad(tee, "src_%u");
+            queue_pad    = gst_element_get_static_pad (file_recorder.file_queue, "sink");
             gst_pad_link(tee_file_pad, queue_pad);
 
-            // gst_pad_add_probe(tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK, static_probe_block_callback, this, NULL);
+            gst_pad_add_probe(tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK, static_probe_block_callback, this, NULL);
         }
         set_resolution(ResolutionPresets::LOW);
         add_rtpbin_probes();
@@ -147,12 +148,16 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
     {
         RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
-        return ptr->rtcp_callback(pad, info);
+        return ptr->probe_block_callback(pad, info);
     }
 
-    GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
+    GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPadProbeInfo* info)
     {
-
+        // pad is blocked, so it's ok to unlink
+        gst_pad_unlink(tee_file_pad, queue_pad);
+        file_recorder.disable_recorder();
+        gst_element_release_request_pad(tee, tee_file_pad);
+        return GST_PAD_PROBE_REMOVE;
     }
 
     void RTSPAdaptiveStreaming::add_rtpbin_probes() {
