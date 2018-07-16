@@ -62,11 +62,11 @@ public:
 
     GstElement* tee;
 
-        // GstElement* file_recorder_bin;
-        // GstElement* file_sink;
-        // GstElement* file_queue;
-        // GstElement* file_h264_parser;
-        // GstElement* mux;
+    // GstElement* file_recorder_bin;
+    // GstElement* file_sink;
+    // GstElement* file_queue;
+    // GstElement* file_h264_parser;
+    // GstElement* mux;
 
     QoSEstimator qos_estimator;
     const CameraType camera_type;
