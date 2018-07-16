@@ -120,9 +120,9 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     }
     if (RECORD_VIDEO) {
         file_recorder.init_file_recorder(pipeline, tee);
-        gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
-                          static_probe_block_callback, this, NULL);
-        file_recorder.init_file_recorder(pipeline, tee);
+        // gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
+        //                   static_probe_block_callback, this, NULL);
+        // file_recorder.init_file_recorder(pipeline, tee);
     }
     set_resolution(ResolutionPresets::LOW);
     add_rtpbin_probes();
@@ -141,6 +141,7 @@ GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPa
     gst_pad_unlink(file_recorder.tee_file_pad, file_recorder.queue_pad);
     file_recorder.disable_recorder();
     gst_element_release_request_pad(tee, file_recorder.tee_file_pad);
+    g_warning("Pad Removed");
     return GST_PAD_PROBE_REMOVE;
 }
 

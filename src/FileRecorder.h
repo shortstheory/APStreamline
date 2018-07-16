@@ -75,6 +75,7 @@ public:
 
     bool disable_recorder()
     {
+        g_warning("Recorder disabled!!");
         if (!recording) {
             g_warning("Recording not started");
             return false;

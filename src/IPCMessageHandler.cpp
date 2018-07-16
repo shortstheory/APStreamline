@@ -156,6 +156,7 @@ void IPCMessageHandler::process_msg(char* buf)
         set_device_quality(buf);
         break;
     case RECORD_TO_FILE:
+        set_file_recording(buf);
         break;
     case ERROR:
         g_warning("Unrecognised header");

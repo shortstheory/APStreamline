@@ -8,7 +8,7 @@
 
 #define MAX_CAMERAS 8
 
-char socket_path[80] = "/tmp/mysocket";
+char socket_path[80] = "../../rtsp_server";
 
 
 typedef enum CameraType {RAW_CAM, H264_CAM} CameraType;
@@ -144,7 +144,7 @@ int main()
         exit(-1);
     }
 
-    write(fd, "GDP", 4);
+    write(fd, "RTF$/dev/video0 1", 19);
     char read_buffer[1000];
     int bytes_read = recv(fd, read_buffer, sizeof(read_buffer), 0);
     process_msg(read_buffer);
