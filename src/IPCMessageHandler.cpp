@@ -108,16 +108,21 @@ void IPCMessageHandler::set_device_quality(char* buffer)
     cout << "Got an SDP message! " << buffer << endl;
     char video_device[20];
     int camera_setting;
+    int record_video;
 
     msg_payload = get_message_payload(buffer);
     cout << "Payload string - " << msg_payload << endl;
-    sscanf(msg_payload.c_str(), "%s %d", video_device, &camera_setting);
+    sscanf(msg_payload.c_str(), "%s %d %d", video_device, &camera_setting, &record_video);
 
+    bool _record_stream;
+    _record_stream = (record_video) ? true : false;
     RTSPAdaptiveStreaming* stream;
+
     try {
         stream = rtsp_stream_server->get_stream_map().at(string(video_device));
         if (stream->get_media_prepared()) {
             stream->change_quality_preset(camera_setting);
+            stream->record_stream(_record_stream);
         } else {
             g_warning("Stream not connected yet");
         }
