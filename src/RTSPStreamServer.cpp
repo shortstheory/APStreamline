@@ -149,7 +149,6 @@ void RTSPStreamServer::get_v4l2_devices_info()
 
                     for (frmival.index = 0; ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) >= 0; frmival.index++) {
                         int framerate  = frmival.discrete.denominator;
-                        VideoPresets video_preset;
                         // printf("%d\n", framerate);
                         switch (preset) {
                         case FRAME_320x240:
