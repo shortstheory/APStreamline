@@ -85,50 +85,50 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
             // g_warning("element name = %s", str.c_str());
     }
 
-        list = GST_BIN_CHILDREN(pipeline);
+    list = GST_BIN_CHILDREN(pipeline);
 
-        for (l = list; l != NULL; l = l->next) {
-            element = (GstElement*)l->data;
-            str = gst_element_get_name(element);
-            g_warning("String val - %s", str.c_str());
-            if (camera_type == CameraType::RAW_CAM) {
-                if (str.find("x264enc") != std::string::npos) {
-                    h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-                }
-            }
-            if (str.find("tee_element") != std::string::npos) {
-                g_warning("found tee");
-                tee = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-            }
-            if (str.find("v4l2src") != std::string::npos) {
-                v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-            }
-            if (str.find("textoverlay") != std::string::npos) {
-                text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-                g_object_set(G_OBJECT(text_overlay), "valignment", 2, NULL); //top
-                g_object_set(G_OBJECT(text_overlay), "halignment", 0, NULL); //left
-                g_object_set(G_OBJECT(text_overlay), "font-desc", "Sans, 9", NULL);
-            }
-            if (str.find("capsfilter") != std::string::npos) {
-                src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-            }
-            // there should be only 1 payloader, but just check later on
-            if (str.find("pay") != std::string::npos) {
-                rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+    for (l = list; l != NULL; l = l->next) {
+        element = (GstElement*)l->data;
+        str = gst_element_get_name(element);
+        g_warning("String val - %s", str.c_str());
+        if (camera_type == CameraType::RAW_CAM) {
+            if (str.find("x264enc") != std::string::npos) {
+                h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
         }
-        if (RECORD_VIDEO) {
-            // file_recorder.init_file_recorder(pipeline, tee);
-            // gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
-            //                   static_probe_block_callback, this, NULL);
-            // file_recorder.init_file_recorder(pipeline, tee);
+        if (str.find("tee_element") != std::string::npos) {
+            g_warning("found tee");
+            tee = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
         }
-        g_warning("PPLP %p", pipeline);
-
-        set_resolution(ResolutionPresets::LOW);
-        add_rtpbin_probes();
-        media_prepared = true;
+        if (str.find("v4l2src") != std::string::npos) {
+            v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+        }
+        if (str.find("textoverlay") != std::string::npos) {
+            text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+            g_object_set(G_OBJECT(text_overlay), "valignment", 2, NULL); //top
+            g_object_set(G_OBJECT(text_overlay), "halignment", 0, NULL); //left
+            g_object_set(G_OBJECT(text_overlay), "font-desc", "Sans, 9", NULL);
+        }
+        if (str.find("capsfilter") != std::string::npos) {
+            src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+        }
+        // there should be only 1 payloader, but just check later on
+        if (str.find("pay") != std::string::npos) {
+            rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+        }
     }
+    if (RECORD_VIDEO) {
+        // file_recorder.init_file_recorder(pipeline, tee);
+        // gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
+        //                   static_probe_block_callback, this, NULL);
+        // file_recorder.init_file_recorder(pipeline, tee);
+    }
+    g_warning("PPLP %p", pipeline);
+
+    set_resolution(ResolutionPresets::LOW);
+    add_rtpbin_probes();
+    media_prepared = true;
+}
 
     GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data) {
         RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
