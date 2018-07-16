@@ -19,8 +19,10 @@ public:
     GstElement* file_queue;
     GstElement* file_h264_parser;
     GstElement* mux;
-    void init_file_recorder()
+    GstElement* pipeline;
+    void init_file_recorder(GstElement* _pipeline)
     {
+        pipeline = _pipeline;
         // file_recorder_bin = gst_bin_new(NULL);
         file_queue = gst_element_factory_make("queue", NULL);
         file_h264_parser = gst_element_factory_make("h264parse", NULL);
@@ -37,9 +39,12 @@ public:
 
         g_object_set(G_OBJECT(file_sink), "location", file_path.c_str(), NULL);
 
-        // gst_bin_add_many(GST_BIN(file_recorder_bin), file_queue, file_h264_parser, mux, file_sink, NULL);
-        // // // see if we need ghost pads or if we can get away without it here
-        // gst_element_link_many(file_queue, file_h264_parser, mux, file_sink, NULL);
+        gst_bin_add_many(GST_BIN(pipeline), file_queue, file_h264_parser, mux, file_sink, NULL);
+        gst_element_link_many(file_queue, file_h264_parser, mux, file_sink, NULL);
+        gst_element_sync_state_with_parent(file_queue);
+        gst_element_sync_state_with_parent(file_h264_parser);
+        gst_element_sync_state_with_parent(mux);
+        gst_element_sync_state_with_parent(file_sink);
     }
 };
 
