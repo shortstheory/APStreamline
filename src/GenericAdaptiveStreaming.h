@@ -60,11 +60,13 @@ public:
     GstElement* rtph264_payloader;
     GstElement* text_overlay;
 
-    GstElement* file_recorder_bin;
-    GstElement* file_sink;
-    GstElement* file_queue;
-    GstElement* file_h264_parser;
-    GstElement* mux;
+    GstElement* tee;
+
+        // GstElement* file_recorder_bin;
+        // GstElement* file_sink;
+        // GstElement* file_queue;
+        // GstElement* file_h264_parser;
+        // GstElement* mux;
 
     QoSEstimator qos_estimator;
     const CameraType camera_type;
@@ -81,7 +83,6 @@ public:
     bool play_pipeline();
     bool pause_pipeline();
     bool change_source(string _device);
-    void init_file_recorder();
     GstBus* get_pipeline_bus();
 };
 

@@ -36,7 +36,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
             file_path = "Video_" + file_path + ".mkv";
 
             launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! videoconvert ! textoverlay ! "
-                            " x264enc tune=zerolatency threads=4 bitrate=500 ! tee name=t t. ! queue ! h264parse ! rtph264pay name=pay0";// t. ! queue name=file_queue ! h264parse ! matroskamux ! filesink location=" + file_path;
+                            " x264enc tune=zerolatency threads=4 bitrate=500 ! tee name=tee_element tee_element. ! queue ! h264parse ! rtph264pay name=pay0";// t. ! queue name=file_queue ! h264parse ! matroskamux ! filesink location=" + file_path;
         } else {
             launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! videoconvert ! textoverlay ! "
                             " x264enc tune=zerolatency threads=4 bitrate=500 ! h264parse ! rtph264pay name=pay0";
@@ -77,6 +77,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     string str;
     GList* list = GST_BIN_CHILDREN(parent);
     GList* l;
+
     for (l = list; l != NULL; l = l->next) {
         element = (GstElement*)l->data;
         str = gst_element_get_name(element);
@@ -109,6 +110,10 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
                     h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
                 }
             }
+            if (str.find("tee_element") != std::string::npos) {
+                g_warning("found tee");
+                tee = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+            }
             if (str.find("v4l2src") != std::string::npos) {
                 v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
@@ -125,17 +130,15 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
             if (str.find("pay") != std::string::npos) {
                 rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
-            if (str == string("file_queue")) {
-                file_queue = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-            }
         }
-        init_file_recorder();
-        gst_bin_add(GST_BIN(pipeline), file_recorder_bin);
-        gst_element_sync_state_with_parent(pipeline);
-        gst_element_link(file_queue, file_h264_parser);
+        FileRecorder file_recorder;
+        file_recorder.init_file_recorder();
 
-        GstPad* queue_src_pad = gst_element_get_static_pad(file_queue, "sink");
-        gst_pad_add_probe(queue_src_pad, GST_PAD_PROBE_TYPE_BLOCK, NULL, NULL, NULL);
+        // gst_bin_add(GST_BIN(pipeline), file_recorder.file_recorder_bin);
+        // gst_element_sync_state_with_parent(file_recorder.file_recorder_bin);
+
+        // GstPad* queue_src_pad = gst_element_get_static_pad(file_queue, "sink");
+        // gst_pad_add_probe(queue_src_pad, GST_PAD_PROBE_TYPE_BLOCK, NULL, NULL, NULL);
 
         set_resolution(ResolutionPresets::LOW);
         add_rtpbin_probes();
