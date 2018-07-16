@@ -38,12 +38,15 @@ public:
             return false;
         }
         pipeline = _pipeline;
+        tee = _tee;
+        if (!pipeline || !tee) {
+            return false;
+        }
         // file_recorder_bin = gst_bin_new(NULL);
         file_queue = gst_element_factory_make("queue", NULL);
         file_h264_parser = gst_element_factory_make("h264parse", NULL);
         mux = gst_element_factory_make("matroskamux", NULL);
         file_sink = gst_element_factory_make("filesink", NULL);
-        tee = _tee;
 
         string file_path;
         auto t = std::time(nullptr);
@@ -92,7 +95,6 @@ public:
         gst_object_unref(file_sink);
         return true;
     }
-
 };
 
 #endif

@@ -36,10 +36,12 @@ private:
     static GstPadProbeReturn static_payloader_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data);
 
 public:
+    FileRecorder file_recorder;
     RTSPAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM,
                           string _uri = "/test", GstRTSPServer* server = nullptr, int quality = AUTO_PRESET);
     ~RTSPAdaptiveStreaming() override;
     bool get_media_prepared();
+    bool record_stream(bool _record_stream);
 };
 
 #endif

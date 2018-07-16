@@ -46,7 +46,6 @@ private:
     void degrade_quality();
 
 public:
-    FileRecorder file_recorder;
     int current_quality;
     string device;
     ResolutionPresets current_res;

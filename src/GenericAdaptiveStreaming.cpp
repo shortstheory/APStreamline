@@ -320,8 +320,3 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
         }
     }
 }
-
-bool GenericAdaptiveStreaming::record_stream(bool _record_stream)
-{
-    return true;
-}
