@@ -6,10 +6,14 @@
 
 #ifdef __amd64__
 static const guint32 MAX_STEADY_BITRATE = 6000;
+static const bool AMD64 = true;
+static const bool ARM = false;
 #endif
 
 #ifdef __arm__
 static const guint32 MAX_STEADY_BITRATE = 2500;
+static const bool AMD64 = false;
+static const bool ARM = true;
 #endif
 
 static const bool RECORD_VIDEO = true;

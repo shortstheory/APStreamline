@@ -67,13 +67,15 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     for (l = list; l != NULL; l = l->next) {
         element = (GstElement*)l->data;
         str = gst_element_get_name(element);
-#ifdef __amd64__
-        if (str.find("pipeline") != std::string::npos) {
-#endif
-#ifdef __arm__
-        if (str.find("bin") != std::string::npos) {
-#endif
-            pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+        if (AMD64) {
+            if (str.find("pipeline") != std::string::npos) {
+                pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+            }
+        }
+        if (ARM) {
+            if (str.find("bin") != std::string::npos) {
+                pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+            }
         }
         if (str.find("rtpbin") != std::string::npos) {
             rtpbin = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
@@ -82,7 +84,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
             g_warning("Identified %s", str.c_str());
             multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
         }
-            // g_warning("element name = %s", str.c_str());
+        // g_warning("element name = %s", str.c_str());
     }
 
     list = GST_BIN_CHILDREN(pipeline);
@@ -123,12 +125,14 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     media_prepared = true;
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data) {
+GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
+{
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
     return ptr->probe_block_callback(pad, info);
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPadProbeInfo* info) {
+GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPadProbeInfo* info)
+{
     // pad is blocked, so it's ok to unlink
     gst_pad_unlink(file_recorder.tee_file_pad, file_recorder.queue_pad);
     file_recorder.disable_recorder();
@@ -137,7 +141,8 @@ GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPa
     return GST_PAD_PROBE_REMOVE;
 }
 
-void RTSPAdaptiveStreaming::add_rtpbin_probes() {
+void RTSPAdaptiveStreaming::add_rtpbin_probes()
+{
     GstPad* rtcp_rr_pad;
     GstPad* rtcp_sr_pad;
     GstPad* payloader_pad;
@@ -155,16 +160,19 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes() {
     g_object_unref(payloader_pad);
 }
 
-bool RTSPAdaptiveStreaming::get_media_prepared() {
+bool RTSPAdaptiveStreaming::get_media_prepared()
+{
     return media_prepared;
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::static_rtcp_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data) {
+GstPadProbeReturn RTSPAdaptiveStreaming::static_rtcp_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
+{
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
     return ptr->rtcp_callback(pad, info);
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeInfo* info) {
+GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeInfo* info)
+{
     g_warning("H264 rate - %d", h264_bitrate);
     GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buf != nullptr) {
@@ -187,12 +195,14 @@ GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeI
     return GST_PAD_PROBE_OK;
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::static_payloader_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data) {
+GstPadProbeReturn RTSPAdaptiveStreaming::static_payloader_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
+{
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
     return ptr->payloader_callback(pad, info);
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadProbeInfo* info) {
+GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadProbeInfo* info)
+{
     guint32 buffer_size;
     guint64 bytes_sent;
     GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
@@ -205,12 +215,13 @@ GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadP
 }
 
 // make void
-bool RTSPAdaptiveStreaming::record_stream(bool _record_stream) {
+bool RTSPAdaptiveStreaming::record_stream(bool _record_stream)
+{
     if (_record_stream) {
         return file_recorder.init_file_recorder(pipeline, tee);
     } else {
         gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
-                            static_probe_block_callback, this, NULL);
+                          static_probe_block_callback, this, NULL);
         return true;
     }
 }
