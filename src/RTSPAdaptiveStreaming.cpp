@@ -26,23 +26,10 @@ void RTSPAdaptiveStreaming::init_media_factory()
     string launch_string;
 
     if (camera_type == CameraType::RAW_CAM) {
-        if (RECORD_VIDEO) {
-            string file_path;
-            auto t = std::time(nullptr);
-            auto tm = *std::localtime(&t);
-            std::stringstream ss;
-            ss << std::put_time(&tm, "%d-%m-%Y_%H:%M:%S") << std::endl;
-            file_path =  ss.str();
-            file_path = "Video_" + file_path + ".mkv";
-
-            launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! videoconvert ! textoverlay ! "
-                            " x264enc tune=zerolatency threads=4 bitrate=500 ! tee name=tee_element tee_element. ! queue ! h264parse ! rtph264pay name=pay0";// t. ! queue name=file_queue ! h264parse ! matroskamux ! filesink location=" + file_path;
-        } else {
-            launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! videoconvert ! textoverlay ! "
-                            " x264enc tune=zerolatency threads=4 bitrate=500 ! h264parse ! rtph264pay name=pay0";
-        }
+        launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! videoconvert ! textoverlay ! "
+                        " x264enc tune=zerolatency threads=4 bitrate=500 ! tee name=tee_element tee_element. ! queue ! h264parse ! rtph264pay name=pay0";// t. ! queue name=file_queue ! h264parse ! matroskamux ! filesink location=" + file_path;
     } else if (camera_type == CameraType::H264_CAM) {
-        launch_string = "v4l2src device=" + device + " ! video/x-h264, width=320, height=240, framerate=30/1 ! "
+        launch_string = "v4l2src device=" + device + " ! video/x-h264, width=320, height=240, framerate=30/1 ! tee name=tee_element tee_element. ! "
                         " h264parse ! rtph264pay name=pay0";
     }
     gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
@@ -132,13 +119,9 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
             }
         }
         if (RECORD_VIDEO) {
-            file_recorder.init_file_recorder(pipeline);
+            file_recorder.init_file_recorder(pipeline, tee);
 
-            tee_file_pad = gst_element_get_request_pad(tee, "src_%u");
-            queue_pad    = gst_element_get_static_pad (file_recorder.file_queue, "sink");
-            gst_pad_link(tee_file_pad, queue_pad);
-
-            gst_pad_add_probe(tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK, static_probe_block_callback, this, NULL);
+            // gst_pad_add_probe(tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK, static_probe_block_callback, this, NULL);
         }
         set_resolution(ResolutionPresets::LOW);
         add_rtpbin_probes();
@@ -154,9 +137,9 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPadProbeInfo* info)
     {
         // pad is blocked, so it's ok to unlink
-        gst_pad_unlink(tee_file_pad, queue_pad);
+        gst_pad_unlink(file_recorder.tee_file_pad, file_recorder.queue_pad);
         file_recorder.disable_recorder();
-        gst_element_release_request_pad(tee, tee_file_pad);
+        gst_element_release_request_pad(tee, file_recorder.tee_file_pad);
         return GST_PAD_PROBE_REMOVE;
     }
 

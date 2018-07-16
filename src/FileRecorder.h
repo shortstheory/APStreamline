@@ -13,6 +13,8 @@
 #include <ctime>
 
 class FileRecorder {
+private:
+    bool recording;
 public:
     GstElement* file_recorder_bin;
     GstElement* file_sink;
@@ -20,14 +22,23 @@ public:
     GstElement* file_h264_parser;
     GstElement* mux;
     GstElement* pipeline;
-    void init_file_recorder(GstElement* _pipeline)
+    GstElement* tee;
+    GstPad* tee_file_pad;
+    GstPad* queue_pad;
+
+    bool init_file_recorder(GstElement* _pipeline, GstElement* _tee)
     {
+        if (recording) {
+            g_warning("Recording in progress");
+            return false;
+        }
         pipeline = _pipeline;
         // file_recorder_bin = gst_bin_new(NULL);
         file_queue = gst_element_factory_make("queue", NULL);
         file_h264_parser = gst_element_factory_make("h264parse", NULL);
         mux = gst_element_factory_make("matroskamux", NULL);
         file_sink = gst_element_factory_make("filesink", NULL);
+        tee = _tee;
 
         string file_path;
         auto t = std::time(nullptr);
@@ -45,10 +56,21 @@ public:
         gst_element_sync_state_with_parent(file_h264_parser);
         gst_element_sync_state_with_parent(mux);
         gst_element_sync_state_with_parent(file_sink);
+
+        tee_file_pad = gst_element_get_request_pad(tee, "src_%u");
+        queue_pad    = gst_element_get_static_pad (file_queue, "sink");
+        gst_pad_link(tee_file_pad, queue_pad);
+        recording = true;
+        return true;
     }
 
-    void disable_recorder()
+    bool disable_recorder()
     {
+        if (!recording) {
+            g_warning("Recording not started");
+            return false;
+        }
+        recording = false;
         gst_bin_remove(GST_BIN(pipeline), file_queue);
         gst_bin_remove(GST_BIN(pipeline), file_h264_parser);
         gst_bin_remove(GST_BIN(pipeline), mux);
@@ -63,6 +85,7 @@ public:
         gst_object_unref(file_queue);
         gst_object_unref(mux);
         gst_object_unref(file_sink);
+        return true;
     }
 
 };
