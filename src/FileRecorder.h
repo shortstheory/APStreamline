@@ -26,6 +26,11 @@ public:
     GstPad* tee_file_pad;
     GstPad* queue_pad;
 
+    FileRecorder()
+    {
+        recording = false;
+    }
+
     bool init_file_recorder(GstElement* _pipeline, GstElement* _tee)
     {
         if (recording) {

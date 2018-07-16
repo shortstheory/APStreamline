@@ -25,6 +25,7 @@ private:
     bool send_string(string data);
     void send_device_props();
     void set_device_quality(char* buffer);
+    void set_file_recording(char* buffer);
 
 public:
     IPCMessageHandler(int fd, RTSPStreamServer* _rtsp_stream_server);

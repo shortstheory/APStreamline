@@ -122,6 +122,28 @@ void IPCMessageHandler::set_device_quality(char* buffer)
     }
 }
 
+void IPCMessageHandler::set_file_recording(char* buffer)
+{
+    string msg_payload;
+    int file_setting;
+    char video_device[20];
+    msg_payload = get_message_payload(buffer);
+    sscanf(msg_payload.c_str(), "%s %d", video_device, &file_setting);
+    bool _record_stream;
+    _record_stream = (file_setting) ? true : false;
+    RTSPAdaptiveStreaming* stream;
+    try {
+        stream = rtsp_stream_server->get_stream_map().at(string(video_device));
+        if (stream->get_media_prepared()) {
+            stream->record_stream(_record_stream);
+        } else {
+            g_warning("Stream not connected yet");
+        }
+    } catch (const out_of_range& err) {
+        cerr << err.what();
+    }
+}
+
 void IPCMessageHandler::process_msg(char* buf)
 {
     RTSPMessageType msgtype;
@@ -132,6 +154,8 @@ void IPCMessageHandler::process_msg(char* buf)
         break;
     case SET_DEVICE_PROPS:
         set_device_quality(buf);
+        break;
+    case RECORD_TO_FILE:
         break;
     case ERROR:
         g_warning("Unrecognised header");

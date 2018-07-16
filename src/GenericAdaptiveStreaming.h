@@ -46,6 +46,7 @@ private:
     void degrade_quality();
 
 public:
+    FileRecorder file_recorder;
     int current_quality;
     string device;
     ResolutionPresets current_res;
@@ -78,6 +79,7 @@ public:
     void pipeline_add_elements();
 
     void change_quality_preset(int quality);
+    bool record_stream(bool _record_stream);
     void set_resolution(ResolutionPresets setting);
     void adapt_stream();
     bool play_pipeline();
