@@ -8,6 +8,7 @@
 #include <string.h>
 #include <iostream>
 #include <fcntl.h>
+#include <algorithm>
 
 #include "RTSPStreamServer.h"
 

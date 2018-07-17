@@ -17,7 +17,7 @@ Support for NVidia Jetson boards will be added soon.
 Install the `gstreamer` dependencies:
 
 ```
-sudo apt install libgstreamer-plugins-base1.0* libgstreamer1.0-dev libgstrtspserver-1.0-dev gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
+sudo apt install libgstreamer-plugins-base1.0* libgstreamer1.0-dev libgstrtspserver-1.0-dev gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly python3-pip
 ```
 
 Install `meson` from `pip` and `ninja` for building the code:
