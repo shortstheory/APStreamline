@@ -6,14 +6,14 @@
 #include "RTSPAdaptiveStreaming.h"
 
 RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
-                                             CameraType type,
-                                             string _uri,
-                                             GstRTSPServer* server,
-                                             int quality):
-                                             GenericAdaptiveStreaming(_device, type),
-                                             uri(_uri),
-                                             rtsp_server(server),
-                                             media_prepared(false)
+        CameraType type,
+        string _uri,
+        GstRTSPServer* server,
+        int quality):
+    GenericAdaptiveStreaming(_device, type),
+    uri(_uri),
+    rtsp_server(server),
+    media_prepared(false)
 {
     current_quality = quality;
     init_media_factory();
@@ -38,11 +38,21 @@ void RTSPAdaptiveStreaming::init_media_factory()
     string launch_string;
 
     if (camera_type == CameraType::RAW_CAM) {
-        launch_string = "v4l2src device=" + device + " ! video/x-raw, width=320, height=240, framerate=30/1 ! videoconvert ! textoverlay ! "
-                        " x264enc tune=zerolatency threads=4 bitrate=500 ! tee name=tee_element tee_element. ! queue ! h264parse ! rtph264pay name=pay0";// t. ! queue name=file_queue ! h264parse ! matroskamux ! filesink location=" + file_path;
+        launch_string = "v4l2src device=" + device +
+                        " ! video/x-raw, width=320, height=240, framerate=30/1"
+                        " ! videoconvert"
+                        " ! textoverlay"
+                        " ! x264enc tune=zerolatency threads=4 bitrate=500"
+                        " ! tee name=tee_element tee_element."
+                        " ! queue"
+                        " ! h264parse"
+                        " ! rtph264pay name=pay0";
     } else if (camera_type == CameraType::H264_CAM) {
-        launch_string = "v4l2src device=" + device + " ! video/x-h264, width=320, height=240, framerate=30/1 ! tee name=tee_element tee_element. ! "
-                        " h264parse ! rtph264pay name=pay0";
+        launch_string = "v4l2src device=" + device +
+                        " ! video/x-h264, width=320, height=240, framerate=30/1"
+                        " ! tee name=tee_element tee_element."
+                        " ! h264parse"
+                        " ! rtph264pay name=pay0";
     }
     gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
 
@@ -137,7 +147,9 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     media_prepared = true;
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
+GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad,
+        GstPadProbeInfo* info,
+        gpointer data)
 {
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
     return ptr->probe_block_callback(pad, info);
@@ -177,7 +189,9 @@ bool RTSPAdaptiveStreaming::get_media_prepared()
     return media_prepared;
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::static_rtcp_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
+GstPadProbeReturn RTSPAdaptiveStreaming::static_rtcp_callback(GstPad* pad,
+        GstPadProbeInfo* info,
+        gpointer data)
 {
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
     return ptr->rtcp_callback(pad, info);
@@ -207,7 +221,10 @@ GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeI
     return GST_PAD_PROBE_OK;
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::static_payloader_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data)
+GstPadProbeReturn RTSPAdaptiveStreaming::static_payloader_callback(GstPad* pad,
+        GstPadProbeInfo* info,
+
+        gpointer data)
 {
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
     return ptr->payloader_callback(pad, info);
