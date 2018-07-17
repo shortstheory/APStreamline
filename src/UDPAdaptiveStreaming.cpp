@@ -143,7 +143,7 @@ void UDPAdaptiveStreaming::rtcp_callback(GstElement* src, GstBuffer* buf)
     // g_warning("BuffSize: %lu", gst_buffer_get_size(buf));
     // find the right way around using mallocs
     GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
-    rtcp_buffer->buffer = NULL;
+    rtcp_buffer->buffer = nullptr;
     gst_rtcp_buffer_map(buf, GST_MAP_READ, rtcp_buffer);
     GstRTCPPacket *packet = (GstRTCPPacket*)malloc(sizeof(GstRTCPPacket));
     gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);

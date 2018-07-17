@@ -35,7 +35,7 @@ void RTSPStreamServer::get_v4l2_devices()
     DIR *dp;
     struct dirent *ep;
     dp = opendir(v4l2_device_path.c_str());
-    if (dp == NULL) {
+    if (dp == nullptr) {
         fprintf(stderr, "Could not open directory %d", errno);
     }
     while ((ep = readdir(dp))) {

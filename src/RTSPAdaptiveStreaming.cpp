@@ -63,13 +63,13 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     g_warning("got parent!");
     GstElement* element;
 
-    multi_udp_sink = NULL;
+    multi_udp_sink = nullptr;
 
     string str;
     GList* list = GST_BIN_CHILDREN(parent);
     GList* l;
 
-    for (l = list; l != NULL; l = l->next) {
+    for (l = list; l != nullptr; l = l->next) {
         element = (GstElement*)l->data;
         str = gst_element_get_name(element);
         if (AMD64) {
@@ -94,7 +94,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
 
     list = GST_BIN_CHILDREN(pipeline);
 
-    for (l = list; l != NULL; l = l->next) {
+    for (l = list; l != nullptr; l = l->next) {
         element = (GstElement*)l->data;
         str = gst_element_get_name(element);
         g_warning("String val - %s", str.c_str());
