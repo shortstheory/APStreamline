@@ -117,8 +117,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
                 fmt.index = h264_index;
                 if (check_h264_ioctls(fd)) {
                     info.camera_type = H264_CAM;
-                }
-                else {
+                } else {
                     info.camera_type = UVC_CAM;
                 }
             } else {

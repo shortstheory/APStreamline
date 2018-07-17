@@ -50,7 +50,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
                         " ! rtph264pay name=pay0";
         break;
     case UVC_CAM:
-        launch_string = "uvch264src device=" + device + 
+        launch_string = "uvch264src device=" + device +
                         " ! name=src auto-start=true src.vidsrc "
                         " ! queue"
                         " ! video/x-h264, width=320, height=240, framerate=30/1"
@@ -127,17 +127,28 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         element = (GstElement*)l->data;
         str = gst_element_get_name(element);
         g_warning("String val - %s", str.c_str());
-        if (camera_type == CameraType::RAW_CAM) {
+
+        switch (camera_type) {
+        case RAW_CAM:
             if (str.find("x264enc") != std::string::npos) {
                 h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
-        }
+        // the lack of a break is intentional, trust me! :P
+        case H264_CAM:
+            if (str.find("v4l2src") != std::string::npos) {
+                v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+            }
+            break;
+        case UVC_CAM:
+            if (str.find("uvch264src") != std::string::npos) {
+                v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
+            }
+            break;
+        };
+
         if (str.find("tee_element") != std::string::npos) {
             g_warning("found tee");
             tee = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-        }
-        if (str.find("v4l2src") != std::string::npos) {
-            v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
         }
         if (str.find("textoverlay") != std::string::npos) {
             text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
