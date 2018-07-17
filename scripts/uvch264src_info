@@ -1,0 +1,240 @@
+Factory Details:
+  Rank                     none (0)
+  Long-name                UVC H264 Source
+  Klass                    Source/Video
+  Description              UVC H264 Encoding camera source
+  Author                   Youness Alaoui <youness.alaoui@collabora.co.uk>
+
+Plugin Details:
+  Name                     uvch264
+  Description              UVC compliant H264 encoding cameras plugin
+  Filename                 /usr/lib/x86_64-linux-gnu/gstreamer-1.0/libgstuvch264.so
+  Version                  1.14.1
+  License                  LGPL
+  Source module            gst-plugins-bad
+  Source release date      2018-05-17
+  Binary package           GStreamer Bad Plugins (Ubuntu)
+  Origin URL               https://launchpad.net/distros/ubuntu/+source/gst-plugins-bad1.0
+
+GObject
+ +----GInitiallyUnowned
+       +----GstObject
+             +----GstElement
+                   +----GstBin
+                         +----GstBaseCameraSrc
+                               +----GstUvcH264Src
+
+Implemented Interfaces:
+  GstChildProxy
+
+Pad Templates:
+  SRC template: 'vidsrc'
+    Availability: Always
+    Capabilities:
+      video/x-raw
+                 format: { (string)I420, (string)YV12, (string)YUY2, (string)UYVY, (string)AYUV, (string)RGBx, (string)BGRx, (string)xRGB, (string)xBGR, (string)RGBA, (string)BGRA, (string)ARGB, (string)ABGR, (string)RGB, (string)BGR, (string)Y41B, (string)Y42B, (string)YVYU, (string)Y444, (string)v210, (string)v216, (string)NV12, (string)NV21, (string)GRAY8, (string)GRAY16_BE, (string)GRAY16_LE, (string)v308, (string)RGB16, (string)BGR16, (string)RGB15, (string)BGR15, (string)UYVP, (string)A420, (string)RGB8P, (string)YUV9, (string)YVU9, (string)IYU1, (string)ARGB64, (string)AYUV64, (string)r210, (string)I420_10BE, (string)I420_10LE, (string)I422_10BE, (string)I422_10LE, (string)Y444_10BE, (string)Y444_10LE, (string)GBR, (string)GBR_10BE, (string)GBR_10LE, (string)NV16, (string)NV24, (string)NV12_64Z32, (string)A420_10BE, (string)A420_10LE, (string)A422_10BE, (string)A422_10LE, (string)A444_10BE, (string)A444_10LE, (string)NV61, (string)P010_10BE, (string)P010_10LE, (string)IYU2, (string)VYUY, (string)GBRA, (string)GBRA_10BE, (string)GBRA_10LE, (string)GBR_12BE, (string)GBR_12LE, (string)GBRA_12BE, (string)GBRA_12LE, (string)I420_12BE, (string)I420_12LE, (string)I422_12BE, (string)I422_12LE, (string)Y444_12BE, (string)Y444_12LE, (string)GRAY10_LE32, (string)NV12_10LE32, (string)NV16_10LE32 }
+                  width: [ 1, 2147483647 ]
+                 height: [ 1, 2147483647 ]
+              framerate: [ 0/1, 2147483647/1 ]
+      image/jpeg
+                  width: [ 1, 2147483647 ]
+                 height: [ 1, 2147483647 ]
+              framerate: [ 0/1, 2147483647/1 ]
+      video/x-h264
+                  width: [ 1, 2147483647 ]
+                 height: [ 1, 2147483647 ]
+              framerate: [ 0/1, 2147483647/1 ]
+          stream-format: { (string)byte-stream, (string)avc }
+              alignment: au
+                profile: { (string)high, (string)main, (string)baseline, (string)constrained-baseline }
+  
+  SRC template: 'imgsrc'
+    Availability: Always
+    Capabilities:
+      EMPTY
+  
+  SRC template: 'vfsrc'
+    Availability: Always
+    Capabilities:
+      video/x-raw
+                 format: { (string)I420, (string)YV12, (string)YUY2, (string)UYVY, (string)AYUV, (string)RGBx, (string)BGRx, (string)xRGB, (string)xBGR, (string)RGBA, (string)BGRA, (string)ARGB, (string)ABGR, (string)RGB, (string)BGR, (string)Y41B, (string)Y42B, (string)YVYU, (string)Y444, (string)v210, (string)v216, (string)NV12, (string)NV21, (string)GRAY8, (string)GRAY16_BE, (string)GRAY16_LE, (string)v308, (string)RGB16, (string)BGR16, (string)RGB15, (string)BGR15, (string)UYVP, (string)A420, (string)RGB8P, (string)YUV9, (string)YVU9, (string)IYU1, (string)ARGB64, (string)AYUV64, (string)r210, (string)I420_10BE, (string)I420_10LE, (string)I422_10BE, (string)I422_10LE, (string)Y444_10BE, (string)Y444_10LE, (string)GBR, (string)GBR_10BE, (string)GBR_10LE, (string)NV16, (string)NV24, (string)NV12_64Z32, (string)A420_10BE, (string)A420_10LE, (string)A422_10BE, (string)A422_10LE, (string)A444_10BE, (string)A444_10LE, (string)NV61, (string)P010_10BE, (string)P010_10LE, (string)IYU2, (string)VYUY, (string)GBRA, (string)GBRA_10BE, (string)GBRA_10LE, (string)GBR_12BE, (string)GBR_12LE, (string)GBRA_12BE, (string)GBRA_12LE, (string)I420_12BE, (string)I420_12LE, (string)I422_12BE, (string)I422_12LE, (string)Y444_12BE, (string)Y444_12LE, (string)GRAY10_LE32, (string)NV12_10LE32, (string)NV16_10LE32 }
+                  width: [ 1, 2147483647 ]
+                 height: [ 1, 2147483647 ]
+              framerate: [ 0/1, 2147483647/1 ]
+      image/jpeg
+                  width: [ 1, 2147483647 ]
+                 height: [ 1, 2147483647 ]
+              framerate: [ 0/1, 2147483647/1 ]
+
+Element has no clocking capabilities.
+Element has no URI handling capabilities.
+
+Pads:
+  SRC: 'vfsrc'
+  SRC: 'imgsrc'
+  SRC: 'vidsrc'
+
+Element Properties:
+  name                : The name of the object
+                        flags: readable, writable
+                        String. Default: "uvch264src0"
+  parent              : The parent of the object
+                        flags: readable, writable
+                        Object of type "GstObject"
+  async-handling      : The bin will handle Asynchronous state changes
+                        flags: readable, writable
+                        Boolean. Default: false
+  message-forward     : Forwards all children messages
+                        flags: readable, writable
+                        Boolean. Default: false
+  mode                : The capture mode (still image capture or video recording)
+                        flags: readable, writable
+                        Enum "GstCameraBin2Mode" Default: 2, "mode-video"
+                           (1): mode-image       - Still image capture (default)
+                           (2): mode-video       - Video recording
+  zoom                : Digital zoom factor (e.g. 1.5 means 1.5x)
+                        flags: readable, writable
+                        Float. Range:               1 -    3.402823e+38 Default:               1 
+  max-zoom            : Digital zoom factor (e.g. 1.5 means 1.5x)
+                        flags: readable
+                        Float. Range:               1 -    3.402823e+38 Default:              10 
+  ready-for-capture   : Informs this element is ready for starting another capture
+                        flags: readable
+                        Boolean. Default: true
+  post-previews       : If capture preview images should be posted to the bus
+                        flags: readable, writable
+                        Boolean. Default: true
+  preview-caps        : The caps of the preview image to be posted (NULL means ANY)
+                        flags: readable, writable
+                                                   ANY
+
+  preview-filter      : A custom preview filter to process preview image data
+                        flags: readable, writable
+                        Object of type "GstElement"
+  auto-start          : Automatically starts capture when going to the PAUSED state
+                        flags: readable, writable
+                        Boolean. Default: false
+  colorspace-name     : The name of the colorspace element
+                        flags: readable, writable, changeable only in NULL or READY state
+                        String. Default: "videoconvert"
+  jpeg-decoder-name   : The name of the jpeg decoder element
+                        flags: readable, writable, changeable only in NULL or READY state
+                        String. Default: "jpegdec"
+  num-clock-samples   : Number of clock samples to gather for the PTS synchronization (-1 = unlimited)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Integer. Range: 0 - 2147483647 Default: 0 
+  num-buffers         : Number of buffers to output before sending EOS (-1 = unlimited)
+                        flags: readable, writable
+                        Integer. Range: -1 - 2147483647 Default: -1 
+  device              : Device location
+                        flags: readable, writable
+                        String. Default: "/dev/video0"
+  device-name         : Name of the device
+                        flags: readable
+                        String. Default: ""
+  initial-bitrate     : Initial bitrate in bits/second (static control)
+                        flags: readable, writable, changeable only in NULL or READY state
+                        Unsigned Integer. Range: 0 - 4294967295 Default: 3000000 
+  slice-units         : Slice units (static control)
+                        flags: readable, writable, changeable only in NULL or READY state
+                        Unsigned Integer. Range: 0 - 65535 Default: 4 
+  slice-mode          : Defines the unit of the slice-units property (static control)
+                        flags: readable, writable, changeable only in NULL or READY state
+                        Enum "UvcH264SliceMode" Default: 3, "slice/frame"
+                           (0): ignored          - Ignored
+                           (1): bits/slice       - Bits per slice
+                           (2): MBs/slice        - MBs per Slice
+                           (3): slice/frame      - Slice Per Frame
+  iframe-period       : Time between IDR frames in milliseconds (static control)
+                        flags: readable, writable, changeable only in NULL or READY state
+                        Unsigned Integer. Range: 0 - 65535 Default: 10000 
+  usage-type          : The usage type (static control)
+                        flags: readable, writable, changeable only in NULL or READY state
+                        Enum "UvcH264UsageType" Default: 1, "realtime"
+                           (1): realtime         - Realtime (video conferencing)
+                           (2): broadcast        - Broadcast
+                           (3): storage          - Storage
+                           (4): ucconfig0        - UCConfig 0
+                           (5): ucconfig1        - UCConfig 1
+                           (6): ucconfig2q       - UCConfig 2Q
+                           (7): ucconfig2s       - UCConfig 2S
+                           (8): ucconfig3        - UCConfig 3
+  entropy             : Entropy (static control)
+                        flags: readable, writable, changeable only in NULL or READY state
+                        Enum "UvcH264Entropy" Default: 0, "cavlc"
+                           (0): cavlc            - CAVLC
+                           (1): cabac            - CABAC
+  enable-sei          : Enable SEI picture timing (static control)
+                        flags: readable, writable, changeable only in NULL or READY state
+                        Boolean. Default: false
+  num-reorder-frames  : Number of B frames between the references frames (static control)
+                        flags: readable, writable, changeable only in NULL or READY state
+                        Unsigned Integer. Range: 0 - 255 Default: 0 
+  preview-flipped     : Horizontal flipped image for non H.264 streams (static control)
+                        flags: readable, writable, changeable only in NULL or READY state
+                        Boolean. Default: false
+  leaky-bucket-size   : Size of the leaky bucket size in milliseconds (static control)
+                        flags: readable, writable, changeable only in NULL or READY state
+                        Unsigned Integer. Range: 0 - 65535 Default: 1000 
+  rate-control        : Rate control mode (static & dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Enum "UvcH264RateControl" Default: 1, "cbr"
+                           (1): cbr              - Constant bit rate
+                           (2): vbr              - Variable bit rate
+                           (3): qp               - Constant QP
+  fixed-framerate     : Fixed framerate (static & dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Boolean. Default: false
+  max-mbps            : The number of macroblocks per second for the maximum processing rate
+                        flags: readable
+                        Unsigned Integer. Range: 0 - 4294967295 Default: 0 
+  level-idc           : Level IDC (dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Unsigned Integer. Range: 0 - 255 Default: 40 
+  peak-bitrate        : The peak bitrate in bits/second (dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Unsigned Integer. Range: 0 - 4294967295 Default: 3000000 
+  average-bitrate     : The average bitrate in bits/second (dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Unsigned Integer. Range: 0 - 4294967295 Default: 3000000 
+  min-iframe-qp       : The minimum Quantization step size for I frames (dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Integer. Range: -127 - 127 Default: 10 
+  max-iframe-qp       : The minimum Quantization step size for I frames (dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Integer. Range: -127 - 127 Default: 46 
+  min-pframe-qp       : The minimum Quantization step size for P frames (dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Integer. Range: -127 - 127 Default: 10 
+  max-pframe-qp       : The minimum Quantization step size for P frames (dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Integer. Range: -127 - 127 Default: 46 
+  min-bframe-qp       : The minimum Quantization step size for B frames (dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Integer. Range: -127 - 127 Default: 10 
+  max-bframe-qp       : The minimum Quantization step size for B frames (dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Integer. Range: -127 - 127 Default: 46 
+  ltr-buffer-size     : Total number of Long-Term Reference frames (dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Integer. Range: 0 - 255 Default: 0 
+  ltr-encoder-control : Number of LTR frames the device can control (dynamic control)
+                        flags: readable, writable, changeable in NULL, READY, PAUSED or PLAYING state
+                        Integer. Range: 0 - 255 Default: 0 
+
+Element Actions:
+  "get-enum-setting" :  gboolean user_function (GstElement* object,
+                                                gchararray arg0,
+                                                gpointer arg1,
+                                                gpointer arg2);
+  "get-boolean-setting" :  gboolean user_function (GstElement* object,
+                                                   gchararray arg0,
+                                                   gpointer arg1,
+                                                   gpointer arg2);
+  "get-int-setting" :  gboolean user_function (GstElement* object,
+                                               gchararray arg0,
+                                               gpointer arg1,
+                                               gpointer arg2,
+                                               gpointer arg3);
+  "start-capture" :  void user_function (GstElement* object);
+  "stop-capture" :  void user_function (GstElement* object);

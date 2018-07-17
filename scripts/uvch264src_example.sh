@@ -1,0 +1,1 @@
+gst-launch-1.0 -v -e uvch264src device=/dev/video1 initial-bitrate=50000000 average-bitrate=50000000 name=src auto-start=true src.vidsrc ! queue ! video/x-h264,width=1920,height=1080,framerate=30/1 ! h264parse ! avdec_h264 ! xvimagesink sync=false
