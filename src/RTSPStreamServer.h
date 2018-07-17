@@ -35,7 +35,6 @@ private:
     static bool initialised;
     static RTSPStreamServer* instance;
     RTSPStreamServer(string _ip_addr, string _port);
-    // RTSPStreamServer(string _ip_addr = "127.0.0.1", string _port = "8554");
 
     ~RTSPStreamServer();
 public:

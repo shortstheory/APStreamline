@@ -115,12 +115,12 @@ void RTSPStreamServer::get_v4l2_devices_info()
             // only take h264 caps if the camera support it, mjpg will have the same caps
             if (h264_index != -1) {
                 fmt.index = h264_index;
-                info.camera_type = H264_CAM;
-                // if (check_h264_ioctls(fd)) {
-                // }
-                // else {
-                //     info.camera_type = RAW_H264_CAM;
-                // }
+                if (check_h264_ioctls(fd)) {
+                    info.camera_type = H264_CAM;
+                }
+                else {
+                    info.camera_type = UVC_CAM;
+                }
             } else {
                 info.camera_type = RAW_CAM;
             }
