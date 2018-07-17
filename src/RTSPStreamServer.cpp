@@ -218,11 +218,11 @@ void RTSPStreamServer::remove_stream(string device)
 {
     auto device_itr = device_properties_map.find(device);
     auto stream_itr = adaptive_streams_map.find(device);
+    auto list_itr = find(device_list.begin(), device_list.end(), device);
 
-    if (stream_itr->second != nullptr) {
-        delete stream_itr->second;
-    }
+    remove_mount_point(device_itr->second.mount_point);
 
+    device_list.erase(list_itr);
     device_properties_map.erase(device_itr);
     adaptive_streams_map.erase(stream_itr);
 }

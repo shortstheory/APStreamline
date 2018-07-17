@@ -1,5 +1,6 @@
 2DO:
 
+* get rid of device_list
 * remove void IPCMessageHandler::set_file_recording(char* buffer)
 * use static element names instead in rtspstreamer
 * add scripts
