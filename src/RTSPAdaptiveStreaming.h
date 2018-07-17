@@ -28,17 +28,26 @@ private:
     GstPadProbeReturn payloader_callback(GstPad* pad, GstPadProbeInfo* info);
     GstPadProbeReturn probe_block_callback(GstPad* pad, GstPadProbeInfo* info);
 
-    static void static_media_constructed_callback(GstRTSPMediaFactory *media_factory, GstRTSPMedia *media,
-            gpointer data);
+    static void static_media_constructed_callback(GstRTSPMediaFactory *media_factory,
+                                                  GstRTSPMedia *media,
+                                                  gpointer data);
     static void static_media_prepared_callback(GstRTSPMedia* media, gpointer user_data);
-    static GstPadProbeReturn static_probe_block_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data);
-    static GstPadProbeReturn static_rtcp_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data);
-    static GstPadProbeReturn static_payloader_callback(GstPad* pad, GstPadProbeInfo* info, gpointer data);
+    static GstPadProbeReturn static_probe_block_callback(GstPad* pad,
+                                                         GstPadProbeInfo* info,
+                                                         gpointer data);
+    static GstPadProbeReturn static_rtcp_callback(GstPad* pad,
+                                                  GstPadProbeInfo* info,
+                                                  gpointer data);
+    static GstPadProbeReturn static_payloader_callback(GstPad* pad,
+                                                       GstPadProbeInfo* info,
+                                                       gpointer data);
 
 public:
     FileRecorder file_recorder;
-    RTSPAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM,
-                          string _uri = "/test", GstRTSPServer* server = nullptr, int quality = AUTO_PRESET);
+    RTSPAdaptiveStreaming(string _device = "/dev/video0",
+                          CameraType type = CameraType::RAW_CAM,
+                          string _uri = "/test", GstRTSPServer* server = nullptr,
+                          int quality = AUTO_PRESET);
     ~RTSPAdaptiveStreaming() override;
     bool get_media_prepared();
     bool record_stream(bool _record_stream);

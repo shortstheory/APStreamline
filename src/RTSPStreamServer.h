@@ -24,7 +24,6 @@ private:
 
     vector<string> device_list;
     map<string, RTSPAdaptiveStreaming*> adaptive_streams_map;
-
     map<string, v4l2_info> device_properties_map;
 
     void get_v4l2_devices();
@@ -42,6 +41,7 @@ private:
 public:
     static RTSPStreamServer* get_instance(string _ip_addr, string _port);
     GstRTSPServer* get_server();
+    void remove_stream(string device);
 
     string get_ip_address();
     string get_port();

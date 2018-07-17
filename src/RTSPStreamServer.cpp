@@ -214,6 +214,19 @@ void RTSPStreamServer::remove_mount_point(string mount_point)
     gst_rtsp_mount_points_remove_factory(mounts, mount_point.c_str());
 }
 
+void RTSPStreamServer::remove_stream(string device)
+{
+    auto device_itr = device_properties_map.find(device);
+    auto stream_itr = adaptive_streams_map.find(device);
+
+    if (stream_itr->second != nullptr) {
+        delete stream_itr->second;
+    }
+
+    device_properties_map.erase(device_itr);
+    adaptive_streams_map.erase(stream_itr);
+}
+
 void RTSPStreamServer::setup_streams()
 {
     for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++) {

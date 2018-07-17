@@ -50,13 +50,6 @@ GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
 {
     gst_element_set_state(pipeline, GST_STATE_NULL);
     gst_object_unref(pipeline);
-    // gst_object_unref(v4l2_src);
-    // gst_object_unref(video_udp_sink);
-    // gst_object_unref(h264_encoder);
-    // gst_object_unref(rtph264_payloader);
-    // gst_object_unref(rtpbin);
-    // gst_object_unref(rr_rtcp_identity);
-    // gst_object_unref(sr_rtcp_identity);
 }
 
 void GenericAdaptiveStreaming::pipeline_add_elements()

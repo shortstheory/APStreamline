@@ -14,6 +14,11 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device, CameraType type, st
 
 RTSPAdaptiveStreaming::~RTSPAdaptiveStreaming()
 {
+    gst_element_set_state(multi_udp_sink, GST_STATE_NULL);
+    gst_object_unref(multi_udp_sink);
+    gst_element_set_state(rtpbin, GST_STATE_NULL);
+    gst_object_unref(rtpbin);
+    gst_object_unref(rtsp_server);
 }
 
 void RTSPAdaptiveStreaming::init_media_factory()
