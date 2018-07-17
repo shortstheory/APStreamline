@@ -13,11 +13,6 @@
 #define V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME		(V4L2_CID_MPEG_BASE+229)
 #endif
 
-// GenericAdaptiveStreaming::GenericAdaptiveStreaming() : camera_type(CameraType::RAW_CAM)
-// {
-//     g_warning("noparmctr");
-// }
-
 GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType type) :
     device(_device), camera_type(type),
     network_state(NetworkState::STEADY), successive_transmissions(0)
@@ -38,11 +33,6 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
 
     set_state_constants();
     text_overlay = NULL;
-    // if (link_all_elements()) {
-    //     g_warning("goodlink");
-    // } else {
-    //     g_warning("bad link");
-    // }
 }
 
 //unreffing pointers which are null can be dangerous, check this
@@ -54,7 +44,12 @@ GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
 
 void GenericAdaptiveStreaming::pipeline_add_elements()
 {
-    gst_bin_add_many(GST_BIN(pipeline), v4l2_src, src_capsfilter, text_overlay, rtph264_payloader, h264_parser, NULL);
+    gst_bin_add_many(GST_BIN(pipeline),
+                     v4l2_src,src_capsfilter,
+                     text_overlay,
+                     rtph264_payloader,
+                     h264_parser,
+                     NULL);
     if (camera_type == CameraType::RAW_CAM) {
         gst_bin_add_many(GST_BIN(pipeline), h264_encoder, videoconvert, NULL);
     } else if (camera_type == CameraType::H264_CAM) {

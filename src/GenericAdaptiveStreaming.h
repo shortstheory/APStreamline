@@ -32,7 +32,6 @@ private:
 
     string video_caps_string;
 
-    // better off as a char array, change it later
     string video_presets[3];
     guint32 bitrate_presets[3];
 
@@ -59,14 +58,7 @@ public:
     GstElement* h264_parser;
     GstElement* rtph264_payloader;
     GstElement* text_overlay;
-
     GstElement* tee;
-
-    // GstElement* file_recorder_bin;
-    // GstElement* file_sink;
-    // GstElement* file_queue;
-    // GstElement* file_h264_parser;
-    // GstElement* mux;
 
     QoSEstimator qos_estimator;
     const CameraType camera_type;
