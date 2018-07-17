@@ -5,8 +5,15 @@
 
 #include "RTSPAdaptiveStreaming.h"
 
-RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device, CameraType type, string _uri, GstRTSPServer* server, int quality):
-    GenericAdaptiveStreaming(_device, type), uri(_uri), rtsp_server(server), media_prepared(false)
+RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
+                                             CameraType type,
+                                             string _uri,
+                                             GstRTSPServer* server,
+                                             int quality):
+                                             GenericAdaptiveStreaming(_device, type),
+                                             uri(_uri),
+                                             rtsp_server(server),
+                                             media_prepared(false)
 {
     current_quality = quality;
     init_media_factory();
