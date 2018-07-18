@@ -57,12 +57,19 @@ void RTSPAdaptiveStreaming::init_media_factory()
                         " ! video/x-raw, width=320, height=240, framerate=10/1"
                         " ! fakesink sync=false src.vidsrc"
                         " ! queue"
-                        " ! video/x-h264, width=1280, height=720, framerate=30/1"
+                        " ! video/x-h264, width=320, height=240, framerate=30/1"
                         " ! tee name=tee_element tee_element."
                         " ! queue"
                         " ! h264parse"
                         " ! rtph264pay name=pay0";
-
+        // launch_string = "uvch264src device=" + device +
+        //                 " name=src auto-start=true src.vidsrc "
+        //                 " ! queue"
+        //                 " ! video/x-h264, width=320, height=240, framerate=30/1"
+        //                 " ! tee name=tee_element tee_element."
+        //                 " ! queue"
+        //                 " ! h264parse"
+        //                 " ! rtph264pay name=pay0";
         // launch_string = "uvch264src device=" + device +
         //                 " name=src auto-start=true src.vdsrc "
         //                 " ! queue"
@@ -172,6 +179,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
             tee = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
         }
         if (str.find("capsfilter") != std::string::npos) {
+            g_warning("Using caps filter - %s", str.c_str());
             src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
         }
         if (str.find("pay") != std::string::npos) {

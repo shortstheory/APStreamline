@@ -21,7 +21,7 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
         video_presets[ResolutionPresets::LOW] = RAW_CAPS_FILTERS[VIDEO_320x240x30];
         video_presets[ResolutionPresets::MED] = RAW_CAPS_FILTERS[VIDEO_640x480x30];
         video_presets[ResolutionPresets::HIGH] = RAW_CAPS_FILTERS[VIDEO_1280x720x30];
-    } else if (camera_type == CameraType::H264_CAM) {
+    } else if (camera_type == CameraType::H264_CAM || camera_type == CameraType::UVC_CAM) {
         video_presets[ResolutionPresets::LOW] = H264_CAPS_FILTERS[VIDEO_320x240x30];
         video_presets[ResolutionPresets::MED] = H264_CAPS_FILTERS[VIDEO_640x480x30];
         video_presets[ResolutionPresets::HIGH] = H264_CAPS_FILTERS[VIDEO_1280x720x30];
@@ -150,7 +150,7 @@ void GenericAdaptiveStreaming::degrade_quality()
 void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 {
     string currstate = (network_state == NetworkState::STEADY) ? "STEADY" : "CONGESTED";
-    g_warning("Curr state %s %d", currstate.c_str(), successive_transmissions);
+    // g_warning("Curr state %s %d", currstate.c_str(), successive_transmissions);
 
     if (bitrate >= MIN_BITRATE && bitrate <= MAX_BITRATE) {
         h264_bitrate = bitrate;
@@ -205,11 +205,11 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
 void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {
-    g_warning("RES CHANGE! %d ", setting);
 
     string caps_filter_string;
     caps_filter_string = video_presets[setting];
     set_encoding_bitrate(bitrate_presets[setting]);
+    g_warning("RES CHANGE! %d %s", setting, caps_filter_string.c_str());
 
     current_res = setting;
     GstCaps* src_caps;

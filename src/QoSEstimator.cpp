@@ -95,7 +95,7 @@ void QoSEstimator::calculate_bitrates(const guint64 &bytes_sent, const guint32 &
         bytes_interval = bytes_sent - last_bytes_sent;
         estimated_bitrate = bytes_interval * 8.0 / (float)(curr_count - last_count);
         encoding_bitrate = rtph_bytes_interval * 8.0 / (float)(curr_count - last_count);
-        g_warning("ESTD Bw!!! %f enc rate! %f", estimated_bitrate, encoding_bitrate);
+        // g_warning("ESTD Bw!!! %f enc rate! %f", estimated_bitrate, encoding_bitrate);
         prev_bw_tv = tv;
         last_bytes_sent = bytes_sent;
         rtph_bytes_interval = 0;
