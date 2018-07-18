@@ -51,10 +51,11 @@ void RTSPAdaptiveStreaming::init_media_factory()
         break;
     case UVC_CAM:
         launch_string = "uvch264src device=" + device +
-                        " ! name=src auto-start=true src.vidsrc "
+                        " name=src auto-start=true src.vidsrc "
                         " ! queue"
                         " ! video/x-h264, width=320, height=240, framerate=30/1"
                         " ! tee name=tee_element tee_element."
+                        " ! queue"
                         " ! h264parse"
                         " ! rtph264pay name=pay0";
         break;
@@ -62,6 +63,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
         launch_string = "v4l2src device=" + device +
                         " ! video/x-h264, width=320, height=240, framerate=30/1"
                         " ! tee name=tee_element tee_element."
+                        " ! queue"
                         " ! h264parse"
                         " ! rtph264pay name=pay0";
         break;
@@ -146,7 +148,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
             }
             break;
         case UVC_CAM:
-            if (str.find("uvch264src") != std::string::npos) {
+            if (str.find("src") != std::string::npos) {
                 v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
             break;
@@ -164,7 +166,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         }
     }
 
-    set_resolution(ResolutionPresets::LOW);
+    // set_resolution(ResolutionPresets::LOW);
     add_rtpbin_probes();
     media_prepared = true;
 }
@@ -225,7 +227,7 @@ GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeI
     GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buf != nullptr) {
         GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
-        rtcp_buffer->buffer = NULL;
+        rtcp_buffer->buffer = nullptr;
         gst_rtcp_buffer_map(buf, GST_MAP_READ, rtcp_buffer);
         GstRTCPPacket *packet = (GstRTCPPacket*)malloc(sizeof(GstRTCPPacket));
         gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
