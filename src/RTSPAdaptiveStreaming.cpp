@@ -50,14 +50,27 @@ void RTSPAdaptiveStreaming::init_media_factory()
                         " ! rtph264pay name=pay0";
         break;
     case UVC_CAM:
+//gst-launch-1.0 -v -e uvch264src device=/dev/video1 name=src auto-start=true src.vfsrc ! queue ! "video/x-raw,width=320,height=240,framerate=10/1" ! fakesink sync=false src.vidsrc ! queue ! video/x-h264,width=1280,height=720,framerate=30/1 ! h264parse ! avdec_h264 ! xvimagesink sync=false
         launch_string = "uvch264src device=" + device +
-                        " name=src auto-start=true src.vidsrc "
+                        " name=src auto-start=true src.vfsrc"
                         " ! queue"
-                        " ! video/x-h264, width=320, height=240, framerate=30/1"
+                        " ! video/x-raw, width=320, height=240, framerate=10/1"
+                        " ! fakesink sync=false src.vidsrc"
+                        " ! queue"
+                        " ! video/x-h264, width=1280, height=720, framerate=30/1"
                         " ! tee name=tee_element tee_element."
                         " ! queue"
                         " ! h264parse"
                         " ! rtph264pay name=pay0";
+
+        // launch_string = "uvch264src device=" + device +
+        //                 " name=src auto-start=true src.vdsrc "
+        //                 " ! queue"
+        //                 " ! video/x-h264, width=320, height=240, framerate=30/1"
+        //                 " ! tee name=tee_element tee_element."
+        //                 " ! queue"
+        //                 " ! h264parse"
+        //                 " ! rtph264pay name=pay0";
         break;
     case H264_CAM:
         launch_string = "v4l2src device=" + device +
@@ -166,7 +179,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         }
     }
 
-    // set_resolution(ResolutionPresets::LOW);
+    set_resolution(ResolutionPresets::LOW);
     add_rtpbin_probes();
     media_prepared = true;
 }
