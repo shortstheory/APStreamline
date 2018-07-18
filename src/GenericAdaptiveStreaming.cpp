@@ -160,47 +160,53 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
         h264_bitrate = MIN_BITRATE;
     }
 
-    if (text_overlay) {
-        QoSReport qos_report = qos_estimator.get_qos_report();
+    switch (camera_type) {
+        case RAW_CAM:
+            g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
+            if (text_overlay) {
+                QoSReport qos_report = qos_estimator.get_qos_report();
 
-        string state = (network_state == NetworkState::STEADY) ? "STEADY" : "CONGESTED";
-        string stats = "BR: " + to_string(h264_bitrate) + " H264: " +
-                       to_string(qos_report.get_encoding_bitrate())
-                       + " BW: " + to_string(qos_report.get_estimated_bitrate()) + " STATE: " + state;
+                string state = (network_state == NetworkState::STEADY) ? "STEADY" : "CONGESTED";
+                string stats = "BR: " + to_string(h264_bitrate) + " H264: " +
+                            to_string(qos_report.get_encoding_bitrate())
+                            + " BW: " + to_string(qos_report.get_estimated_bitrate()) + " STATE: " + state;
 
-        g_object_set(G_OBJECT(text_overlay), "text", stats.c_str(), NULL);
-    }
-    if (camera_type == CameraType::RAW_CAM) {
-        g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
-    } else if (camera_type == CameraType::H264_CAM) {
-        int v4l2_cam_fd;
-        g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
-        if (v4l2_cam_fd > 0) {
-            v4l2_control bitrate_ctrl;
-            v4l2_control veritcal_flip;
-            v4l2_control horizontal_flip;
-            v4l2_control i_frame_interval;
-
-            bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
-            bitrate_ctrl.value = bitrate*1000;
-
-            veritcal_flip.id = V4L2_CID_VFLIP;
-            veritcal_flip.value = TRUE;
-
-            horizontal_flip.id = V4L2_CID_HFLIP;
-            horizontal_flip.value = TRUE;
-
-            i_frame_interval.id = V4L2_CID_MPEG_VIDEO_H264_I_PERIOD;
-            i_frame_interval.value = I_FRAME_INTERVAL;
-
-            if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
-                ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &veritcal_flip) == -1 ||
-                ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1 ||
-                ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1) {
-                g_warning("ioctl fail :/");
+                g_object_set(G_OBJECT(text_overlay), "text", stats.c_str(), NULL);
             }
-        }
-    }
+            break;
+        case H264_CAM:
+            int v4l2_cam_fd;
+            g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
+            if (v4l2_cam_fd > 0) {
+                v4l2_control bitrate_ctrl;
+                v4l2_control veritcal_flip;
+                v4l2_control horizontal_flip;
+                v4l2_control i_frame_interval;
+
+                bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
+                bitrate_ctrl.value = bitrate*1000;
+
+                veritcal_flip.id = V4L2_CID_VFLIP;
+                veritcal_flip.value = TRUE;
+
+                horizontal_flip.id = V4L2_CID_HFLIP;
+                horizontal_flip.value = TRUE;
+
+                i_frame_interval.id = V4L2_CID_MPEG_VIDEO_H264_I_PERIOD;
+                i_frame_interval.value = I_FRAME_INTERVAL;
+
+                if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
+                    ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &veritcal_flip) == -1 ||
+                    ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1 ||
+                    ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1) {
+                    g_warning("ioctl fail :/");
+                }
+            }
+            break;
+        case UVC_CAM:
+            g_object_set(v4l2_src, "average-bitrate", bitrate*1000, NULL);
+            break;
+    };
 }
 
 void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
