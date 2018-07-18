@@ -57,7 +57,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
                         " ! capsfilter name=vfcaps caps=video/x-raw, width=320, height=240, framerate=10/1"
                         " ! fakesink sync=false src.vidsrc"
                         " ! queue"
-                        " ! capsfilter name=webcaps caps=video/x-h264, width=320, height=240, framerate=30/1"
+                        " ! video/x-h264, width=640, height=480, framerate=30/1"
                         " ! tee name=tee_element tee_element."
                         " ! queue"
                         " ! h264parse"
@@ -83,7 +83,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
         launch_string = "v4l2src device=" + device +
                         " ! video/x-h264, width=320, height=240, framerate=30/1"
                         " ! tee name=tee_element tee_element."
-                        " ! queUsingue"
+                        " ! queue"
                         " ! h264parse"
                         " ! rtph264pay name=pay0";
         break;
@@ -175,8 +175,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
             if (str.find("src") != std::string::npos) {
                 v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
-            if (str.find("webcaps") != std::string::npos) {
-                g_warning("GotWebCaps - %s", str.c_str());
+            if (str.find("capsfilter") != std::string::npos) {
                 src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
             break;
@@ -191,7 +190,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         }
     }
 
-    set_resolution(ResolutionPresets::LOW);
+    // set_resolution(ResolutionPresets::LOW);
     add_rtpbin_probes();
     media_prepared = true;
 }
