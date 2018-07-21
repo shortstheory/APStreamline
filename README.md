@@ -64,6 +64,14 @@ From here, the APWeb page will display the list of available RTSP streams and th
 
 The video quality can either be automatically set based on the avaialble network bandwith or set manually for more fine-grained control.
 
+The RTSP streams can be viewed using any RTSP player.
+
+For example, this can be done in VLC by going to Media > Open Network Stream and pasting in the RTSP Mount Point for the camera displayed in the APWeb configuration page. However, VLC introduces *two* seconds of latency for the jitter reduction, making it unsuitable for critical applications. To circumvent this, RTSP streams can also be viewed at zero latency by using the `gst-launch` command:
+
+`gst-launch-1.0 playbin uri=<RTSP-MOUNT-POINT> latency=0`
+
+As an example RTSP Mount Point looks like: `rtsp://192.168.0.17:8554/cam0`. Refer to the APWeb page to see the mount point given to your camera.
+
 ### UDP Streaming
 
 *Use this if you only need to stream from one camera at a time or your GCS doesn't support RTSP streaming*
