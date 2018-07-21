@@ -44,7 +44,19 @@ On the Raspberry Pi, use `sudo modprobe bcm2835-v4l2` to load the V4L2 driver fo
 
 ## Usage
 
+Video livestreams can be launched through both RTSP and UDP. It is recommended to use RTSP for streaming video as it provides the advantages of supporting multiple cameras, conifguring the resolution on-the-fly, and recording the livestream to a file.
+
 ### RTSP Streaming
+
+Launch the RTSP stream server by running:
+
+`stream_server <interface>`
+
+Along with this, make sure the APWeb server is running. This will serve the configuration page for the RTSP stream server.
+
+The list of available network interfaces can be found by running `ifconfig`.
+
+The stream server will search for all the V4L2 cameras available in `/dev/`. It will query the capabilities of all these cameras and select hardware encoding or software encoding accordingly.
 
 ### UDP Streaming
 
