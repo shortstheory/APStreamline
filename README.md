@@ -58,6 +58,12 @@ The list of available network interfaces can be found by running `ifconfig`.
 
 The stream server will search for all the V4L2 cameras available in `/dev/`. It will query the capabilities of all these cameras and select hardware encoding or software encoding accordingly.
 
+From here, the APWeb page will display the list of available RTSP streams and their mount points:
+
+![Screenshot](screenshots/topimage.png)
+
+The video quality can either be automatically set based on the avaialble network bandwith or set manually for more fine-grained control.
+
 ### UDP Streaming
 
 *Use this if you only need to stream from one camera at a time or your GCS doesn't support RTSP streaming*
