@@ -54,7 +54,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
         launch_string = "uvch264src device=" + device +
                         " name=src auto-start=true src.vfsrc"
                         " ! queue"
-                        " ! capsfilter name=vfcaps caps=video/x-raw, width=320, height=240, framerate=10/1"
+                        " ! capsfilter name=vfcaps caps=video/x-raw, width=640, height=480, framerate=10/1"
                         " ! fakesink sync=false src.vidsrc"
                         " ! queue"
                         " ! video/x-h264, width=640, height=480, framerate=30/1"

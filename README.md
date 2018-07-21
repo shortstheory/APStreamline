@@ -10,7 +10,9 @@ The Adaptive Streaming aims to fix this problem by dynamically adjusting the vid
 
 Currently this project supports H.264 hardware encoding the video feed of the Raspberry Pi Camera on the Raspberry Pi 3B(+). H.264 software encoding is supported for all other V4L2 cameras.
 
-Support for NVidia Jetson boards will be added soon.
+### Note for hardware encoding webcams
+
+Some webcams such as the Logitech C920 support hardware encoding through an onboard processor, however bugs in the UVC driver has resulted in some reduced functionality. These webcams are configured to adaptively stream in only 480p through adjusting the H.264 video bitrate. Switching the resolution results in the video client closing due to the transmission of an EOS event once the resolution has changed.
 
 ## Running the Code
 
@@ -38,9 +40,15 @@ adaptive_streaming
 
 By default, port 5000 is used for sending RTP packets and port 5001 is used for sending and receiving RTCP packets.
 
-On the Raspberry Pi, use `sudo modprobe bcm2835-v4l2` to load the V4L2 driver for the Raspberry Pi camera.
+On the Raspberry Pi, use `sudo modprobe bcm2835-v4l2` to load the V4L2 driver for the Raspberry Pi camera. Add `bcm2835-v4l2` to `/etc/modules` for automatically loading this module on boot.
 
 ## Usage
+
+### RTSP Streaming
+
+### UDP Streaming
+
+*Use this if you only need to stream from one camera at a time or your GCS doesn't support RTSP streaming*
 
 On installing `adaptive-streaming`, run it from the terminal as so:
 
