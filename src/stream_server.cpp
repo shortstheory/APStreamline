@@ -14,6 +14,7 @@
 #include "IPCMessageHandler.h"
 
 char socket_path[80] = "/tmp/rtsp_server.sock";
+RTSPStreamServer* rtsp_stream_server;
 // char socket_path[80] = "../../rtsp_server";
 
 void ipc_loop(RTSPStreamServer* streamer)
@@ -91,7 +92,10 @@ string get_ip_address(string interface = "lo")
 
 void terminate_process(int signum)
 {
-    cerr << "Process being shutdown" << signum << endl;
+    // cerr << "Process terminated" << signum << endl;
+    fprintf(stderr, "Process terminated %d\n", signum);
+    free(rtsp_stream_server);
+    exit(1);
 }
 
 int main(int argc, char *argv[])
@@ -110,7 +114,6 @@ int main(int argc, char *argv[])
     } else {
         ip_addr = "127.0.0.1";
     }
-    RTSPStreamServer* rtsp_stream_server;
     rtsp_stream_server = RTSPStreamServer::get_instance(ip_addr, "8554");
     gst_rtsp_server_attach(rtsp_stream_server->get_server(), NULL);
 

@@ -273,6 +273,7 @@ RTSPStreamServer* RTSPStreamServer::get_instance(string _ip_addr, string _port)
 
 RTSPStreamServer::~RTSPStreamServer()
 {
+    fprintf(stderr, "Destructor called\n");
     for (auto stream_pair : adaptive_streams_map) {
         free(stream_pair.second);
     }
