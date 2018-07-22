@@ -40,9 +40,8 @@ void RTSPAdaptiveStreaming::init_media_factory()
     switch (camera_type) {
     case RAW_CAM:
         launch_string = "v4l2src device=" + device +
-                        // " ! image/jpeg, width=320, height=240, framerate=30/1"
-                        // " ! jpegdec"
-                        " ! video/x-raw, width=640, height=480, framerate=30/1"
+                        " ! image/jpeg, width=320, height=240, framerate=30/1"
+                        " ! jpegdec"
                         " ! videoconvert"
                         " ! textoverlay"
                         " ! x264enc tune=zerolatency threads=4 bitrate=500"
