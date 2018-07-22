@@ -98,12 +98,16 @@ void GenericAdaptiveStreaming::adapt_stream()
 
     if (qos_report.get_fraction_lost() == 0) {
         successive_transmissions++;
-        // if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
+        if (multi_udp_sink) {
+            if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
+                improve_quality();
+            } else {
+                g_warning("Buffer overflow possible!");
+                degrade_quality();
+            }
+        } else {
             improve_quality();
-        // } else {
-        //     g_warning("Buffer overflow possible!");
-        //     degrade_quality();
-        // }
+        }
     } else {
         network_state = NetworkState::CONGESTION;
         successive_transmissions = 0;

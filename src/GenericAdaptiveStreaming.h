@@ -59,6 +59,7 @@ public:
     GstElement* rtph264_payloader;
     GstElement* text_overlay;
     GstElement* tee;
+    GstElement* multi_udp_sink;
 
     QoSEstimator qos_estimator;
     const CameraType camera_type;

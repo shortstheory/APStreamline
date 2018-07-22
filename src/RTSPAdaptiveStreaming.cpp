@@ -21,8 +21,10 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
 
 RTSPAdaptiveStreaming::~RTSPAdaptiveStreaming()
 {
-    gst_element_set_state(multi_udp_sink, GST_STATE_NULL);
-    gst_object_unref(multi_udp_sink);
+    if (multi_udp_sink) {
+        gst_element_set_state(multi_udp_sink, GST_STATE_NULL);
+        gst_object_unref(multi_udp_sink);
+    }
     gst_element_set_state(rtpbin, GST_STATE_NULL);
     gst_object_unref(rtpbin);
     gst_object_unref(rtsp_server);
@@ -223,20 +225,18 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes()
     GstPad* payloader_pad;
 
     rtcp_rr_pad = gst_element_get_static_pad(rtpbin, "recv_rtcp_sink_0");
-    rtcp_sr_pad = gst_element_get_static_pad(rtpbin, "send_rtcp_src_0");
-    payloader_pad = gst_element_get_static_pad(rtph264_payloader, "sink");
-
-    if (rtcp_rr_pad && rtcp_sr_pad && payloader_pad) {
-        g_warning("Pads added OK");
-    }
-
     gst_pad_add_probe(rtcp_rr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
-    gst_pad_add_probe(rtcp_sr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
-    gst_pad_add_probe(payloader_pad, GST_PAD_PROBE_TYPE_BUFFER, static_payloader_callback, this, NULL);
-
     g_object_unref(rtcp_rr_pad);
+
+    rtcp_sr_pad = gst_element_get_static_pad(rtpbin, "send_rtcp_src_0");
+    gst_pad_add_probe(rtcp_sr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
     g_object_unref(rtcp_sr_pad);
-    g_object_unref(payloader_pad);
+    
+    if (multi_udp_sink) {
+        payloader_pad = gst_element_get_static_pad(rtph264_payloader, "sink");
+        gst_pad_add_probe(payloader_pad, GST_PAD_PROBE_TYPE_BUFFER, static_payloader_callback, this, NULL);
+        g_object_unref(payloader_pad);
+    }
 }
 
 bool RTSPAdaptiveStreaming::get_media_prepared()
