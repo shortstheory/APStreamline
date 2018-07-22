@@ -20,16 +20,14 @@ const static vector<string> RTSPMessageHeader = {
     "GDP", "SDP"
 };
 
-struct v4l2_info
-{
+struct v4l2_info {
     string camera_name;
     string mount_point;
     CameraType camera_type;
     guint64 frame_property_bitmask;
 };
 
-struct QoSReport
-{
+struct QoSReport {
     guint8 fraction_lost;
     gfloat estimated_bitrate;
     gfloat encoding_bitrate;
@@ -41,8 +39,8 @@ struct QoSReport
     }
 
     QoSReport(guint8 _fl, gfloat _estd_br, gfloat _enc_br, gfloat _rtt, gfloat bo) :
-    fraction_lost(_fl), estimated_bitrate(_estd_br), encoding_bitrate(_enc_br),
-    rtt(_rtt), buffer_occ(bo)
+        fraction_lost(_fl), estimated_bitrate(_estd_br), encoding_bitrate(_enc_br),
+        rtt(_rtt), buffer_occ(bo)
     {
     }
 };

@@ -54,7 +54,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
                         " ! rtph264pay name=pay0";
         break;
     case UVC_CAM:
-//gst-launch-1.0 -v -e uvch264src device=/dev/video1 name=src auto-start=true src.vfsrc ! queue ! "video/x-raw,width=320,height=240,framerate=10/1" ! fakesink sync=false src.vidsrc ! queue ! video/x-h264,width=1280,height=720,framerate=30/1 ! h264parse ! avdec_h264 ! xvimagesink sync=false
+        //gst-launch-1.0 -v -e uvch264src device=/dev/video1 name=src auto-start=true src.vfsrc ! queue ! "video/x-raw,width=320,height=240,framerate=10/1" ! fakesink sync=false src.vidsrc ! queue ! video/x-h264,width=1280,height=720,framerate=30/1 ! h264parse ! avdec_h264 ! xvimagesink sync=false
         launch_string = "uvch264src device=" + device +
                         " name=src auto-start=true src.vfsrc"
                         " ! queue"
@@ -219,7 +219,7 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes()
     rtcp_sr_pad = gst_element_get_static_pad(rtpbin, "send_rtcp_src_0");
     gst_pad_add_probe(rtcp_sr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
     g_object_unref(rtcp_sr_pad);
-    
+
     if (multi_udp_sink) {
         payloader_pad = gst_element_get_static_pad(rtph264_payloader, "sink");
         gst_pad_add_probe(payloader_pad, GST_PAD_PROBE_TYPE_BUFFER, static_payloader_callback, this, NULL);
@@ -290,7 +290,7 @@ GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadP
 
 void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
 {
-    while(file_recorder.stop_recording);
+    while (file_recorder.stop_recording);
     g_warning("RecordStream %u", _record_stream);
     if (_record_stream) {
         file_recorder.init_file_recorder(pipeline, tee);
@@ -298,7 +298,7 @@ void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
         if (file_recorder.tee_file_pad) {
             file_recorder.stop_recording = true;
             gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
-                                static_probe_block_callback, this, NULL);
+                              static_probe_block_callback, this, NULL);
         } else {
             g_warning("File pad missing");
         }
