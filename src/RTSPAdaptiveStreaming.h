@@ -18,6 +18,7 @@ class RTSPAdaptiveStreaming : public GenericAdaptiveStreaming
 private:
     mutex mtx;
     condition_variable cv;
+    bool recording_spinlock;
     GstRTSPServer* rtsp_server;
     GstElement* rtpbin;
     const string uri;
