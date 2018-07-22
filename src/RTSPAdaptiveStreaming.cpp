@@ -15,7 +15,7 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
     rtsp_server(server),
     media_prepared(false)
 {
-    recording_spinlock = false;
+    file_recorder.stop_recording = false;
     current_quality = quality;
     init_media_factory();
 }
@@ -202,7 +202,7 @@ GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPa
     gst_element_release_request_pad(tee, file_recorder.tee_file_pad);
     g_warning("Pad Removed");
     // cv.notify_one();
-    recording_spinlock = false;
+    file_recorder.stop_recording = false;
     return GST_PAD_PROBE_REMOVE;
 }
 
@@ -290,15 +290,13 @@ GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadP
 
 void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
 {
-    while(recording_spinlock) {
-
-    }
+    while(file_recorder.stop_recording);
     g_warning("RecordStream %u", _record_stream);
     if (_record_stream) {
         file_recorder.init_file_recorder(pipeline, tee);
     } else {
         if (file_recorder.tee_file_pad) {
-            recording_spinlock = true;
+            file_recorder.stop_recording = true;
             gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
                                 static_probe_block_callback, this, NULL);
         } else {

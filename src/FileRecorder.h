@@ -11,6 +11,7 @@
 #include <sstream>
 #include <iomanip>
 #include <ctime>
+#include <atomic>
 
 using namespace std;
 
@@ -28,6 +29,8 @@ public:
     GstElement* tee;
     GstPad* tee_file_pad;
     GstPad* queue_pad;
+
+    atomic<bool> stop_recording;
 
     FileRecorder();
     bool init_file_recorder(GstElement* _pipeline, GstElement* _tee);

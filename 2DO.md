@@ -1,7 +1,5 @@
 2DO:
 
-* struct QoSReport instead of class, looks pretty silly as a class
-* what do I do with ntptime?
 * what to do with UDPStreaming?
 * UDPStreaming handle args better
 * Write comments in headers
@@ -14,6 +12,7 @@ PARTIAL:
 * Work on UVCH264 cams eg C920
 
 DONE:
+* struct QoSReport instead of class, looks pretty silly as a class
 * Update README.md
 * add scripts
 * use static element names instead in rtspstreamer
@@ -21,6 +20,7 @@ DONE:
 * Record on CC
 
 SKIP:
+* what do I do with ntptime?
 * Put V4L2 info fields into RTSPAdaptiveStreaming
 
 NOTES:

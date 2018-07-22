@@ -3,6 +3,9 @@
 FileRecorder::FileRecorder()
 {
     recording = false;
+    stop_recording = false;
+    tee_file_pad = nullptr;
+    queue_pad = nullptr;
 }
 
 bool FileRecorder::init_file_recorder(GstElement* _pipeline, GstElement* _tee)
