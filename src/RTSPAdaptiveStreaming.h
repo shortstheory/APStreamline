@@ -6,6 +6,8 @@
 #include <gst/rtsp-server/rtsp-server.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <condition_variable>
+#include <mutex>
 
 #include "GenericAdaptiveStreaming.h"
 
@@ -14,6 +16,8 @@ using namespace std;
 class RTSPAdaptiveStreaming : public GenericAdaptiveStreaming
 {
 private:
+    mutex mtx;
+    condition_variable cv;
     GstRTSPServer* rtsp_server;
     GstElement* rtpbin;
     const string uri;

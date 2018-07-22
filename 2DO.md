@@ -1,5 +1,6 @@
 2DO:
 
+* fix the issue with callbacks execution order in file recorder
 * what do I do with ntptime?
 * struct QoSReport instead of class, looks pretty silly as a class
 * get rid of device_list

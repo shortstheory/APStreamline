@@ -215,6 +215,7 @@ GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPa
     file_recorder.disable_recorder();
     gst_element_release_request_pad(tee, file_recorder.tee_file_pad);
     g_warning("Pad Removed");
+    // cv.notify_one();
     return GST_PAD_PROBE_REMOVE;
 }
 
