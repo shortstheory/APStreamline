@@ -13,9 +13,9 @@ enum VideoPresets {VIDEO_320x240x15, VIDEO_640x480x15, VIDEO_1280x720x15,
                    VIDEO_320x240x60, VIDEO_640x480x60, VIDEO_1280x720x60
                   };
 
-enum RTSPMessageType {GET_DEVICE_PROPS, SET_DEVICE_PROPS, RECORD_TO_FILE, ERROR, COUNT};
+enum RTSPMessageType {GET_DEVICE_PROPS, SET_DEVICE_PROPS, ERROR, COUNT};
 const static vector<string> RTSPMessageHeader = {
-    "GDP", "SDP", "RTF"
+    "GDP", "SDP"
 };
 
 struct v4l2_info {

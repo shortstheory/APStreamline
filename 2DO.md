@@ -1,17 +1,16 @@
 2DO:
 
+* use static element names instead in rtspstreamer
+* struct QoSReport instead of class, looks pretty silly as a class
 * fix the issue with callbacks execution order in file recorder
 * what do I do with ntptime?
-* struct QoSReport instead of class, looks pretty silly as a class
-* get rid of device_list
-* remove void IPCMessageHandler::set_file_recording(char* buffer)
-* use static element names instead in rtspstreamer
-* Write comments in headers
-* Update README.md
-* Do APSync integration
+* what to do with UDPStreaming?
 * UDPStreaming handle args better
+* Write comments in headers
+* Do APSync integration
 
 PARTIAL:
+* Update README.md
 * Add licenses
 * get framerates for stepwise cams
 * Work on UVCH264 cams eg C920
