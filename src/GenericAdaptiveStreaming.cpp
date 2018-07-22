@@ -98,12 +98,12 @@ void GenericAdaptiveStreaming::adapt_stream()
 
     if (qos_report.get_fraction_lost() == 0) {
         successive_transmissions++;
-        if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
+        // if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
             improve_quality();
-        } else {
-            g_warning("Buffer overflow possible!");
-            degrade_quality();
-        }
+        // } else {
+        //     g_warning("Buffer overflow possible!");
+        //     degrade_quality();
+        // }
     } else {
         network_state = NetworkState::CONGESTION;
         successive_transmissions = 0;
@@ -128,9 +128,11 @@ void GenericAdaptiveStreaming::improve_quality()
     set_encoding_bitrate(h264_bitrate + INC_BITRATE);
     if (current_res == ResolutionPresets::LOW &&
         h264_bitrate > bitrate_presets[ResolutionPresets::MED]) {
+        g_warning("Low->MED");
         set_resolution(ResolutionPresets::MED);
     } else if (current_res == ResolutionPresets::MED &&
                h264_bitrate > bitrate_presets[ResolutionPresets::HIGH]) {
+        g_warning("Med->HIGH");
         set_resolution(ResolutionPresets::HIGH);
     }
 }
@@ -163,8 +165,8 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
     switch (camera_type) {
         case RAW_CAM:
             if (h264_encoder) {
-                g_warning("Bitrate val - %u", bitrate);
-                g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
+                // g_warning("Bitrate val - %u", h264_bitrate);
+                g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate, NULL);
             }
             if (text_overlay) {
                 QoSReport qos_report = qos_estimator.get_qos_report();
@@ -187,7 +189,7 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
                 v4l2_control i_frame_interval;
 
                 bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
-                bitrate_ctrl.value = bitrate*1000;
+                bitrate_ctrl.value = h264_bitrate*1000;
 
                 veritcal_flip.id = V4L2_CID_VFLIP;
                 veritcal_flip.value = TRUE;
@@ -214,7 +216,6 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
 void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {
-
     string caps_filter_string;
     caps_filter_string = video_presets[setting];
     set_encoding_bitrate(bitrate_presets[setting]);

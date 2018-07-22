@@ -194,7 +194,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         }
     }
 
-    // set_resolution(ResolutionPresets::LOW);
+    set_resolution(ResolutionPresets::LOW);
     add_rtpbin_probes();
     media_prepared = true;
 }
