@@ -1,6 +1,5 @@
 2DO:
 
-* use static element names instead in rtspstreamer
 * struct QoSReport instead of class, looks pretty silly as a class
 * what do I do with ntptime?
 * what to do with UDPStreaming?
@@ -10,13 +9,14 @@
 PARTIAL:
 * Do APSync integration
 * fix the issue with callbacks execution order in file recorder
-* Update README.md
 * Add licenses
 * get framerates for stepwise cams
 * Work on UVCH264 cams eg C920
-* add scripts
 
 DONE:
+* Update README.md
+* add scripts
+* use static element names instead in rtspstreamer
 * Get IP Addr of device
 * Record on CC
 

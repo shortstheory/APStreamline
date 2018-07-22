@@ -143,12 +143,10 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         }
     }
 
-    list = GST_BIN_CHILDREN(pipeline);
-
     if (get_element_references()) {
         g_warning("Elements referenced!");
     } else {
-        g_warning("Some elements not reffed");
+        g_warning("Some elements not referenced");
     }
 
     set_resolution(ResolutionPresets::LOW);
