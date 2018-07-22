@@ -287,6 +287,15 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
     } else {
         string caps_filter_string;
         GstCaps* src_caps;
+        guint32 h264_bitrate;
+        if (quality == VIDEO_320x240x15 || quality == VIDEO_320x240x30 || quality == VIDEO_320x240x60) {
+            h264_bitrate = LOW_QUAL_BITRATE;
+        } else if (quality == VIDEO_640x480x15 || quality == VIDEO_640x480x30 || quality == VIDEO_640x480x60) {
+            h264_bitrate = MED_QUAL_BITRATE;
+        } else if (quality == VIDEO_1280x720x15 || quality == VIDEO_1280x720x30 || quality ==VIDEO_1280x720x60) {
+            h264_bitrate = HIGH_QUAL_BITRATE;
+        }
+
         if (camera_type == CameraType::RAW_CAM) {
             // set it to x264enc defaults
             g_object_set(G_OBJECT(h264_encoder), "bitrate", 2048, NULL);
