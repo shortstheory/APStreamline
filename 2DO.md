@@ -6,9 +6,9 @@
 * what to do with UDPStreaming?
 * UDPStreaming handle args better
 * Write comments in headers
-* Do APSync integration
 
 PARTIAL:
+* Do APSync integration
 * fix the issue with callbacks execution order in file recorder
 * Update README.md
 * Add licenses

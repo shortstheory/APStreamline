@@ -42,12 +42,12 @@ void RTSPAdaptiveStreaming::init_media_factory()
 
     switch (camera_type) {
     case RAW_CAM:
-        launch_string = "v4l2src device=" + device +
-                        " ! image/jpeg, width=320, height=240, framerate=30/1"
+        launch_string = "v4l2src name=src device=" + device +
+                        " ! capsfilter name=capsfilter caps=image/jpeg, width=320, height=240, framerate=30/1"
                         " ! jpegdec"
                         " ! videoconvert"
-                        " ! textoverlay"
-                        " ! x264enc tune=zerolatency threads=4 bitrate=500"
+                        " ! textoverlay name=textoverlay"
+                        " ! x264enc name=x264enc tune=zerolatency threads=4 bitrate=500"
                         " ! tee name=tee_element tee_element."
                         " ! queue"
                         " ! h264parse"
@@ -84,7 +84,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
         //                 " ! rtph264pay name=pay0";
         break;
     case H264_CAM:
-        launch_string = "v4l2src device=" + device +
+        launch_string = "v4l2src name=src device=" + device +
                         " ! video/x-h264, width=320, height=240, framerate=30/1"
                         " ! tee name=tee_element tee_element."
                         " ! queue"
@@ -113,31 +113,26 @@ void RTSPAdaptiveStreaming::static_media_prepared_callback(GstRTSPMedia* media, 
 
 void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
 {
-    GstElement* e = gst_rtsp_media_get_element(media);
-    GstElement* parent = (GstElement*)gst_object_get_parent(GST_OBJECT(e));
-    g_warning("got parent!");
     GstElement* element;
+    GstElement* parent;
+    GList* list;
+    GList* list_itr;
+
+    element = gst_rtsp_media_get_element(media);
+    parent = (GstElement*)gst_object_get_parent(GST_OBJECT(element));
 
     multi_udp_sink = nullptr;
 
     string str;
-    GList* list = GST_BIN_CHILDREN(parent);
-    GList* l;
+    list = GST_BIN_CHILDREN(parent);
 
-    for (l = list; l != nullptr; l = l->next) {
-        element = (GstElement*)l->data;
+    for (list_itr = list; list_itr != nullptr; list_itr = list_itr->next) {
+        element = (GstElement*)list_itr->data;
         str = gst_element_get_name(element);
         g_warning("element name = %s", str.c_str());
         // FIXME: this is a gstreamer version thing!
-        if (AMD64) {
-            if (str.find("bin") != std::string::npos) {
-                pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
-            }
-        }
-        if (ARM) {
-            if (str.find("bin") != std::string::npos) {
-                pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
-            }
+        if (str.find("bin") != std::string::npos) {
+            pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
         }
         if (str.find("rtpbin") != std::string::npos) {
             rtpbin = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
@@ -150,55 +145,47 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
 
     list = GST_BIN_CHILDREN(pipeline);
 
-    for (l = list; l != nullptr; l = l->next) {
-        element = (GstElement*)l->data;
-        str = gst_element_get_name(element);
-        g_warning("String val - %s", str.c_str());
-
-        switch (camera_type) {
-        case RAW_CAM:
-            if (str.find("x264enc") != std::string::npos) {
-                g_warning("got h264 encoder");
-                h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-            }
-            if (str.find("textoverlay") != std::string::npos) {
-                text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-                g_object_set(G_OBJECT(text_overlay), "valignment", 2, NULL); //top
-                g_object_set(G_OBJECT(text_overlay), "halignment", 0, NULL); //left
-                g_object_set(G_OBJECT(text_overlay), "font-desc", "Sans, 9", NULL);
-            }
-        // the lack of a break is intentional, trust me! :P
-        case H264_CAM:
-            if (str.find("v4l2src") != std::string::npos) {
-                v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-            }
-            if (str.find("capsfilter") != std::string::npos) {
-                g_warning("Using caps filter - %s", str.c_str());
-                src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-            }
-            break;
-        case UVC_CAM:
-            if (str.find("src") != std::string::npos) {
-                v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-            }
-            if (str.find("capsfilter") != std::string::npos) {
-                src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-            }
-            break;
-        };
-
-        if (str.find("tee_element") != std::string::npos) {
-            g_warning("found tee");
-            tee = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-        }
-        if (str.find("pay") != std::string::npos) {
-            rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
-        }
+    if (get_element_references()) {
+        g_warning("Elements referenced!");
+    } else {
+        g_warning("Some elements not reffed");
     }
 
     set_resolution(ResolutionPresets::LOW);
     add_rtpbin_probes();
     media_prepared = true;
+}
+
+bool RTSPAdaptiveStreaming::get_element_references()
+{
+    if (pipeline) {
+        tee = gst_bin_get_by_name(GST_BIN(pipeline), "tee_element");
+        rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), "pay0");
+        v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), "src");
+        src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter");
+
+        switch (camera_type) {
+        case RAW_CAM:
+            h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), "x264enc");
+            text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), "textoverlay");
+            g_object_set(G_OBJECT(text_overlay), "valignment", 2, NULL); //top
+            g_object_set(G_OBJECT(text_overlay), "halignment", 0, NULL); //left
+            g_object_set(G_OBJECT(text_overlay), "font-desc", "Sans, 9", NULL);
+            if (tee && rtph264_payloader && v4l2_src && src_capsfilter && h264_encoder && text_overlay) {
+                return true;
+            } else {
+                return false;
+            }
+        case H264_CAM:
+        case UVC_CAM:
+            if (tee && rtph264_payloader && v4l2_src && src_capsfilter) {
+                return true;
+            } else {
+                return false;
+            }
+        };
+    }
+    return false;
 }
 
 GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad,

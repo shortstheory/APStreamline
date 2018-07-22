@@ -27,6 +27,7 @@ private:
     void init_media_factory();
     void add_rtpbin_probes();
     void media_prepared_callback(GstRTSPMedia* media);
+    bool get_element_references();
 
     GstPadProbeReturn rtcp_callback(GstPad* pad, GstPadProbeInfo* info);
     GstPadProbeReturn payloader_callback(GstPad* pad, GstPadProbeInfo* info);
