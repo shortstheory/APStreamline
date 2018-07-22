@@ -2,7 +2,6 @@
 
 * use static element names instead in rtspstreamer
 * struct QoSReport instead of class, looks pretty silly as a class
-* fix the issue with callbacks execution order in file recorder
 * what do I do with ntptime?
 * what to do with UDPStreaming?
 * UDPStreaming handle args better
@@ -10,6 +9,7 @@
 * Do APSync integration
 
 PARTIAL:
+* fix the issue with callbacks execution order in file recorder
 * Update README.md
 * Add licenses
 * get framerates for stepwise cams

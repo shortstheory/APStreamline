@@ -8,6 +8,7 @@
 #include <netdb.h>
 #include <ifaddrs.h>
 #include <arpa/inet.h>
+#include <signal.h>
 
 #include "RTSPStreamServer.h"
 #include "IPCMessageHandler.h"
@@ -88,8 +89,18 @@ string get_ip_address(string interface = "lo")
     return string("127.0.0.1");
 }
 
+void terminate_process(int signum)
+{
+    cerr << "Process being shutdown" << signum << endl;
+}
+
 int main(int argc, char *argv[])
 {
+    struct sigaction action;
+    memset(&action, 0, sizeof(struct sigaction));
+    action.sa_handler = terminate_process;
+    sigaction(SIGTERM, &action, NULL);
+
     gst_init(&argc, &argv);
     GMainLoop* loop = g_main_loop_new(NULL, FALSE);
 
