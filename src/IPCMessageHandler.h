@@ -13,6 +13,8 @@
 
 #include "RTSPStreamServer.h"
 
+using namespace std;
+
 class IPCMessageHandler
 {
 private:
