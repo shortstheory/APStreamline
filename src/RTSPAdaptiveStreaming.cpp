@@ -40,7 +40,9 @@ void RTSPAdaptiveStreaming::init_media_factory()
     switch (camera_type) {
     case RAW_CAM:
         launch_string = "v4l2src device=" + device +
-                        " ! video/x-raw, width=320, height=240, framerate=30/1"
+                        // " ! image/jpeg, width=320, height=240, framerate=30/1"
+                        // " ! jpegdec"
+                        " ! video/x-raw, width=640, height=480, framerate=30/1"
                         " ! videoconvert"
                         " ! textoverlay"
                         " ! x264enc tune=zerolatency threads=4 bitrate=500"
@@ -123,8 +125,10 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     for (l = list; l != nullptr; l = l->next) {
         element = (GstElement*)l->data;
         str = gst_element_get_name(element);
+        g_warning("element name = %s", str.c_str());
+        // FIXME: this is a gstreamer version thing!
         if (AMD64) {
-            if (str.find("pipeline") != std::string::npos) {
+            if (str.find("bin") != std::string::npos) {
                 pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
             }
         }
@@ -140,7 +144,6 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
             g_warning("Identified %s", str.c_str());
             multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
         }
-        // g_warning("element name = %s", str.c_str());
     }
 
     list = GST_BIN_CHILDREN(pipeline);
@@ -153,6 +156,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         switch (camera_type) {
         case RAW_CAM:
             if (str.find("x264enc") != std::string::npos) {
+                g_warning("got h264 encoder");
                 h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), str.c_str());
             }
             if (str.find("textoverlay") != std::string::npos) {
@@ -223,6 +227,10 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes()
     rtcp_sr_pad = gst_element_get_static_pad(rtpbin, "send_rtcp_src_0");
     payloader_pad = gst_element_get_static_pad(rtph264_payloader, "sink");
 
+    if (rtcp_rr_pad && rtcp_sr_pad && payloader_pad) {
+        g_warning("Pads added OK");
+    }
+
     gst_pad_add_probe(rtcp_rr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
     gst_pad_add_probe(rtcp_sr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
     gst_pad_add_probe(payloader_pad, GST_PAD_PROBE_TYPE_BUFFER, static_payloader_callback, this, NULL);
@@ -271,13 +279,13 @@ GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeI
 
 GstPadProbeReturn RTSPAdaptiveStreaming::static_payloader_callback(GstPad* pad,
         GstPadProbeInfo* info,
-
         gpointer data)
 {
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
     return ptr->payloader_callback(pad, info);
 }
 
+// FIXME: UDP SINK NO LONGER EXISTS!!!
 GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadProbeInfo* info)
 {
     guint32 buffer_size;
@@ -285,8 +293,10 @@ GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadP
     GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buf != nullptr) {
         buffer_size = gst_buffer_get_size(buf);
-        g_object_get(multi_udp_sink, "bytes-served", &bytes_sent, NULL);
-        qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
+        if (multi_udp_sink) {
+            g_object_get(multi_udp_sink, "bytes-served", &bytes_sent, NULL);
+            qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
+        }
     }
     return GST_PAD_PROBE_OK;
 }

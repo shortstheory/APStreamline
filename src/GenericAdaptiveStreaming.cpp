@@ -162,7 +162,10 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
     switch (camera_type) {
         case RAW_CAM:
-            g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
+            if (h264_encoder) {
+                g_warning("Bitrate val - %u", bitrate);
+                g_object_set(G_OBJECT(h264_encoder), "bitrate", bitrate, NULL);
+            }
             if (text_overlay) {
                 QoSReport qos_report = qos_estimator.get_qos_report();
 
@@ -204,7 +207,7 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
             }
             break;
         case UVC_CAM:
-            g_object_set(v4l2_src, "average-bitrate", bitrate*1000, NULL);
+            g_object_set(v4l2_src, "average-bitrate", h264_bitrate*1000, NULL);
             break;
     };
 }

@@ -4,7 +4,7 @@
 
 Using video cameras for live-streaming the video feed from quadcopters and other unmanned vehicles is becoming increasingly useful. Most video streaming solutions use RTP for streaming video over UDP. UDP is more efficient than TCP because it forgoes the reliable delivery and congestion control mechanisms that TCP boasts.
 
-However, this introduces new problems when streaming video from robots. In most cases, we use the Companion Computer (CC) in Wi-Fi hotspot mode for streaming the video. This means that the video Quality-of-Service progressively gets worse when the robot goes further away from the receiving computer.
+However, this introduces new problems when streaming video from robots. In most cases, we use the Companion Computer (CC) in Wi-Fi hotspot mode for streaming the video. Due to limited Wi-Fi range, the video Quality-of-Service progressively gets worse when the robot goes further away from the receiving computer.
 
 The Adaptive Streaming aims to fix this problem by dynamically adjusting the video quality by parsing the RTCP Receiver Report packets on the CC. These RTCP packets provide helpful QoS information which can be used for automatically changing the bitrate and resolution of the video delivered from the CC.
 
