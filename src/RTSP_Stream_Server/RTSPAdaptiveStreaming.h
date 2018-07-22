@@ -7,7 +7,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#include "GenericAdaptiveStreaming.h"
+#include "../Common/Common.h"
+#include "FileRecorder.h"
 
 using namespace std;
 

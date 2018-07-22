@@ -1,3 +1,6 @@
+#ifndef NTP_TIME_H
+#define NTP_TIME_H
+
 #include <gst/gst.h>
 
 struct ntp_time_t {
@@ -89,3 +92,5 @@ struct ntp_time_t {
         return tp.tv_sec * 1000 + tp.tv_usec / 1000;
     }
 };
+
+#endif

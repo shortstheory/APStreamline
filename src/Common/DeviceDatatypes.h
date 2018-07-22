@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <gst/gst.h>
 
 using namespace std;
 
