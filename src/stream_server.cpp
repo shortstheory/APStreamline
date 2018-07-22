@@ -12,8 +12,8 @@
 #include "RTSPStreamServer.h"
 #include "IPCMessageHandler.h"
 
-// char socket_path[80] = "/tmp/rtsp_server";
-char socket_path[80] = "../../rtsp_server";
+char socket_path[80] = "/tmp/rtsp_server.sock";
+// char socket_path[80] = "../../rtsp_server";
 
 void ipc_loop(RTSPStreamServer* streamer)
 {
