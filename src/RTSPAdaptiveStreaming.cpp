@@ -307,8 +307,12 @@ bool RTSPAdaptiveStreaming::record_stream(bool _record_stream)
     if (_record_stream) {
         return file_recorder.init_file_recorder(pipeline, tee);
     } else {
-        gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
-                          static_probe_block_callback, this, NULL);
-        return true;
+        if (file_recorder.tee_file_pad) {
+            // gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
+            //                     static_probe_block_callback, this, NULL);
+        } else {
+            g_warning("File pad missing");
+        }
     }
+    return true;
 }
