@@ -8,8 +8,8 @@
 #include <gst/rtp/gstrtcpbuffer.h>
 #include <sys/time.h>
 
-#include "QoSReport.h"
 #include "NTPTime.h"
+#include "DeviceDatatypes.h"
 
 class QoSEstimator
 {

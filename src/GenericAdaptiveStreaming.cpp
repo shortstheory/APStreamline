@@ -96,10 +96,10 @@ void GenericAdaptiveStreaming::adapt_stream()
 
     set_state_constants();
 
-    if (qos_report.get_fraction_lost() == 0) {
+    if (qos_report.fraction_lost == 0) {
         successive_transmissions++;
         if (multi_udp_sink) {
-            if (qos_report.get_encoding_bitrate() < qos_report.get_estimated_bitrate() * 1.5) {
+            if (qos_report.encoding_bitrate < qos_report.estimated_bitrate * 1.5) {
                 improve_quality();
             } else {
                 g_warning("Buffer overflow possible!");
@@ -177,8 +177,8 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
                 string state = (network_state == NetworkState::STEADY) ? "STEADY" : "CONGESTED";
                 string stats = "BR: " + to_string(h264_bitrate) + " H264: " +
-                            to_string(qos_report.get_encoding_bitrate())
-                            + " BW: " + to_string(qos_report.get_estimated_bitrate()) + " STATE: " + state;
+                            to_string(qos_report.encoding_bitrate)
+                            + " BW: " + to_string(qos_report.estimated_bitrate) + " STATE: " + state;
 
                 g_object_set(G_OBJECT(text_overlay), "text", stats.c_str(), NULL);
             }
