@@ -6,5 +6,6 @@
 #include "QoSEstimator.h"
 #include "GenericAdaptiveStreaming.h"
 #include "Constants.h"
+#include "FileRecorder.h"
 
 #endif

@@ -8,7 +8,6 @@
 #include <stdlib.h>
 
 #include "../Common/Common.h"
-#include "FileRecorder.h"
 
 using namespace std;
 
