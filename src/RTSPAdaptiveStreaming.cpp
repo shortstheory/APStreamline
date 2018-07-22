@@ -254,7 +254,7 @@ GstPadProbeReturn RTSPAdaptiveStreaming::static_rtcp_callback(GstPad* pad,
 
 GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeInfo* info)
 {
-    g_warning("H264 rate - %d", h264_bitrate);
+    // g_warning("H264 rate - %d", h264_bitrate);
     GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buf != nullptr) {
         GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
@@ -300,18 +300,34 @@ GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadP
     return GST_PAD_PROBE_OK;
 }
 
-// make void
-bool RTSPAdaptiveStreaming::record_stream(bool _record_stream)
+void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
 {
+    g_warning("RecordStream %u", _record_stream);
     if (_record_stream) {
-        return file_recorder.init_file_recorder(pipeline, tee);
+        file_recorder.init_file_recorder(pipeline, tee);
     } else {
         if (file_recorder.tee_file_pad) {
-            // gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
-            //                     static_probe_block_callback, this, NULL);
+            gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
+                                static_probe_block_callback, this, NULL);
         } else {
             g_warning("File pad missing");
         }
     }
-    return true;
+}
+
+void RTSPAdaptiveStreaming::set_device_properties(int quality, bool _record_stream)
+{
+    // we can't have the capsfilter changing when recording from the CC, so we disable it for AUTO mode
+    if (quality == AUTO_PRESET) {
+        record_stream(false);
+        change_quality_preset(quality);
+        return;
+    }
+    if (quality == current_quality) {
+        record_stream(_record_stream);
+    } else {
+        record_stream(false);
+        change_quality_preset(quality);
+        record_stream(_record_stream);
+    }
 }

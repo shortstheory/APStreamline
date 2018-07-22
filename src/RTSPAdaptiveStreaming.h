@@ -40,6 +40,7 @@ private:
     static GstPadProbeReturn static_payloader_callback(GstPad* pad,
             GstPadProbeInfo* info,
             gpointer data);
+    void record_stream(bool _record_stream);
 
 public:
     FileRecorder file_recorder;
@@ -48,8 +49,8 @@ public:
                           string _uri = "/test", GstRTSPServer* server = nullptr,
                           int quality = AUTO_PRESET);
     ~RTSPAdaptiveStreaming() override;
+    void set_device_properties(int quality, bool record_stream);
     bool get_media_prepared();
-    bool record_stream(bool _record_stream);
 };
 
 #endif

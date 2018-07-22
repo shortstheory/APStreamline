@@ -121,8 +121,9 @@ void IPCMessageHandler::set_device_quality(char* buffer)
     try {
         stream = rtsp_stream_server->get_stream_map().at(string(video_device));
         if (stream->get_media_prepared()) {
-            stream->change_quality_preset(camera_setting);
-            stream->record_stream(_record_stream);
+            // stream->record_stream(_record_stream);
+            // stream->change_quality_preset(camera_setting);
+            stream->set_device_properties(camera_setting, _record_stream);
         } else {
             g_warning("Stream not connected yet");
         }
@@ -132,27 +133,27 @@ void IPCMessageHandler::set_device_quality(char* buffer)
 }
 
 // 2DO: get rid of this
-void IPCMessageHandler::set_file_recording(char* buffer)
-{
-    string msg_payload;
-    int file_setting;
-    char video_device[20];
-    msg_payload = get_message_payload(buffer);
-    sscanf(msg_payload.c_str(), "%s %d", video_device, &file_setting);
-    bool _record_stream;
-    _record_stream = (file_setting) ? true : false;
-    RTSPAdaptiveStreaming* stream;
-    try {
-        stream = rtsp_stream_server->get_stream_map().at(string(video_device));
-        if (stream->get_media_prepared()) {
-            stream->record_stream(_record_stream);
-        } else {
-            g_warning("Stream not connected yet");
-        }
-    } catch (const out_of_range& err) {
-        cerr << err.what();
-    }
-}
+// void IPCMessageHandler::set_file_recording(char* buffer)
+// {
+//     string msg_payload;
+//     int file_setting;
+//     char video_device[20];
+//     msg_payload = get_message_payload(buffer);
+//     sscanf(msg_payload.c_str(), "%s %d", video_device, &file_setting);
+//     bool _record_stream;
+//     _record_stream = (file_setting) ? true : false;
+//     RTSPAdaptiveStreaming* stream;
+//     try {
+//         stream = rtsp_stream_server->get_stream_map().at(string(video_device));
+//         if (stream->get_media_prepared()) {
+//             stream->record_stream(_record_stream);
+//         } else {
+//             g_warning("Stream not connected yet");
+//         }
+//     } catch (const out_of_range& err) {
+//         cerr << err.what();
+//     }
+// }
 
 void IPCMessageHandler::process_msg(char* buf)
 {
@@ -166,7 +167,7 @@ void IPCMessageHandler::process_msg(char* buf)
         set_device_quality(buf);
         break;
     case RECORD_TO_FILE:
-        set_file_recording(buf);
+        // set_file_recording(buf);
         break;
     case ERROR:
         g_warning("Unrecognised header");
