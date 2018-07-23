@@ -15,7 +15,7 @@ static const bool ARM = false;
 #endif
 
 #ifdef __arm__
-static const guint32 MAX_STEADY_BITRATE = 2500;
+static const guint32 MAX_STEADY_BITRATE = 4000;
 static const bool AMD64 = false;
 static const bool ARM = true;
 #endif
@@ -23,12 +23,12 @@ static const bool ARM = true;
 static const bool RECORD_VIDEO = true;
 
 static const guint32 MIN_STEADY_BITRATE = 500;
-static const guint32 INC_STEADY_BITRATE = 250;
+static const guint32 INC_STEADY_BITRATE = 500;
 static const guint32 DEC_STEADY_BITRATE = 1000;
 
 static const guint32 MAX_CONGESTION_BITRATE = 1000;
 static const guint32 MIN_CONGESTION_BITRATE = 100;
-static const guint32 INC_CONGESTION_BITRATE = 125;
+static const guint32 INC_CONGESTION_BITRATE = 250;
 static const guint32 DEC_CONGESTION_BITRATE = 500;
 
 static const guint32 LOW_QUAL_BITRATE = 500;
