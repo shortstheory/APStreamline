@@ -14,10 +14,11 @@ using namespace std;
 class RTSPAdaptiveStreaming : public GenericAdaptiveStreaming
 {
 private:
-    GstRTSPServer* rtsp_server;
-    GstElement* rtpbin;
     const string uri;
+    GstRTSPServer* rtsp_server;
     bool media_prepared;
+
+    GstElement* rtpbin;
 
     void init_media_factory();
     void add_rtpbin_probes();

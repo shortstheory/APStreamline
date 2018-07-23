@@ -16,19 +16,19 @@ class QoSEstimator
 private:
     gfloat smooth_rtt;
     guint64 prev_rr_time;
-    guint64 rtph_bytes_interval;
     guint32 prev_pkt_count;
     gfloat prev_buffer_occ;
     gfloat rtp_size;
     guint32 bytes_transferred;
+    gfloat smooth_enc_bitrate;
     guint64 last_bytes_sent;
+    guint64 rtph_bytes_interval;
     // not the same as encoding bitrate!
     timeval prev_tv;
     timeval prev_bw_tv;
 
     gfloat estimated_bitrate;
     gfloat encoding_bitrate;
-    gfloat smooth_enc_bitrate;
 
     guint64 get_current_ntp_time();
     guint32 get_compressed_ntp_time(const guint64 &full_ntp_timestamp);

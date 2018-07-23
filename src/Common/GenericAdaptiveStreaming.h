@@ -45,8 +45,10 @@ private:
     void degrade_quality();
 
 public:
-    int current_quality;
     string device;
+    const CameraType camera_type;
+
+    int current_quality;
     ResolutionPresets current_res;
     guint32 h264_bitrate;
     FileRecorder file_recorder;
@@ -63,7 +65,6 @@ public:
     GstElement* multi_udp_sink;
 
     QoSEstimator qos_estimator;
-    const CameraType camera_type;
 
     GenericAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM);
 

@@ -14,8 +14,8 @@
 #endif
 
 GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType type) :
-    device(_device), camera_type(type),
-    network_state(NetworkState::STEADY), successive_transmissions(0)
+    network_state(NetworkState::STEADY), successive_transmissions(0),
+    device(_device), camera_type(type)
 {
     if (camera_type == CameraType::RAW_CAM) {
         video_presets[ResolutionPresets::LOW] = RAW_CAPS_FILTERS[VIDEO_320x240x30];
