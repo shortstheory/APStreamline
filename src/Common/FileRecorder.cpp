@@ -12,6 +12,8 @@ FileRecorder::FileRecorder()
 bool FileRecorder::init_file_recorder(GstElement* _pipeline, GstElement* _tee)
 {
     g_warning("init of FR");
+
+    // In case we are already recording to a file, there's no need to reset the recorder
     if (recording) {
         g_warning("Recording in progress");
         return false;
@@ -21,7 +23,7 @@ bool FileRecorder::init_file_recorder(GstElement* _pipeline, GstElement* _tee)
     if (!pipeline || !tee) {
         return false;
     }
-    // file_recorder_bin = gst_bin_new(NULL);
+
     file_queue = gst_element_factory_make("queue", NULL);
     file_h264_parser = gst_element_factory_make("h264parse", NULL);
     mux = gst_element_factory_make("matroskamux", NULL);
@@ -85,6 +87,5 @@ bool FileRecorder::disable_recorder()
 
 bool FileRecorder::get_recording()
 {
-    g_warning("RecValGET %d", recording);
     return recording;
 }

@@ -19,6 +19,9 @@
 
 using namespace std;
 
+// Generic implementation of an Adaptive Video Streamer. Contains all the necessary
+// GstElements which need to be manually referenced by subclassing it. 
+// All the adapatation logic is handled here
 class GenericAdaptiveStreaming
 {
 private:
@@ -69,9 +72,7 @@ public:
     GenericAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM);
 
     virtual ~GenericAdaptiveStreaming();
-
     void pipeline_add_elements();
-
     void change_quality_preset(int quality);
     bool record_stream(bool _record_stream);
     void set_resolution(ResolutionPresets setting);

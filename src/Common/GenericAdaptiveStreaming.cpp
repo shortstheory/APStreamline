@@ -8,11 +8,6 @@
 
 #include "GenericAdaptiveStreaming.h"
 
-// not sure why this isn't included in some pacakges?!
-#ifndef V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME
-#define V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME		(V4L2_CID_MPEG_BASE+229)
-#endif
-
 GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType type) :
     network_state(NetworkState::STEADY), successive_transmissions(0),
     device(_device), camera_type(type)
@@ -35,7 +30,6 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     text_overlay = NULL;
 }
 
-//unreffing pointers which are null can be dangerous, check this
 GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
 {
     gst_element_set_state(pipeline, GST_STATE_NULL);
@@ -91,13 +85,14 @@ void GenericAdaptiveStreaming::adapt_stream()
     QoSReport qos_report;
     qos_report = qos_estimator.get_qos_report();
     g_warning("QOSData - loss-%u udp-%f x264-%f rtt-%f", qos_report.fraction_lost, qos_report.estimated_bitrate, qos_report.encoding_bitrate, qos_report.rtt);
-    // adapt according to the information in this report
+
     if (successive_transmissions >= SUCCESSFUL_TRANSMISSION) {
         network_state = NetworkState::STEADY;
     }
 
     set_state_constants();
 
+    // If we get a number of transmissions without any packet loss, we can increase bitrate
     if (qos_report.fraction_lost == 0) {
         successive_transmissions++;
         if (multi_udp_sink) {
@@ -159,7 +154,6 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
     switch (camera_type) {
     case RAW_CAM:
         if (h264_encoder) {
-            // g_warning("Bitrate val - %u", h264_bitrate);
             g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate, NULL);
         }
         if (text_overlay) {
@@ -169,7 +163,6 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
             string stats = "BR: " + to_string(h264_bitrate) + " H264: " +
                            to_string(qos_report.encoding_bitrate)
                            + " BW: " + to_string(qos_report.estimated_bitrate) + " STATE: " + state;
-
             g_object_set(G_OBJECT(text_overlay), "text", stats.c_str(), NULL);
         }
         break;
@@ -191,6 +184,8 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
     };
 }
 
+// Swap out capsfilters for changing the resolution. This doesn't work with UVC cameras.
+
 void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {
     if (camera_type != UVC_CAM) {
@@ -198,9 +193,7 @@ void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
         caps_filter_string = video_presets[setting];
         set_encoding_bitrate(bitrate_presets[setting]);
         g_warning("RES CHANGE! %d %s", setting, caps_filter_string.c_str());
-
         current_res = setting;
-
         GstCaps* src_caps;
         src_caps = gst_caps_from_string(caps_filter_string.c_str());
         g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
@@ -249,7 +242,9 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
     } else {
         string caps_filter_string;
         GstCaps* src_caps;
-        // guint32 h264_bitrate;
+
+        // Set the bitrate to the presets we use in AUTO mode
+
         if (quality == VIDEO_320x240x15 || quality == VIDEO_320x240x30 || quality == VIDEO_320x240x60) {
             h264_bitrate = LOW_QUAL_BITRATE;
         } else if (quality == VIDEO_640x480x15 || quality == VIDEO_640x480x30 || quality == VIDEO_640x480x60) {
@@ -259,7 +254,6 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
         }
 
         if (camera_type == CameraType::RAW_CAM) {
-            // set it to x264enc defaults
             g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate, NULL);
 
             caps_filter_string = RAW_CAPS_FILTERS[current_quality];

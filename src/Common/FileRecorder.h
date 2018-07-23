@@ -15,12 +15,13 @@
 
 using namespace std;
 
+// Manages the recording of the livestreamed video to a file on the CC
+
 class FileRecorder
 {
 private:
     bool recording;
 public:
-    GstElement* file_recorder_bin;
     GstElement* file_sink;
     GstElement* file_queue;
     GstElement* file_h264_parser;
@@ -29,8 +30,6 @@ public:
     GstElement* tee;
     GstPad* tee_file_pad;
     GstPad* queue_pad;
-
-    // bool stop_recording;
 
     FileRecorder();
     bool init_file_recorder(GstElement* _pipeline, GstElement* _tee);

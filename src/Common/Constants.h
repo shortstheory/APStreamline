@@ -4,6 +4,10 @@
 #include <gst/gst.h>
 #include <vector>
 
+// This generalisation is hardly rigid, but we can target higher bitrates on
+// x86/amd64 systems which are typically laptops. ARM devices such as the
+// Raspberry Pi are far more limited.
+
 #ifdef __amd64__
 static const guint32 MAX_STEADY_BITRATE = 4000;
 static const bool AMD64 = true;

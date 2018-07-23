@@ -3,6 +3,8 @@
 
 #include <gst/gst.h>
 
+// Used for doing the messy bit-shifting logic for getting RTT times
+
 struct ntp_time_t {
     guint32 second;
     guint32 fraction;

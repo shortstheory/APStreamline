@@ -53,17 +53,6 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     update_rtt(lsr, dlsr);
     prev_rr_time = curr_time_ms;
     qos_report = QoSReport(fractionlost, estimated_bitrate, encoding_bitrate, smooth_rtt, curr_buffer_occ);
-
-    // g_warning("bw %f occ %f loss %d encode-Rate %f h264enc %d", estimated_bitrate, curr_buffer_occ, fractionlost, encoding_bitrate);
-
-    // g_warning("rtt %f rtpsize %f encode-Rate %f", smooth_rtt, rtp_size, smooth_enc_bitrate);
-    // g_warning("    block         %llu", i);
-    // g_warning("    ssrc          %llu", ssrc);
-    // g_warning("    highest   seq %llu", exthighestseq);
-    // g_warning("    jitter        %llu", jitter);
-    // g_warning("    fraction lost %llu", fractionlost);
-    // g_warning("    packet   lost %llu", packetslost);
-    // g_warning("lsr %llu", lsr>>16);
 }
 
 QoSReport QoSEstimator::get_qos_report()
@@ -71,7 +60,6 @@ QoSReport QoSEstimator::get_qos_report()
     return qos_report;
 }
 
-// not really used anywhere yet, but we'll keep it around till it becomes useful
 void QoSEstimator::process_sr_packet(GstRTCPPacket* packet)
 {
     guint32 ssrc, rtptime, packet_count, octet_count;
@@ -95,11 +83,9 @@ void QoSEstimator::calculate_bitrates(const guint64 &bytes_sent, const guint32 &
         bytes_interval = bytes_sent - last_bytes_sent;
         estimated_bitrate = bytes_interval * 8.0 / (float)(curr_count - last_count);
         encoding_bitrate = rtph_bytes_interval * 8.0 / (float)(curr_count - last_count);
-        // g_warning("ESTD Bw!!! %f enc rate! %f", estimated_bitrate, encoding_bitrate);
         prev_bw_tv = tv;
         last_bytes_sent = bytes_sent;
         rtph_bytes_interval = 0;
-        // exp_smooth_val(encoding_bitrate, smooth_enc_bitrate, 0.75);
     } else {
         rtph_bytes_interval += buffer_size;
     }

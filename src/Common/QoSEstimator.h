@@ -11,6 +11,10 @@
 #include "NTPTime.h"
 #include "DeviceDatatypes.h"
 
+// Computes Quality-of-Service of the network per RTT of RTCP packets by maintaining
+// timers and state information about bytes transferred. The information recorded
+// per RTT is saved in a QoSReport struct which can be accessed by other classes
+
 class QoSEstimator
 {
 private:

@@ -20,13 +20,17 @@ const static vector<string> RTSPMessageHeader = {
     "GDP", "SDP"
 };
 
-struct v4l2_info {
+
+// Includes some metadata about each camera
+struct v4l2_info
+{
     string camera_name;
     string mount_point;
     CameraType camera_type;
     guint64 frame_property_bitmask;
 };
 
+// Gives QoS estimates to the Adaptive Streamer for acting upon
 struct QoSReport {
     guint8 fraction_lost;
     gfloat estimated_bitrate;
