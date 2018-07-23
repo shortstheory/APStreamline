@@ -114,18 +114,6 @@ void GenericAdaptiveStreaming::adapt_stream()
         network_state = NetworkState::CONGESTION;
         successive_transmissions = 0;
         decrease_resolution();
-        // Force key-frame on hardware encoders. Doesn't always work if the IOCTL isn't supported
-        // if (camera_type == CameraType::H264_CAM) {
-        //     int v4l2_cam_fd;
-        //     g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
-        //     v4l2_control force_keyframe;
-        //     force_keyframe.id = V4L2_CID_MPEG_VIDEO_FORCE_KEY_FRAME; //value is ignored
-        //     if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &force_keyframe) == -1) {
-        //         g_warning("Keyframe ioctl failed");
-        //     } else {
-        //         g_warning("New keyframe requested");
-        //     }
-        // }
     }
 }
 
@@ -246,22 +234,6 @@ void GenericAdaptiveStreaming::decrease_resolution()
     default:
         break;
     }
-}
-
-bool GenericAdaptiveStreaming::change_source(string _device)
-{
-    if (pause_pipeline() && gst_bin_remove(GST_BIN(pipeline), v4l2_src)) {
-        v4l2_src = gst_element_factory_make("v4l2src", NULL);
-        if (v4l2_src) {
-            device = _device;
-            g_object_set(G_OBJECT(v4l2_src), "device", _device.c_str(), NULL);
-            gst_bin_add(GST_BIN(pipeline), v4l2_src);
-            if (gst_element_link(v4l2_src, src_capsfilter)) {
-                return play_pipeline();
-            }
-        }
-    }
-    return false;
 }
 
 void GenericAdaptiveStreaming::change_quality_preset(int quality)

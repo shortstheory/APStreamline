@@ -78,7 +78,6 @@ public:
     void adapt_stream();
     bool play_pipeline();
     bool pause_pipeline();
-    bool change_source(string _device);
     GstBus* get_pipeline_bus();
 };
 
