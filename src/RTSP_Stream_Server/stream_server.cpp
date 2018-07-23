@@ -46,7 +46,7 @@ void ipc_loop(RTSPStreamServer* streamer)
     // if ((client_fd = accept(socket_fd, NULL, NULL)) == -1) {
     //     g_warning("Connection failed");
 
-    while (client_fd = accept(socket_fd, NULL, NULL)) {
+    while ((client_fd = accept(socket_fd, NULL, NULL))) {
         IPCMessageHandler message_handler(client_fd, streamer);
         // g_warning("Connection accepted!");
         while ((bytes_read=read(client_fd,buf,sizeof(buf))) > 0) {
@@ -61,7 +61,7 @@ void ipc_loop(RTSPStreamServer* streamer)
 string get_ip_address(string interface = "lo")
 {
     struct ifaddrs *ifaddr, *ifa;
-    int family, s;
+    int s;
     char host[NI_MAXHOST];
 
     if (getifaddrs(&ifaddr) == -1) {
@@ -73,8 +73,8 @@ string get_ip_address(string interface = "lo")
         if (ifa->ifa_addr == NULL) {
             continue;
         }
-        s=getnameinfo(ifa->ifa_addr,sizeof(struct sockaddr_in), host, NI_MAXHOST,
-                      NULL, 0, NI_NUMERICHOST);
+        s = getnameinfo(ifa->ifa_addr, sizeof(struct sockaddr_in), host, NI_MAXHOST,
+                        NULL, 0, NI_NUMERICHOST);
         if ((strcmp(ifa->ifa_name, interface.c_str()) == 0) && (ifa->ifa_addr->sa_family==AF_INET)) {
             if (s != 0) {
                 printf("getnameinfo() failed: %s\n", gai_strerror(s));

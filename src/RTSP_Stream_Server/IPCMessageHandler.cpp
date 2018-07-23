@@ -4,7 +4,7 @@ RTSPMessageType IPCMessageHandler::get_message_type(char* buf)
 {
     string buffer(buf);
     cout << "Recevied buffer - " << buf << endl;
-    for (int i = 0; i < RTSPMessageHeader.size(); i++) {
+    for (size_t i = 0; i < RTSPMessageHeader.size(); i++) {
         if (!buffer.compare(0, RTSPMessageHeader[i].size(), RTSPMessageHeader[i])) {
             cout << "Message type - " << RTSPMessageHeader[i] << " " << static_cast<RTSPMessageType>(i) << endl;
             return static_cast<RTSPMessageType>(i);
@@ -47,7 +47,7 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
             "\"name\": \"%s\", "
             "\"mount\": \"%s\", "
             "\"camtype\": %d, "
-            "\"frame_property_bitmask\": %llu, "
+            "\"frame_property_bitmask\": %lu, "
             "\"current_quality\": %u, "
             "\"recording\": %d"
             "}",
@@ -143,7 +143,7 @@ void IPCMessageHandler::process_msg(char* buf)
     case SET_DEVICE_PROPS:
         set_device_quality(buf);
         break;
-    case ERROR:
+    default:
         g_warning("Unrecognised header");
         break;
     }

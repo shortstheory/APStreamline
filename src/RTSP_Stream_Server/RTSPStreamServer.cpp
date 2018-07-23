@@ -55,10 +55,7 @@ void RTSPStreamServer::get_v4l2_devices()
 bool RTSPStreamServer::check_h264_ioctls(int fd)
 {
     v4l2_queryctrl bitrate_ctrl;
-    v4l2_queryctrl i_frame_interval;
-
     bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
-    i_frame_interval.id = V4L2_CID_MPEG_VIDEO_H264_I_PERIOD;
 
     // i_frame interval is nice to have, but not a must have, might do special handling later
     if (ioctl(fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1) {
