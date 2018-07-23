@@ -50,7 +50,7 @@ void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
     timeval tv;
     gettimeofday(&tv, NULL);
     // rtt calc
-    // curr_rtt = update_rtt(lsr, dlsr);
+    update_rtt(lsr, dlsr);
     prev_rr_time = curr_time_ms;
     qos_report = QoSReport(fractionlost, estimated_bitrate, encoding_bitrate, smooth_rtt, curr_buffer_occ);
 

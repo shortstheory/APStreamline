@@ -111,7 +111,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         element = (GstElement*)list_itr->data;
         str = gst_element_get_name(element);
         g_warning("element name = %s", str.c_str());
-        // FIXME: this is a gstreamer version thing!
+
         if (str.find("bin") != std::string::npos || str.find("pipeline") != std::string::npos) {
             pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
         }
@@ -163,15 +163,45 @@ bool RTSPAdaptiveStreaming::get_element_references()
         case RAW_CAM:
             h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), "x264enc");
             text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), "textoverlay");
-            g_object_set(G_OBJECT(text_overlay), "valignment", 2, NULL); //top
-            g_object_set(G_OBJECT(text_overlay), "halignment", 0, NULL); //left
-            g_object_set(G_OBJECT(text_overlay), "font-desc", "Sans, 9", NULL);
             if (tee && rtph264_payloader && v4l2_src && src_capsfilter && h264_encoder && text_overlay) {
+                g_object_set(G_OBJECT(text_overlay),
+                             "valignment", 2,
+                             "halignment", 0,
+                             "font-desc", "Sans, 9", NULL);
+                g_object_set(G_OBJECT(h264_encoder), 
+                             "tune", 0x00000004,
+                             "threads", 4,
+                             "key-int-max", I_FRAME_INTERVAL,
+                             NULL);
+
                 return true;
             } else {
                 return false;
             }
         case H264_CAM:
+            int v4l2_cam_fd;
+            if (v4l2_src) {
+                g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
+                if (v4l2_cam_fd > 0) {
+                    v4l2_control veritcal_flip;
+                    veritcal_flip.id = V4L2_CID_VFLIP;
+                    veritcal_flip.value = TRUE;
+
+                    v4l2_control horizontal_flip;
+                    horizontal_flip.id = V4L2_CID_HFLIP;
+                    horizontal_flip.value = TRUE;
+
+                    v4l2_control i_frame_interval;
+                    i_frame_interval.id = V4L2_CID_MPEG_VIDEO_H264_I_PERIOD;
+                    i_frame_interval.value = I_FRAME_INTERVAL;
+
+                    if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &veritcal_flip) == -1 ||
+                        ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1 ||
+                        ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1) {
+                            return false;
+                    }
+                }
+            }
         case UVC_CAM:
             if (tee && rtph264_payloader && v4l2_src && src_capsfilter) {
                 return true;
