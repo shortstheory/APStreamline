@@ -1,18 +1,18 @@
-# Adaptive H.264 Streaming Using GStreamer
+# Adaptive H.264 Streaming From ArduPilot Robots Using GStreamer
 
 ## Introduction
 
-Using video cameras for live-streaming the video feed from quadcopters and other unmanned vehicles is becoming increasingly useful. Most video streaming solutions use RTP for streaming video over UDP. UDP is more efficient than TCP because it forgoes the reliable delivery and congestion control mechanisms that TCP boasts.
+Using video cameras for live-streaming the video feed from aerial robots and other unmanned vehicles is becoming increasingly useful. Most video streaming solutions use RTP for streaming video over UDP. UDP is more efficient than TCP because it forgoes the overhead that comes with TCP's reliable delivery and congestion control mechanisms.
 
-However, this introduces new problems when streaming video from robots. In most cases, we use the Companion Computer (CC) in Wi-Fi hotspot mode for streaming the video. Due to limited Wi-Fi range, the video Quality-of-Service progressively gets worse when the robot goes further away from the receiving computer.
+However, this introduces new problems when streaming video from robots. In most cases, we use the Companion Computer (CC) in Wi-Fi hotspot mode for streaming the video. Due to limited Wi-Fi range, the video Quality-of-Service progressively gets worse when the robot moves further away from the receiving computer.
 
-The Adaptive Streaming aims to fix this problem by dynamically adjusting the video quality by parsing the RTCP Receiver Report packets on the CC. These RTCP packets provide helpful QoS information which can be used for automatically changing the bitrate and resolution of the video delivered from the CC.
+The Adaptive Streaming aims to fix this problem by dynamically adjusting the video quality. Even over UDP, we can still obtain estimates of QoS using RTCP and parsing the RTCP Receiver Report packets on the CC. These RTCP packets provide helpful QoS information (such as RTT and packet loss) which can be used for automatically changing the bitrate and resolution of the video delivered from the CC.
 
 Currently this project supports H.264 hardware encoding the video feed of the Raspberry Pi Camera on the Raspberry Pi 3B(+). H.264 software encoding is supported for all other V4L2 cameras.
 
 ### Note for hardware encoding webcams
 
-Some webcams such as the Logitech C920 support hardware encoding through an onboard processor, however bugs in the UVC driver has resulted in some reduced functionality. These webcams are configured to adaptively stream in only 480p through adjusting the H.264 video bitrate. Switching the resolution results in the video client closing due to the transmission of an EOS event once the resolution has changed.
+Some webcams such as the Logitech C920 support hardware encoding through an onboard processor, however bugs in the UVC driver has resulted in some reduced functionality. These webcams are configured to adaptively stream only in 480p through adjusting the H.264 video bitrate. Switching the resolution results in the video client closing due to the transmission of an EOS event once the resolution has changed.
 
 ## Running the Code
 
@@ -48,31 +48,41 @@ Video livestreams can be launched through both RTSP and UDP. It is recommended t
 
 ### RTSP Streaming
 
+#### APWeb (Recommended)
+
+Start the [APWeb server](https://github.com/shortstheory/APWeb). This will serve the configuration page for the RTSP stream server.
+
+On navigating to the new `video/` page, you will be presented with a page to start the RTSP Server:
+
+![Screenshot](screenshots/server_stop.png)
+
+On selecting the desired interface and starting the RTSP Server, the APWeb server will spawn the Stream Server process. The stream server will search for all the V4L2 cameras available in `/dev/`. It will query the capabilities of all these cameras and select hardware encoding or software encoding accordingly. The list of available cameras can be refreshed by simply stopping and starting the server.
+
+From here, the APWeb page will display the list of available RTSP streams and their mount points:
+
+![Screenshot](screenshots/server_start.png)
+
+The video quality can either be automatically set based on the avaialble network bandwidth or set manually for more fine-grained control.
+
+The APWeb page also presents an option to record the video stream to a file. For this the video stream must be opened on the client. This works with any of the manually set resolutions but does **not** work with Auto quality. This is because the dynamically changing resolution causes problems with the file recording pipeline. An exception to this is the UVC cameras which can record to a file in Auto mode as well.
+
+The RTSP streams can be viewed using any RTSP player.
+
+For example, this can be done in VLC by going to "Media > Open Network Stream" and pasting in the RTSP Mount Point for the camera displayed in the APWeb configuration page. However, VLC introduces *two* seconds of latency for the jitter reduction, making it unsuitable for critical applications. To circumvent this, RTSP streams can also be viewed at zero latency by using the `gst-launch` command:
+
+`gst-launch-1.0 playbin uri=<RTSP-MOUNT-POINT> latency=100`
+
+As an example RTSP Mount Point looks like: `rtsp://192.168.0.17:8554/cam0`. Refer to the APWeb page to see the mount points given for your camera.
+
+#### Standalone
+
 Launch the RTSP stream server by running:
 
 `stream_server <interface>`
 
-Along with this, make sure the APWeb server is running. This will serve the configuration page for the RTSP stream server.
-
 The list of available network interfaces can be found by running `ifconfig`.
 
-The stream server will search for all the V4L2 cameras available in `/dev/`. It will query the capabilities of all these cameras and select hardware encoding or software encoding accordingly.
-
-From here, the APWeb page will display the list of available RTSP streams and their mount points:
-
-![Screenshot](screenshots/topimage.png)
-
-The video quality can either be automatically set based on the avaialble network bandwith or set manually for more fine-grained control.
-
-The RTSP streams can be viewed using any RTSP player.
-
-For example, this can be done in VLC by going to Media > Open Network Stream and pasting in the RTSP Mount Point for the camera displayed in the APWeb configuration page. However, VLC introduces *two* seconds of latency for the jitter reduction, making it unsuitable for critical applications. To circumvent this, RTSP streams can also be viewed at zero latency by using the `gst-launch` command:
-
-`gst-launch-1.0 playbin uri=<RTSP-MOUNT-POINT> latency=0`
-
-As an example RTSP Mount Point looks like: `rtsp://192.168.0.17:8554/cam0`. Refer to the APWeb page to see the mount point given to your camera.
-
-### UDP Streaming
+### UDP Streaming (Currently Broken!)
 
 *Use this if you only need to stream from one camera at a time or your GCS doesn't support RTSP streaming*
 
@@ -90,7 +100,7 @@ For APSync images with the CC on 10.0.1.128, you can directly run `./recv_apsync
 
 Typically, this `gst-launch` command should be run on the receiver before streaming the video from the companion computer.
 
-## Troubleshooting
+#### Troubleshooting
 
 Sometimes you might see:
 
