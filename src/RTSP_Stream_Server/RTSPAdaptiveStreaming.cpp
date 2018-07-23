@@ -284,10 +284,6 @@ GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadP
 
 void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
 {
-    while (file_recorder.stop_recording) {
-        // this is dangerous, the stream deactiviating won't reset the callback either
-        g_warning("Waiting for recorder!");
-    }
     g_warning("RecordStream %u", _record_stream);
     if (_record_stream) {
         file_recorder.init_file_recorder(pipeline, tee);
@@ -316,7 +312,11 @@ void RTSPAdaptiveStreaming::set_device_properties(int quality, bool _record_stre
         record_stream(_record_stream);
     } else {
         record_stream(false);
+        // while (file_recorder.stop_recording) {
+        // // this is dangerous, the stream deactiviating won't reset the callback either
+        //     g_warning("Waiting for recorder!");
+        // }
         change_quality_preset(quality);
-        record_stream(_record_stream);
+        // record_stream(_record_stream);
     }
 }
