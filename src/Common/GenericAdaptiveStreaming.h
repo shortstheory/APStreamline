@@ -15,7 +15,7 @@
 #include "QoSEstimator.h"
 #include "DeviceDatatypes.h"
 #include "Constants.h"
-// #include "FileRecorder.h"
+#include "FileRecorder.h"
 
 using namespace std;
 
@@ -49,6 +49,7 @@ public:
     string device;
     ResolutionPresets current_res;
     guint32 h264_bitrate;
+    FileRecorder file_recorder;
 
     GstElement* pipeline;
     GstElement* v4l2_src;

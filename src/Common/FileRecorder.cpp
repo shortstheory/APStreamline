@@ -6,6 +6,8 @@ FileRecorder::FileRecorder()
     stop_recording = false;
     tee_file_pad = nullptr;
     queue_pad = nullptr;
+    tee = nullptr;
+    pipeline = nullptr;
 }
 
 bool FileRecorder::init_file_recorder(GstElement* _pipeline, GstElement* _tee)
@@ -70,6 +72,15 @@ bool FileRecorder::disable_recorder()
     gst_bin_remove(GST_BIN(pipeline), file_h264_parser);
     gst_bin_remove(GST_BIN(pipeline), mux);
     gst_bin_remove(GST_BIN(pipeline), file_sink);
+
+    gst_pad_unlink(tee_file_pad, queue_pad);
+    gst_element_release_request_pad(tee, tee_file_pad);
+    gst_object_unref(tee_file_pad);
+    gst_object_unref(queue_pad);
+
+    stop_recording = false;
+    tee_file_pad = nullptr;
+    queue_pad = nullptr;
 
     return true;
 }

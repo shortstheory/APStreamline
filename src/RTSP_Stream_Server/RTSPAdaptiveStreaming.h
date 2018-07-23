@@ -33,8 +33,8 @@ private:
     static void static_media_constructed_callback(GstRTSPMediaFactory *media_factory,
             GstRTSPMedia *media,
             gpointer data);
-    static void static_media_prepared_callback(GstRTSPMedia* media, gpointer user_data);
-    static void static_media_unprepared_callback(GstRTSPMedia* media, gpointer user_data);
+    static void static_media_prepared_callback(GstRTSPMedia* media, gpointer data);
+    static void static_media_unprepared_callback(GstRTSPMedia* media, gpointer data);
 
     static GstPadProbeReturn static_probe_block_callback(GstPad* pad,
             GstPadProbeInfo* info,
@@ -48,7 +48,6 @@ private:
     void record_stream(bool _record_stream);
 
 public:
-    FileRecorder file_recorder;
     RTSPAdaptiveStreaming(string _device = "/dev/video0",
                           CameraType type = CameraType::RAW_CAM,
                           string _uri = "/test", GstRTSPServer* server = nullptr,

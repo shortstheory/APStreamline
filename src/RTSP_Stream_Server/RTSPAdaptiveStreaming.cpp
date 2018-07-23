@@ -22,12 +22,6 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
 
 RTSPAdaptiveStreaming::~RTSPAdaptiveStreaming()
 {
-    if (multi_udp_sink) {
-        gst_element_set_state(multi_udp_sink, GST_STATE_NULL);
-        gst_object_unref(multi_udp_sink);
-    }
-    gst_element_set_state(rtpbin, GST_STATE_NULL);
-    gst_object_unref(rtpbin);
     gst_object_unref(rtsp_server);
 }
 
@@ -92,10 +86,11 @@ void RTSPAdaptiveStreaming::static_media_prepared_callback(GstRTSPMedia* media, 
     ptr->media_prepared_callback(media);
 }
 
-void RTSPAdaptiveStreaming::static_media_unprepared_callback(GstRTSPMedia* media, gpointer user_data)
+void RTSPAdaptiveStreaming::static_media_unprepared_callback(GstRTSPMedia* media, gpointer data)
 {
     // use this as a way to clean up variables and refs I guess?!
-    g_warning("Stream disconnected!");
+    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    ptr->media_unprepared_callback(media);
 }
 
 void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
@@ -141,6 +136,22 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     media_prepared = true;
 }
 
+void RTSPAdaptiveStreaming::media_unprepared_callback(GstRTSPMedia* media)
+{
+    file_recorder.disable_recorder();
+    gst_element_set_state(pipeline, GST_STATE_NULL);
+    gst_object_unref(pipeline);
+
+    gst_element_set_state(rtpbin, GST_STATE_NULL);
+    gst_object_unref(rtpbin);
+
+    if (multi_udp_sink) {
+        gst_element_set_state(multi_udp_sink, GST_STATE_NULL);
+        gst_object_unref(multi_udp_sink);
+    }
+    g_warning("Stream disconnected!");
+}
+
 bool RTSPAdaptiveStreaming::get_element_references()
 {
     if (pipeline) {
@@ -184,11 +195,8 @@ GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad
 GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPadProbeInfo* info)
 {
     // pad is blocked, so it's ok to unlink
-    gst_pad_unlink(file_recorder.tee_file_pad, file_recorder.queue_pad);
     file_recorder.disable_recorder();
-    gst_element_release_request_pad(tee, file_recorder.tee_file_pad);
     g_warning("Pad Removed");
-    file_recorder.stop_recording = false;
     return GST_PAD_PROBE_REMOVE;
 }
 
@@ -200,16 +208,16 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes()
 
     rtcp_rr_pad = gst_element_get_static_pad(rtpbin, "recv_rtcp_sink_0");
     gst_pad_add_probe(rtcp_rr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
-    g_object_unref(rtcp_rr_pad);
+    gst_object_unref(rtcp_rr_pad);
 
     rtcp_sr_pad = gst_element_get_static_pad(rtpbin, "send_rtcp_src_0");
     gst_pad_add_probe(rtcp_sr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
-    g_object_unref(rtcp_sr_pad);
+    gst_object_unref(rtcp_sr_pad);
 
     if (multi_udp_sink) {
         payloader_pad = gst_element_get_static_pad(rtph264_payloader, "sink");
         gst_pad_add_probe(payloader_pad, GST_PAD_PROBE_TYPE_BUFFER, static_payloader_callback, this, NULL);
-        g_object_unref(payloader_pad);
+        gst_object_unref(payloader_pad);
     }
 }
 
@@ -277,6 +285,7 @@ GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadP
 void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
 {
     while (file_recorder.stop_recording) {
+        // this is dangerous, the stream deactiviating won't reset the callback either
         g_warning("Waiting for recorder!");
     }
     g_warning("RecordStream %u", _record_stream);
