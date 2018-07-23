@@ -20,7 +20,7 @@ RTSPStreamServer* rtsp_stream_server;
 void ipc_loop(RTSPStreamServer* streamer)
 {
     struct sockaddr_un addr;
-    char buf[1000];
+    char buf[IPC_BUFFER_SIZE];
     int socket_fd, client_fd, bytes_read;
 
     if ((socket_fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
