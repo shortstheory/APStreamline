@@ -280,7 +280,7 @@ GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeI
         //same buffer can have an SDES and an RTCP pkt
         while (more) {
             qos_estimator.handle_rtcp_packet(packet);
-            if (current_quality == AUTO_PRESET) {
+            if (current_quality == AUTO_PRESET && gst_rtcp_packet_get_type(packet) == GST_RTCP_TYPE_RR) {
                 adapt_stream();
             }
             more = gst_rtcp_packet_move_to_next(packet);
