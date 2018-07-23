@@ -61,10 +61,6 @@ void RTSPAdaptiveStreaming::init_media_factory()
         launch_string = "v4l2src name=src device=" + device +
                         " ! queue"
                         " ! capsfilter name=capsfilter caps=video/x-h264,width=320,height=240,framerate=30/1"
-                    #ifndef __arm__
-                        " ! queue"
-                        " ! tee name=tee_element tee_element."
-                    #endif
                         " ! queue"
                         " ! h264parse"
                         " ! rtph264pay name=pay0";
@@ -352,21 +348,20 @@ void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
 void RTSPAdaptiveStreaming::set_device_properties(int quality, bool _record_stream)
 {
     // We can't have the capsfilter changing when recording from the CC, so we disable it for AUTO mode
-#ifdef __amd64__
-    if (quality == AUTO_PRESET && camera_type != UVC_CAM) {
-        record_stream(false);
-        change_quality_preset(quality);
-        return;
-    }
-    if (quality == current_quality) {
-        record_stream(_record_stream);
+    if (camera_type != H264_CAM) {
+        if (quality == AUTO_PRESET && camera_type != UVC_CAM) {
+            record_stream(false);
+            change_quality_preset(quality);
+            return;
+        }
+        if (quality == current_quality) {
+            record_stream(_record_stream);
+        } else {
+            record_stream(false);
+            change_quality_preset(quality);
+        }
     } else {
         record_stream(false);
         change_quality_preset(quality);
     }
-#endif
-#ifdef __arm__
-    record_stream(false);
-    change_quality_preset(quality);
-#endif
 }
