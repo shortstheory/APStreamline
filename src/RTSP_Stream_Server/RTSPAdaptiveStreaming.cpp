@@ -83,12 +83,19 @@ void RTSPAdaptiveStreaming::static_media_constructed_callback(GstRTSPMediaFactor
         GstRTSPMedia *media, gpointer data)
 {
     g_signal_connect(media, "prepared", G_CALLBACK(static_media_prepared_callback), data);
+    g_signal_connect(media, "unprepared", G_CALLBACK(static_media_unprepared_callback), data);
 }
 
 void RTSPAdaptiveStreaming::static_media_prepared_callback(GstRTSPMedia* media, gpointer data)
 {
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
     ptr->media_prepared_callback(media);
+}
+
+void RTSPAdaptiveStreaming::static_media_unprepared_callback(GstRTSPMedia* media, gpointer user_data)
+{
+    // use this as a way to clean up variables and refs I guess?!
+    g_warning("Stream disconnected!");
 }
 
 void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)

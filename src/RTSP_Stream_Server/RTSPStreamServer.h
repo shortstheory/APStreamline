@@ -16,6 +16,8 @@ private:
     static string v4l2_device_path;
     static string v4l2_device_prefix;
     static string mount_point_prefix;
+    static bool initialised;
+    static RTSPStreamServer* instance;
 
     string ip_addr;
     string port;
@@ -32,10 +34,7 @@ private:
     void remove_mount_point(string mount_point);
     bool check_h264_ioctls(int fd);
 
-    static bool initialised;
-    static RTSPStreamServer* instance;
     RTSPStreamServer(string _ip_addr, string _port);
-
     ~RTSPStreamServer();
 public:
     static RTSPStreamServer* get_instance(string _ip_addr, string _port);
