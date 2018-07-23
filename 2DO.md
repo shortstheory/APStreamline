@@ -6,7 +6,6 @@
 
 PARTIAL:
 * Do APSync integration
-* Add licenses
 * get framerates for stepwise cams
 * Work on UVCH264 cams eg C920
 
@@ -20,6 +19,7 @@ DONE:
 * Record on CC
 
 SKIP:
+* Add licenses
 * what do I do with ntptime?
 * Put V4L2 info fields into RTSPAdaptiveStreaming
 

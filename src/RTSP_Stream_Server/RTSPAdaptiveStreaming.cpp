@@ -43,7 +43,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
     switch (camera_type) {
     case RAW_CAM:
         launch_string = "v4l2src name=src device=" + device +
-                        " ! capsfilter name=capsfilter caps=image/jpeg, width=320, height=240, framerate=30/1"
+                        " ! capsfilter name=capsfilter caps=image/jpeg,width=320,height=240,framerate=30/1"
                         " ! jpegdec"
                         " ! videoconvert"
                         " ! textoverlay name=textoverlay"
@@ -58,10 +58,10 @@ void RTSPAdaptiveStreaming::init_media_factory()
         launch_string = "uvch264src device=" + device +
                         " name=src auto-start=true src.vfsrc"
                         " ! queue"
-                        " ! capsfilter name=vfcaps caps=video/x-raw, width=640, height=480, framerate=10/1"
+                        " ! capsfilter name=vfcaps caps=video/x-raw,width=640,height=480,framerate=10/1"
                         " ! fakesink sync=false src.vidsrc"
                         " ! queue"
-                        " ! video/x-h264, width=640, height=480, framerate=30/1"
+                        " ! capsfilter name=capsfilter caps=video/x-h264,width=640,height=480,framerate=30/1"
                         " ! tee name=tee_element tee_element."
                         " ! queue"
                         " ! h264parse"
@@ -85,7 +85,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
         break;
     case H264_CAM:
         launch_string = "v4l2src name=src device=" + device +
-                        " ! video/x-h264, width=320, height=240, framerate=30/1"
+                        " ! capsfilter name=capsfilter caps=video/x-h264,width=320,height=240,framerate=30/1"
                         " ! tee name=tee_element tee_element."
                         " ! queue"
                         " ! h264parse"
@@ -131,7 +131,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         str = gst_element_get_name(element);
         g_warning("element name = %s", str.c_str());
         // FIXME: this is a gstreamer version thing!
-        if (str.find("bin") != std::string::npos) {
+        if (str.find("bin") != std::string::npos || str.find("pipeline") != std::string::npos) {
             pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
         }
         if (str.find("rtpbin") != std::string::npos) {
