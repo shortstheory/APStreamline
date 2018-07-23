@@ -29,10 +29,6 @@ void QoSEstimator::handle_rtcp_packet(GstRTCPPacket* packet)
 
 void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
 {
-    // guint64 rr_time_delta_ms;
-    // gfloat bandwidth;
-    // gfloat curr_rtt;
-    // guint32 packet_interval;
     guint64 curr_time_ms = 0;
 
     guint32 exthighestseq;

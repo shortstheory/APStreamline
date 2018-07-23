@@ -16,6 +16,8 @@
 
 using namespace std;
 
+// Subclass of GenericAdaptiveStreaming, handling the streaming over RTSP
+
 class RTSPAdaptiveStreaming : public GenericAdaptiveStreaming
 {
 private:
@@ -27,14 +29,15 @@ private:
 
     void init_media_factory();
     void add_rtpbin_probes();
+
+    // Several GStreamer functions operate using callbacks, however we need to first
+    // catch them as static methods while passing the 'this' pointer as an argument
+    // to call the object's method!
     void media_prepared_callback(GstRTSPMedia* media);
     void media_unprepared_callback(GstRTSPMedia* media);
     void deep_callback(GstBin* bin,
                        GstBin* sub_bin,
                        GstElement* element);
-
-    bool get_element_references();
-
     GstPadProbeReturn rtcp_callback(GstPad* pad, GstPadProbeInfo* info);
     GstPadProbeReturn probe_block_callback(GstPad* pad, GstPadProbeInfo* info);
     GstPadProbeReturn payloader_callback(GstPad* pad, GstPadProbeInfo* info);
@@ -48,7 +51,6 @@ private:
                                      GstBin* sub_bin,
                                      GstElement* element,
                                      gpointer data);
-
     static GstPadProbeReturn static_probe_block_callback(GstPad* pad,
             GstPadProbeInfo* info,
             gpointer data);
@@ -58,6 +60,10 @@ private:
     static GstPadProbeReturn static_payloader_callback(GstPad* pad,
             GstPadProbeInfo* info,
             gpointer data);
+
+    // Takes the pipeline created by the launch string and iterates through it to
+    // find the elements for configuration
+    bool get_element_references();
     void record_stream(bool _record_stream);
 
 public:

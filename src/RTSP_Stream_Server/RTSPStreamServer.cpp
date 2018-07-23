@@ -30,7 +30,6 @@ RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_
     setup_streams();
 }
 
-// convert strings to char arrays here, this is sub-optimal
 void RTSPStreamServer::get_v4l2_devices()
 {
     DIR *dp;
@@ -40,12 +39,11 @@ void RTSPStreamServer::get_v4l2_devices()
         fprintf(stderr, "Could not open directory %d", errno);
     }
     while ((ep = readdir(dp))) {
-        // fprintf(stderr, "%s\n", ep->d_name);
         string s = ep->d_name;
         if (s.find(v4l2_device_prefix) != std::string::npos) {
             s = v4l2_device_path + s;
             fprintf(stderr, "Found V4L2 camera device %s\n", s.c_str());
-            // add device path to list
+            // Add device path to list
             device_list.push_back(s);
         }
     }
@@ -57,7 +55,6 @@ bool RTSPStreamServer::check_h264_ioctls(int fd)
     v4l2_queryctrl bitrate_ctrl;
     bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
 
-    // i_frame interval is nice to have, but not a must have, might do special handling later
     if (ioctl(fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1) {
         return false;
     }
@@ -109,7 +106,6 @@ void RTSPStreamServer::get_v4l2_devices_info()
                 fmt.index = mjpg_index;
             }
 
-            // only take h264 caps if the camera support it, mjpg will have the same caps
             if (h264_index != -1) {
                 fmt.index = h264_index;
                 if (check_h264_ioctls(fd)) {
@@ -136,17 +132,15 @@ void RTSPStreamServer::get_v4l2_devices_info()
                         continue;
                     }
 
-                    // printf("%dx%d\n",
-                    //         frmsize.discrete.width,
-                    //         frmsize.discrete.height);
-
                     frmival.pixel_format = fmt.pixelformat;
                     frmival.width = frmsize.discrete.width;
                     frmival.height = frmsize.discrete.height;
 
                     for (frmival.index = 0; ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) >= 0; frmival.index++) {
                         int framerate  = frmival.discrete.denominator;
-                        // printf("%d\n", framerate);
+                        // For simplicity in maintenance, we only support 240p, 480p
+                        // and 720p. If a camera supports a resolution we use a bitmask
+                        // for saving its capabilities as it greatly simplifies our IPC
                         switch (preset) {
                         case FRAME_320x240:
                             if (framerate == 15) {
@@ -179,6 +173,8 @@ void RTSPStreamServer::get_v4l2_devices_info()
                             ;
                         }
                     }
+                // The PiCam doesn't list the resolutions explicitly, so we have
+                // to guess its capabilities
                 } else if (frmsize.type == V4L2_FRMSIZE_TYPE_STEPWISE) {
                     // How do I get the framerates for stepwise cams?
                     info.frame_property_bitmask |= (1 << VIDEO_320x240x15);

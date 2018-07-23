@@ -33,6 +33,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
 
     string launch_string;
 
+    // Set launch string according to the type of camera
     switch (camera_type) {
     case RAW_CAM:
         launch_string = "v4l2src name=src device=" + device +
@@ -70,6 +71,47 @@ void RTSPAdaptiveStreaming::init_media_factory()
     gst_rtsp_mount_points_add_factory(mounts, uri.c_str(), media_factory);
     g_signal_connect(media_factory, "media-constructed", G_CALLBACK(static_media_constructed_callback), this);
     g_object_unref(mounts);
+}
+
+
+void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
+{
+    GstElement* element;
+    GstElement* parent;
+    GList* list;
+    GList* list_itr;
+
+    element = gst_rtsp_media_get_element(media);
+    parent = (GstElement*)gst_object_get_parent(GST_OBJECT(element));
+    multi_udp_sink = nullptr;
+
+    g_signal_connect(parent, "deep-element-added", G_CALLBACK(static_deep_callback), this);
+
+    string str;
+    list = GST_BIN_CHILDREN(parent);
+
+    for (list_itr = list; list_itr != nullptr; list_itr = list_itr->next) {
+        element = (GstElement*)list_itr->data;
+        str = gst_element_get_name(element);
+        g_warning("element name = %s", str.c_str());
+
+        if (str.find("bin") != std::string::npos || str.find("pipeline") != std::string::npos) {
+            pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+        }
+        if (str.find("rtpbin") != std::string::npos) {
+            rtpbin = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+        }
+    }
+
+    if (get_element_references()) {
+        g_warning("Elements referenced!");
+    } else {
+        g_warning("Some elements not referenced");
+    }
+
+    set_resolution(ResolutionPresets::LOW);
+    add_rtpbin_probes();
+    media_prepared = true;
 }
 
 void RTSPAdaptiveStreaming::static_media_constructed_callback(GstRTSPMediaFactory *media_factory,
@@ -114,46 +156,7 @@ void RTSPAdaptiveStreaming::deep_callback(GstBin* bin,
     }
 }
 
-void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
-{
-    GstElement* element;
-    GstElement* parent;
-    GList* list;
-    GList* list_itr;
-
-    element = gst_rtsp_media_get_element(media);
-    parent = (GstElement*)gst_object_get_parent(GST_OBJECT(element));
-    multi_udp_sink = nullptr;
-
-    g_signal_connect(parent, "deep-element-added", G_CALLBACK(static_deep_callback), this);
-
-    string str;
-    list = GST_BIN_CHILDREN(parent);
-
-    for (list_itr = list; list_itr != nullptr; list_itr = list_itr->next) {
-        element = (GstElement*)list_itr->data;
-        str = gst_element_get_name(element);
-        g_warning("element name = %s", str.c_str());
-
-        if (str.find("bin") != std::string::npos || str.find("pipeline") != std::string::npos) {
-            pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
-        }
-        if (str.find("rtpbin") != std::string::npos) {
-            rtpbin = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
-        }
-    }
-
-    if (get_element_references()) {
-        g_warning("Elements referenced!");
-    } else {
-        g_warning("Some elements not referenced");
-    }
-
-    set_resolution(ResolutionPresets::LOW);
-    add_rtpbin_probes();
-    media_prepared = true;
-}
-
+// Called once the client has disconnected, allowing us to clean up the stream
 void RTSPAdaptiveStreaming::media_unprepared_callback(GstRTSPMedia* media)
 {
     file_recorder.disable_recorder();
@@ -164,6 +167,81 @@ void RTSPAdaptiveStreaming::media_unprepared_callback(GstRTSPMedia* media)
     gst_object_unref(rtpbin);
 
     g_warning("Stream disconnected!");
+}
+
+GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad,
+        GstPadProbeInfo* info,
+        gpointer data)
+{
+    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    return ptr->probe_block_callback(pad, info);
+}
+
+GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPadProbeInfo* info)
+{
+    // pad is blocked, so it's ok to unlink
+    file_recorder.disable_recorder();
+    g_warning("Pad Removed");
+    return GST_PAD_PROBE_REMOVE;
+}
+
+GstPadProbeReturn RTSPAdaptiveStreaming::static_rtcp_callback(GstPad* pad,
+        GstPadProbeInfo* info,
+        gpointer data)
+{
+    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    return ptr->rtcp_callback(pad, info);
+}
+
+// On receiving an RTCP packet, we forward it to the QoSEstimator for extracting
+// the data and generating the QoSReport
+GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeInfo* info)
+{
+    // g_warning("H264 rate - %d", h264_bitrate);
+    GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
+    if (buf != nullptr) {
+        GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
+        rtcp_buffer->buffer = nullptr;
+        gst_rtcp_buffer_map(buf, GST_MAP_READ, rtcp_buffer);
+        GstRTCPPacket *packet = (GstRTCPPacket*)malloc(sizeof(GstRTCPPacket));
+        gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
+        //same buffer can have an SDES and an RTCP pkt
+        while (more) {
+            qos_estimator.handle_rtcp_packet(packet);
+            if (current_quality == AUTO_PRESET && gst_rtcp_packet_get_type(packet) == GST_RTCP_TYPE_RR) {
+                adapt_stream();
+            }
+            more = gst_rtcp_packet_move_to_next(packet);
+        }
+        free(rtcp_buffer);
+        free(packet);
+    }
+    return GST_PAD_PROBE_OK;
+}
+
+GstPadProbeReturn RTSPAdaptiveStreaming::static_payloader_callback(GstPad* pad,
+        GstPadProbeInfo* info,
+        gpointer data)
+{
+    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    return ptr->payloader_callback(pad, info);
+}
+
+// We measure the size of every buffer on the rtph264payloader to get the encoding
+// bitrate estimate
+GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadProbeInfo* info)
+{
+    guint32 buffer_size;
+    guint64 bytes_sent;
+    GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
+    if (buf != nullptr) {
+        buffer_size = gst_buffer_get_size(buf);
+        if (multi_udp_sink) {
+            g_object_get(multi_udp_sink, "bytes-served", &bytes_sent, NULL);
+        }
+        qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
+    }
+    return GST_PAD_PROBE_OK;
 }
 
 bool RTSPAdaptiveStreaming::get_element_references()
@@ -227,22 +305,6 @@ bool RTSPAdaptiveStreaming::get_element_references()
     return false;
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad,
-        GstPadProbeInfo* info,
-        gpointer data)
-{
-    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
-    return ptr->probe_block_callback(pad, info);
-}
-
-GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPadProbeInfo* info)
-{
-    // pad is blocked, so it's ok to unlink
-    file_recorder.disable_recorder();
-    g_warning("Pad Removed");
-    return GST_PAD_PROBE_REMOVE;
-}
-
 void RTSPAdaptiveStreaming::add_rtpbin_probes()
 {
     GstPad* rtcp_rr_pad;
@@ -257,11 +319,6 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes()
     gst_pad_add_probe(rtcp_sr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
     gst_object_unref(rtcp_sr_pad);
 
-    // GstPad* encoder_pad;
-    // encoder_pad = gst_element_get_static_pad(h264_encoder, "sink");
-    // gst_pad_add_probe(encoder_pad, GST_PAD_PROBE_TYPE_BUFFER, static_encoder_callback, this, NULL);
-    // gst_object_unref(encoder_pad);
-
     payloader_pad = gst_element_get_static_pad(rtph264_payloader, "sink");
     gst_pad_add_probe(payloader_pad, GST_PAD_PROBE_TYPE_BUFFER, static_payloader_callback, this, NULL);
     gst_object_unref(payloader_pad);
@@ -272,64 +329,8 @@ bool RTSPAdaptiveStreaming::get_media_prepared()
     return media_prepared;
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::static_rtcp_callback(GstPad* pad,
-        GstPadProbeInfo* info,
-        gpointer data)
-{
-    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
-    return ptr->rtcp_callback(pad, info);
-}
-
-GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeInfo* info)
-{
-    // g_warning("H264 rate - %d", h264_bitrate);
-    GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
-    if (buf != nullptr) {
-        GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
-        rtcp_buffer->buffer = nullptr;
-        gst_rtcp_buffer_map(buf, GST_MAP_READ, rtcp_buffer);
-        GstRTCPPacket *packet = (GstRTCPPacket*)malloc(sizeof(GstRTCPPacket));
-        gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
-        //same buffer can have an SDES and an RTCP pkt
-        while (more) {
-            qos_estimator.handle_rtcp_packet(packet);
-            if (current_quality == AUTO_PRESET && gst_rtcp_packet_get_type(packet) == GST_RTCP_TYPE_RR) {
-                adapt_stream();
-            }
-            more = gst_rtcp_packet_move_to_next(packet);
-        }
-        free(rtcp_buffer);
-        free(packet);
-    }
-    return GST_PAD_PROBE_OK;
-}
-
-GstPadProbeReturn RTSPAdaptiveStreaming::static_payloader_callback(GstPad* pad,
-        GstPadProbeInfo* info,
-        gpointer data)
-{
-    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
-    return ptr->payloader_callback(pad, info);
-}
-
-GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadProbeInfo* info)
-{
-    guint32 buffer_size;
-    guint64 bytes_sent;
-    GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
-    if (buf != nullptr) {
-        buffer_size = gst_buffer_get_size(buf);
-        if (multi_udp_sink) {
-            g_object_get(multi_udp_sink, "bytes-served", &bytes_sent, NULL);
-        }
-        qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
-    }
-    return GST_PAD_PROBE_OK;
-}
-
 void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
 {
-    g_warning("RecordStream %u", _record_stream);
     if (_record_stream) {
         file_recorder.init_file_recorder(pipeline, tee);
     } else {
@@ -342,9 +343,11 @@ void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
     }
 }
 
+// On changing the resolution while the CC is recording, we stop the recording,
+// to avoid any serious concurrency issues which can otherwise occur
 void RTSPAdaptiveStreaming::set_device_properties(int quality, bool _record_stream)
 {
-    // we can't have the capsfilter changing when recording from the CC, so we disable it for AUTO mode
+    // We can't have the capsfilter changing when recording from the CC, so we disable it for AUTO mode
     if (quality == AUTO_PRESET && camera_type != UVC_CAM) {
         record_stream(false);
         change_quality_preset(quality);
