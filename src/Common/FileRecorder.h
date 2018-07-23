@@ -30,7 +30,7 @@ public:
     GstPad* tee_file_pad;
     GstPad* queue_pad;
 
-    bool stop_recording;
+    // bool stop_recording;
 
     FileRecorder();
     bool init_file_recorder(GstElement* _pipeline, GstElement* _tee);

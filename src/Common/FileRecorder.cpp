@@ -3,7 +3,6 @@
 FileRecorder::FileRecorder()
 {
     recording = false;
-    stop_recording = false;
     tee_file_pad = nullptr;
     queue_pad = nullptr;
     tee = nullptr;
@@ -78,7 +77,6 @@ bool FileRecorder::disable_recorder()
     gst_object_unref(tee_file_pad);
     gst_object_unref(queue_pad);
 
-    stop_recording = false;
     tee_file_pad = nullptr;
     queue_pad = nullptr;
 

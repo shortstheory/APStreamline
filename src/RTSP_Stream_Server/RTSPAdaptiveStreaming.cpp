@@ -15,7 +15,6 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
     rtsp_server(server),
     media_prepared(false)
 {
-    file_recorder.stop_recording = false;
     current_quality = quality;
     init_media_factory();
 }
@@ -289,7 +288,6 @@ void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
         file_recorder.init_file_recorder(pipeline, tee);
     } else {
         if (file_recorder.tee_file_pad) {
-            file_recorder.stop_recording = true;
             gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
                               static_probe_block_callback, this, NULL);
         } else {
@@ -312,11 +310,6 @@ void RTSPAdaptiveStreaming::set_device_properties(int quality, bool _record_stre
         record_stream(_record_stream);
     } else {
         record_stream(false);
-        // while (file_recorder.stop_recording) {
-        // // this is dangerous, the stream deactiviating won't reset the callback either
-        //     g_warning("Waiting for recorder!");
-        // }
         change_quality_preset(quality);
-        // record_stream(_record_stream);
     }
 }
