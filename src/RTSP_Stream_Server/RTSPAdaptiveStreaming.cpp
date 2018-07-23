@@ -298,7 +298,9 @@ GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadP
 
 void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
 {
-    while (file_recorder.stop_recording);
+    while (file_recorder.stop_recording) {
+        g_warning("Waiting for recorder!");
+    }
     g_warning("RecordStream %u", _record_stream);
     if (_record_stream) {
         file_recorder.init_file_recorder(pipeline, tee);
