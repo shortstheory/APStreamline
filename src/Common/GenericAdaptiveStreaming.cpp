@@ -292,7 +292,7 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
     } else {
         string caps_filter_string;
         GstCaps* src_caps;
-        guint32 h264_bitrate;
+        // guint32 h264_bitrate;
         if (quality == VIDEO_320x240x15 || quality == VIDEO_320x240x30 || quality == VIDEO_320x240x60) {
             h264_bitrate = LOW_QUAL_BITRATE;
         } else if (quality == VIDEO_640x480x15 || quality == VIDEO_640x480x30 || quality == VIDEO_640x480x60) {
@@ -303,7 +303,7 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
 
         if (camera_type == CameraType::RAW_CAM) {
             // set it to x264enc defaults
-            g_object_set(G_OBJECT(h264_encoder), "bitrate", 2048, NULL);
+            g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate, NULL);
 
             caps_filter_string = RAW_CAPS_FILTERS[current_quality];
             src_caps = gst_caps_from_string(caps_filter_string.c_str());
@@ -316,7 +316,7 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
                 v4l2_control i_frame_interval;
 
                 bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
-                bitrate_ctrl.value = 2000000;
+                bitrate_ctrl.value = h264_bitrate*1000;
 
                 i_frame_interval.id = V4L2_CID_MPEG_VIDEO_H264_I_PERIOD;
                 i_frame_interval.value = 60;

@@ -7,9 +7,9 @@
 PARTIAL:
 * Do APSync integration
 * get framerates for stepwise cams
-* Work on UVCH264 cams eg C920
 
 DONE:
+* Work on UVCH264 cams eg C920
 * fix the issue with callbacks execution order in file recorder
 * struct QoSReport instead of class, looks pretty silly as a class
 * Update README.md
