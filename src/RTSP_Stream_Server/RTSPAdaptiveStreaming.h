@@ -33,8 +33,9 @@ private:
     bool get_element_references();
 
     GstPadProbeReturn rtcp_callback(GstPad* pad, GstPadProbeInfo* info);
-    GstPadProbeReturn payloader_callback(GstPad* pad, GstPadProbeInfo* info);
     GstPadProbeReturn probe_block_callback(GstPad* pad, GstPadProbeInfo* info);
+    GstPadProbeReturn encoder_callback(GstPad* pad, GstPadProbeInfo* info);
+    GstPadProbeReturn payloader_callback(GstPad* pad, GstPadProbeInfo* info);
 
     static void static_media_constructed_callback(GstRTSPMediaFactory *media_factory,
             GstRTSPMedia *media,
@@ -46,6 +47,9 @@ private:
             GstPadProbeInfo* info,
             gpointer data);
     static GstPadProbeReturn static_rtcp_callback(GstPad* pad,
+            GstPadProbeInfo* info,
+            gpointer data);
+    static GstPadProbeReturn static_encoder_callback(GstPad* pad,
             GstPadProbeInfo* info,
             gpointer data);
     static GstPadProbeReturn static_payloader_callback(GstPad* pad,
