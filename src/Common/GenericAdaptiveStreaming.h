@@ -42,9 +42,6 @@ private:
     void set_encoding_bitrate(guint32 bitrate);
     void set_state_constants();
 
-    void increase_resolution();
-    void decrease_resolution();
-
     void improve_quality();
     void degrade_quality();
 

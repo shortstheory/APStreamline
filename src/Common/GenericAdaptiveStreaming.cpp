@@ -108,7 +108,7 @@ void GenericAdaptiveStreaming::adapt_stream()
     } else {
         network_state = NetworkState::CONGESTION;
         successive_transmissions = 0;
-        decrease_resolution();
+        degrade_quality();
     }
 }
 
@@ -198,34 +198,6 @@ void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
         src_caps = gst_caps_from_string(caps_filter_string.c_str());
         g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
         gst_caps_unref(src_caps);
-    }
-}
-
-void GenericAdaptiveStreaming::increase_resolution()
-{
-    switch (current_res) {
-    case ResolutionPresets::LOW:
-        set_resolution(ResolutionPresets::MED);
-        break;
-    case ResolutionPresets::MED:
-        set_resolution(ResolutionPresets::HIGH);
-        break;
-    default:
-        break;
-    }
-}
-
-void GenericAdaptiveStreaming::decrease_resolution()
-{
-    switch (current_res) {
-    case ResolutionPresets::MED:
-        set_resolution(ResolutionPresets::LOW);
-        break;
-    case ResolutionPresets::HIGH:
-        set_resolution(ResolutionPresets::MED);
-        break;
-    default:
-        break;
     }
 }
 
