@@ -87,6 +87,6 @@ bool FileRecorder::disable_recorder()
 
 bool FileRecorder::get_recording()
 {
-    g_warning("RecVal %d", recording);
+    g_warning("RecValGET %d", recording);
     return recording;
 }

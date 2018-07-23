@@ -48,13 +48,13 @@ void ipc_loop(RTSPStreamServer* streamer)
 
     while (client_fd = accept(socket_fd, NULL, NULL)) {
         IPCMessageHandler message_handler(client_fd, streamer);
-        g_warning("Connection accepted!");
+        // g_warning("Connection accepted!");
         while ((bytes_read=read(client_fd,buf,sizeof(buf))) > 0) {
             buf[bytes_read] = '\0';
             message_handler.process_msg(buf);
             printf("read %u bytes: %s\n", bytes_read, buf);
         }
-        g_warning("Disconnected from loop!");
+        // g_warning("Disconnected from loop!");
     }
 }
 

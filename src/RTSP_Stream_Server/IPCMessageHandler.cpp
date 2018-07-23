@@ -38,7 +38,7 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     string port;
     port = rtsp_stream_server->get_port();
 
-    g_warning("IP %s PORT %s", ip_address.c_str(), port.c_str());
+    // g_warning("IP %s PORT %s", ip_address.c_str(), port.c_str());
 
     sprintf(info_buffer, "{"
             "\"ip\": \"%s\", "
