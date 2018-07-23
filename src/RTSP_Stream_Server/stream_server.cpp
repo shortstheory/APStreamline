@@ -15,8 +15,8 @@
 
 char socket_path[80] = "/tmp/rtsp_server.sock";
 RTSPStreamServer* rtsp_stream_server;
-// char socket_path[80] = "../../rtsp_server";
 
+// Separate thread for managing the IPC with the APWeb server
 void ipc_loop(RTSPStreamServer* streamer)
 {
     struct sockaddr_un addr;
@@ -43,18 +43,13 @@ void ipc_loop(RTSPStreamServer* streamer)
         return;
     }
 
-    // if ((client_fd = accept(socket_fd, NULL, NULL)) == -1) {
-    //     g_warning("Connection failed");
-
     while ((client_fd = accept(socket_fd, NULL, NULL))) {
         IPCMessageHandler message_handler(client_fd, streamer);
-        // g_warning("Connection accepted!");
         while ((bytes_read=read(client_fd,buf,sizeof(buf))) > 0) {
             buf[bytes_read] = '\0';
             message_handler.process_msg(buf);
             printf("read %u bytes: %s\n", bytes_read, buf);
         }
-        // g_warning("Disconnected from loop!");
     }
 }
 
@@ -90,14 +85,16 @@ string get_ip_address(string interface = "lo")
     return string("127.0.0.1");
 }
 
+// SIGTERM handler so we can clean up before destroying the stream
 void terminate_process(int signum)
 {
-    // cerr << "Process terminated" << signum << endl;
-    fprintf(stderr, "Process terminated %d\n", signum);
+    fprintf(stderr, "\nProcess terminated %d\n", signum);
     free(rtsp_stream_server);
     exit(1);
 }
 
+// First argument is used as the network interface to use for the Stream Server
+// e.g. ./stream_server eth0
 int main(int argc, char *argv[])
 {
     struct sigaction action;
