@@ -59,6 +59,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
         break;
     case H264_CAM:
         launch_string = "v4l2src name=src device=" + device +
+                        " ! queue"
                         " ! capsfilter name=capsfilter caps=video/x-h264,width=320,height=240,framerate=30/1"
                         " ! tee name=tee_element tee_element."
                         " ! queue"
