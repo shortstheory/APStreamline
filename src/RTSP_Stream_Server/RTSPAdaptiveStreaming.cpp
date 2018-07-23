@@ -92,6 +92,27 @@ void RTSPAdaptiveStreaming::static_media_unprepared_callback(GstRTSPMedia* media
     ptr->media_unprepared_callback(media);
 }
 
+void RTSPAdaptiveStreaming::static_deep_callback(GstBin* bin,
+                                                 GstBin* sub_bin,
+                                                 GstElement* element,
+                                                 gpointer data)
+{
+    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    ptr->deep_callback(bin, sub_bin, element);
+}
+
+void RTSPAdaptiveStreaming::deep_callback(GstBin* bin,
+                                          GstBin* sub_bin,
+                                          GstElement* element)
+{
+    string element_name;
+    element_name = gst_element_get_name(element);
+    if (element_name.find("multiudpsink") != std::string::npos && !multi_udp_sink) {
+        g_warning("Identified %s", element_name.c_str());
+        multi_udp_sink = element;
+    }
+}
+
 void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
 {
     GstElement* element;
@@ -101,8 +122,9 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
 
     element = gst_rtsp_media_get_element(media);
     parent = (GstElement*)gst_object_get_parent(GST_OBJECT(element));
-
     multi_udp_sink = nullptr;
+
+    g_signal_connect(parent, "deep-element-added", G_CALLBACK(static_deep_callback), this);
 
     string str;
     list = GST_BIN_CHILDREN(parent);
@@ -117,10 +139,6 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         }
         if (str.find("rtpbin") != std::string::npos) {
             rtpbin = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
-        }
-        if (str.find("multiudpsink") != std::string::npos) {
-            g_warning("Identified %s", str.c_str());
-            multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
         }
     }
 
@@ -144,10 +162,6 @@ void RTSPAdaptiveStreaming::media_unprepared_callback(GstRTSPMedia* media)
     gst_element_set_state(rtpbin, GST_STATE_NULL);
     gst_object_unref(rtpbin);
 
-    if (multi_udp_sink) {
-        gst_element_set_state(multi_udp_sink, GST_STATE_NULL);
-        gst_object_unref(multi_udp_sink);
-    }
     g_warning("Stream disconnected!");
 }
 
@@ -247,11 +261,9 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes()
     // gst_pad_add_probe(encoder_pad, GST_PAD_PROBE_TYPE_BUFFER, static_encoder_callback, this, NULL);
     // gst_object_unref(encoder_pad);
 
-    // if (multi_udp_sink) {
     payloader_pad = gst_element_get_static_pad(rtph264_payloader, "sink");
     gst_pad_add_probe(payloader_pad, GST_PAD_PROBE_TYPE_BUFFER, static_payloader_callback, this, NULL);
     gst_object_unref(payloader_pad);
-    // }
 }
 
 bool RTSPAdaptiveStreaming::get_media_prepared()
@@ -291,14 +303,6 @@ GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeI
     return GST_PAD_PROBE_OK;
 }
 
-GstPadProbeReturn RTSPAdaptiveStreaming::static_encoder_callback(GstPad* pad,
-        GstPadProbeInfo* info,
-        gpointer data)
-{
-    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
-    return ptr->encoder_callback(pad, info);
-}
-
 GstPadProbeReturn RTSPAdaptiveStreaming::static_payloader_callback(GstPad* pad,
         GstPadProbeInfo* info,
         gpointer data)
@@ -307,34 +311,19 @@ GstPadProbeReturn RTSPAdaptiveStreaming::static_payloader_callback(GstPad* pad,
     return ptr->payloader_callback(pad, info);
 }
 
-// FIXME: UDP SINK NO LONGER EXISTS!!!
-GstPadProbeReturn RTSPAdaptiveStreaming::encoder_callback(GstPad* pad, GstPadProbeInfo* info)
-{
-    guint32 buffer_size;
-    GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
-    if (buf != nullptr) {
-        buffer_size = gst_buffer_get_size(buf);
-        g_warning("x264 - %u", buffer_size);
-        // if (multi_udp_sink) {
-        //     g_object_get(multi_udp_sink, "bytes-served", &bytes_sent, NULL);
-        //     qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
-        // }
-    }
-    return GST_PAD_PROBE_OK;
-}
-
 GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadProbeInfo* info)
 {
     guint32 buffer_size;
+    guint64 bytes_sent;
     GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buf != nullptr) {
         buffer_size = gst_buffer_get_size(buf);
-        // g_warning("pay0 - %u", buffer_size);
-        qos_estimator.calculate_bitrates(0, buffer_size);
+        if (multi_udp_sink) {
+            g_object_get(multi_udp_sink, "bytes-served", &bytes_sent, NULL);
+            g_warning("BYTESSERVED %lu", bytes_sent);
+        }
+        qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
 
-        // if (multi_udp_sink) {
-        //     g_object_get(multi_udp_sink, "bytes-served", &bytes_sent, NULL);
-        // }
     }
     return GST_PAD_PROBE_OK;
 }

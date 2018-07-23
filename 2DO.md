@@ -24,6 +24,8 @@ SKIP:
 * Put V4L2 info fields into RTSPAdaptiveStreaming
 
 NOTES:
+x264enc gives huge buffers but they can't be used for any estimates
+
 c920: resolutions can't be switched no matter what i do, using a capsfilter element doesn't work at all and defaults to a 1080p stream, so idk!?!
 
 it's safe to unlink the pads on the cb of a blocking probe
