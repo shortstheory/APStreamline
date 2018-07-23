@@ -29,28 +29,28 @@ void QoSEstimator::handle_rtcp_packet(GstRTCPPacket* packet)
 
 void QoSEstimator::process_rr_packet(GstRTCPPacket* packet)
 {
-    guint64 rr_time_delta_ms;
-    guint64 curr_time_ms;
-    gfloat bandwidth;
+    // guint64 rr_time_delta_ms;
+    // gfloat bandwidth;
+    // gfloat curr_rtt;
+    // guint32 packet_interval;
+    guint64 curr_time_ms = 0;
 
     guint32 exthighestseq;
     guint32 jitter;
     guint32 lsr;
     guint32 dlsr;
-    guint32 packet_interval;
     guint32 ssrc;
     gint32 packetslost;
 
     guint8 fractionlost;
     gfloat curr_buffer_occ = 0;
-    gfloat curr_rtt;
 
     gst_rtcp_packet_get_rb(packet, 0, &ssrc, &fractionlost,
                            &packetslost, &exthighestseq, &jitter, &lsr, &dlsr);
     timeval tv;
     gettimeofday(&tv, NULL);
     // rtt calc
-    curr_rtt = update_rtt(lsr, dlsr);
+    // curr_rtt = update_rtt(lsr, dlsr);
     prev_rr_time = curr_time_ms;
     qos_report = QoSReport(fractionlost, estimated_bitrate, encoding_bitrate, smooth_rtt, curr_buffer_occ);
 
