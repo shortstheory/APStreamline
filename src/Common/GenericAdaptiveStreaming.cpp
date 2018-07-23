@@ -220,18 +220,19 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
 void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
 {
-    string caps_filter_string;
-    caps_filter_string = video_presets[setting];
-    set_encoding_bitrate(bitrate_presets[setting]);
-    g_warning("RES CHANGE! %d %s", setting, caps_filter_string.c_str());
+    if (camera_type != UVC_CAM) {
+        string caps_filter_string;
+        caps_filter_string = video_presets[setting];
+        set_encoding_bitrate(bitrate_presets[setting]);
+        g_warning("RES CHANGE! %d %s", setting, caps_filter_string.c_str());
 
-    current_res = setting;
-    GstCaps* src_caps;
-    src_caps = gst_caps_from_string(caps_filter_string.c_str());
+        current_res = setting;
 
-    g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
-
-    gst_caps_unref(src_caps);
+        GstCaps* src_caps;
+        src_caps = gst_caps_from_string(caps_filter_string.c_str());
+        g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
+        gst_caps_unref(src_caps);
+    }
 }
 
 void GenericAdaptiveStreaming::increase_resolution()
