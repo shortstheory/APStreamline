@@ -315,10 +315,12 @@ void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
     }
 }
 
+// several edge cases come up for streaming
+
 void RTSPAdaptiveStreaming::set_device_properties(int quality, bool _record_stream)
 {
     // we can't have the capsfilter changing when recording from the CC, so we disable it for AUTO mode
-    if (quality == AUTO_PRESET) {
+    if (quality == AUTO_PRESET && camera_type != UVC_CAM) {
         record_stream(false);
         change_quality_preset(quality);
         return;
