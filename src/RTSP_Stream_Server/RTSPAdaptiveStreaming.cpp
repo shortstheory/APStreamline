@@ -107,6 +107,7 @@ void RTSPAdaptiveStreaming::deep_callback(GstBin* bin,
 {
     string element_name;
     element_name = gst_element_get_name(element);
+    // One udpsink takes care of RTCP packets and the other RTP
     if (element_name.find("multiudpsink") != std::string::npos && !multi_udp_sink) {
         g_warning("Identified %s", element_name.c_str());
         multi_udp_sink = element;
@@ -320,10 +321,8 @@ GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadP
         buffer_size = gst_buffer_get_size(buf);
         if (multi_udp_sink) {
             g_object_get(multi_udp_sink, "bytes-served", &bytes_sent, NULL);
-            g_warning("BYTESSERVED %lu", bytes_sent);
         }
         qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
-
     }
     return GST_PAD_PROBE_OK;
 }
@@ -342,8 +341,6 @@ void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
         }
     }
 }
-
-// several edge cases come up for streaming
 
 void RTSPAdaptiveStreaming::set_device_properties(int quality, bool _record_stream)
 {
