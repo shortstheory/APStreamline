@@ -48,6 +48,8 @@ void RTSPStreamServer::get_v4l2_devices()
         }
     }
     closedir(dp);
+    // To make mount points and the device names in the same order
+    reverse(device_list.begin(), device_list.end());
 }
 
 bool RTSPStreamServer::check_h264_ioctls(int fd)
