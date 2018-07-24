@@ -1,5 +1,8 @@
 2DO:
-
+RTX support: 
+<thaytan> shortstheory, the   gst_rtsp_media_factory_set_profiles (factory, GST_RTSP_PROFILE_AVPF); line and the gst_rtsp_media_factory_set_retransmission_time (factory, 400 * GST_MSECOND) one
+<shortstheory> cool thanks!
+<thaytan> you need to use the AVPF profile with F = Feedback
 * what to do with UDPStreaming?
 * UDPStreaming handle args better
 
