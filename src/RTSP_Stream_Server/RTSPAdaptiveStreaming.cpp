@@ -85,8 +85,15 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     parent = (GstElement*)gst_object_get_parent(GST_OBJECT(element));
     multi_udp_sink = nullptr;
 
-    g_signal_connect(parent, "deep-element-added", G_CALLBACK(static_deep_callback), this);
+    guint major;
+    guint minor;
+    guint micro;
+    guint nano;
+    gst_version(&major, &minor, &micro, &nano);
 
+    if (minor >= 14) {
+        g_signal_connect(parent, "deep-element-added", G_CALLBACK(static_deep_callback), this);
+    }
     string str;
     list = GST_BIN_CHILDREN(parent);
 
@@ -100,6 +107,14 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         }
         if (str.find("rtpbin") != std::string::npos) {
             rtpbin = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+        }
+
+        // Older gstreamer versions on the ARM boards setup multiudpsink in a different place
+        if (minor < 14) {
+            if (str.find("multiudpsink") != std::string::npos) {
+                g_warning("Identified %s", str.c_str());
+                multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+            }
         }
     }
 
