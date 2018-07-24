@@ -165,7 +165,7 @@ void RTSPAdaptiveStreaming::media_unprepared_callback(GstRTSPMedia* media)
 
     gst_element_set_state(rtpbin, GST_STATE_NULL);
     gst_object_unref(rtpbin);
-
+    current_quality = AUTO_PRESET;
     g_warning("Stream disconnected!");
 }
 
@@ -265,6 +265,8 @@ bool RTSPAdaptiveStreaming::get_element_references()
                              "tune", 0x00000004,
                              "threads", 4,
                              "key-int-max", I_FRAME_INTERVAL,
+                             // intra-refresh breaks an iframe over multiple frames
+                             "intra-refresh", TRUE,
                              NULL);
                 return true;
             } else {

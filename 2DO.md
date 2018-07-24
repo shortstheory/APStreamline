@@ -2,13 +2,13 @@
 
 * what to do with UDPStreaming?
 * UDPStreaming handle args better
-* Write comments in headers
 
 PARTIAL:
 * Do APSync integration
 * get framerates for stepwise cams
 
 DONE:
+* Write comments in headers
 * Work on UVCH264 cams eg C920
 * fix the issue with callbacks execution order in file recorder
 * struct QoSReport instead of class, looks pretty silly as a class
@@ -22,6 +22,11 @@ SKIP:
 * Add licenses
 * what do I do with ntptime?
 * Put V4L2 info fields into RTSPAdaptiveStreaming
+
+DIRTY HACKS:
+* guestimated the resolutions of stepwise cameras
+* disabled file recorder for h264 cameras
+* disabled res switching for UVC cameras (we DONT want EOS on switching, no matter what)
 
 NOTES:
 x264enc gives huge buffers but they can't be used for any estimates
