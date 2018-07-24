@@ -1,0 +1,4 @@
+gst-launch-1.0 v4l2src name=src device=/dev/video1 ! capsfilter name=capsfilter caps=image/jpeg,width=1280,height=720,framerate=30/1 ! jpegdec ! videoconvert ! omxh264enc control-rate=2 target-bitrate=2000000 ! tee name=tee_element tee_element. ! queue ! h264parse ! rtph264pay name=pay0 ! udpsink host=10.42.0.1 port=5000
+
+gst-launch-1.0 -v udpsrc caps="application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264,payload=96" port=5000 ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink
+
