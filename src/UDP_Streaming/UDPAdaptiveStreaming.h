@@ -25,6 +25,7 @@ private:
     bool init_rtp_elements();
     bool link_all_elements();
 
+    void pipeline_add_elements();
     void init_rtp_element_properties();
     void pipeline_add_rtp_elements();
     void rtcp_callback(GstElement* src, GstBuffer *buf);

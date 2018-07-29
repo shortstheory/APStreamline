@@ -70,7 +70,6 @@ public:
     GenericAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM);
 
     virtual ~GenericAdaptiveStreaming();
-    void pipeline_add_elements();
     void change_quality_preset(int quality);
     bool record_stream(bool _record_stream);
     void set_resolution(ResolutionPresets setting);

@@ -36,20 +36,6 @@ GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
     gst_object_unref(pipeline);
 }
 
-void GenericAdaptiveStreaming::pipeline_add_elements()
-{
-    gst_bin_add_many(GST_BIN(pipeline),
-                     v4l2_src,src_capsfilter,
-                     text_overlay,
-                     rtph264_payloader,
-                     h264_parser,
-                     NULL);
-    if (camera_type == CameraType::RAW_CAM) {
-        gst_bin_add_many(GST_BIN(pipeline), h264_encoder, videoconvert, NULL);
-    } else if (camera_type == CameraType::H264_CAM) {
-    }
-}
-
 bool GenericAdaptiveStreaming::play_pipeline()
 {
     return gst_element_set_state(pipeline, GST_STATE_PLAYING);

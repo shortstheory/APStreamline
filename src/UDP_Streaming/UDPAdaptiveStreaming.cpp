@@ -63,6 +63,21 @@ void UDPAdaptiveStreaming::init_element_properties()
     }
 }
 
+
+void UDPAdaptiveStreaming::pipeline_add_elements()
+{
+    gst_bin_add_many(GST_BIN(pipeline),
+                     v4l2_src,src_capsfilter,
+                     text_overlay,
+                     rtph264_payloader,
+                     h264_parser,
+                     NULL);
+    if (camera_type == CameraType::RAW_CAM) {
+        gst_bin_add_many(GST_BIN(pipeline), h264_encoder, videoconvert, NULL);
+    } else if (camera_type == CameraType::H264_CAM) {
+    }
+}
+
 bool UDPAdaptiveStreaming::init_rtp_elements()
 {
     rtpbin = gst_element_factory_make("rtpbin", NULL);
