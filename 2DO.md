@@ -1,4 +1,5 @@
 2DO:
+* remove debug stmts
 RTX support: 
 <thaytan> shortstheory, the   gst_rtsp_media_factory_set_profiles (factory, GST_RTSP_PROFILE_AVPF); line and the gst_rtsp_media_factory_set_retransmission_time (factory, 400 * GST_MSECOND) one
 <shortstheory> cool thanks!

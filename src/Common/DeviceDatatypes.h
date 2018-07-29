@@ -31,7 +31,8 @@ struct v4l2_info
 };
 
 // Gives QoS estimates to the Adaptive Streamer for acting upon
-struct QoSReport {
+struct QoSReport 
+{
     guint8 fraction_lost;
     gfloat estimated_bitrate;
     gfloat encoding_bitrate;
