@@ -70,7 +70,11 @@ void GenericAdaptiveStreaming::adapt_stream()
 {
     QoSReport qos_report;
     qos_report = qos_estimator.get_qos_report();
-    g_warning("QOSData - loss-%u udp-%f x264-%f rtt-%f", qos_report.fraction_lost, qos_report.estimated_bitrate, qos_report.encoding_bitrate, qos_report.rtt);
+    g_warning("QOSData - loss-%u udp-%f x264-%f rtt-%f", 
+              qos_report.fraction_lost,
+              qos_report.estimated_bitrate,
+              qos_report.encoding_bitrate,
+              qos_report.rtt);
 
     if (successive_transmissions >= SUCCESSFUL_TRANSMISSION) {
         network_state = NetworkState::STEADY;
@@ -232,7 +236,7 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
 
                 if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
                     ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1) {
-                    g_warning("ioctl fail :/");
+                    g_warning("IOCTL failed");
                 }
             }
             caps_filter_string = H264_CAPS_FILTERS[current_quality];
