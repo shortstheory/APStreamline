@@ -14,10 +14,9 @@
 #include "IPCMessageHandler.h"
 
 char socket_path[80] = "/tmp/rtsp_server.sock";
-RTSPStreamServer* rtsp_stream_server;
 
 // Separate thread for managing the IPC with the APWeb server
-void ipc_loop(RTSPStreamServer* streamer)
+void ipc_loop()
 {
     struct sockaddr_un addr;
     char buf[IPC_BUFFER_SIZE];
@@ -44,7 +43,7 @@ void ipc_loop(RTSPStreamServer* streamer)
     }
 
     while ((client_fd = accept(socket_fd, NULL, NULL))) {
-        IPCMessageHandler message_handler(client_fd, streamer);
+        IPCMessageHandler message_handler(client_fd, RTSPStreamServer::get_instance());
         while ((bytes_read=read(client_fd,buf,sizeof(buf))) > 0) {
             buf[bytes_read] = '\0';
             message_handler.process_msg(buf);
@@ -89,7 +88,7 @@ string get_ip_address(string interface = "lo")
 void terminate_process(int signum)
 {
     fprintf(stderr, "\nProcess terminated %d\n", signum);
-    free(rtsp_stream_server);
+    free(RTSPStreamServer::get_instance());
     exit(1);
 }
 
@@ -97,6 +96,8 @@ void terminate_process(int signum)
 // e.g. ./stream_server eth0
 int main(int argc, char *argv[])
 {
+    RTSPStreamServer* rtsp_stream_server;
+
     struct sigaction action;
     memset(&action, 0, sizeof(struct sigaction));
     action.sa_handler = terminate_process;
@@ -114,7 +115,7 @@ int main(int argc, char *argv[])
     rtsp_stream_server = RTSPStreamServer::get_instance(ip_addr, "8554");
     gst_rtsp_server_attach(rtsp_stream_server->get_server(), NULL);
 
-    thread t(&ipc_loop, rtsp_stream_server);
+    thread t(&ipc_loop);
     t.detach();
 
     g_main_loop_run(loop);

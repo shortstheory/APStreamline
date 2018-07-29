@@ -266,6 +266,14 @@ RTSPStreamServer* RTSPStreamServer::get_instance(string _ip_addr, string _port)
     return instance;
 }
 
+RTSPStreamServer* RTSPStreamServer::get_instance()
+{
+    if (initialised) {
+        return instance;
+    }
+    return nullptr;
+}
+
 RTSPStreamServer::~RTSPStreamServer()
 {
     fprintf(stderr, "Destructor called\n");

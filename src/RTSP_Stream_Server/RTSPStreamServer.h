@@ -41,6 +41,7 @@ private:
     ~RTSPStreamServer();
 public:
     static RTSPStreamServer* get_instance(string _ip_addr, string _port);
+    static RTSPStreamServer* get_instance();
     GstRTSPServer* get_server();
 
     void remove_stream(string device);
