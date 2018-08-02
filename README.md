@@ -81,31 +81,3 @@ Launch the RTSP stream server by running:
 `stream_server <interface>`
 
 The list of available network interfaces can be found by running `ifconfig`.
-
-### UDP Streaming (Currently Broken!)
-
-*Use this if you only need to stream from one camera at a time or your GCS doesn't support RTSP streaming*
-
-On installing `adaptive-streaming`, run it from the terminal as so:
-
-Software encoding - `adaptive_streaming /dev/video0 <RECEIVER_IP> raw`
-
-Hardware encoding (recommended for the Raspberry Pi) - `adaptive_streaming /dev/video0 <RECEIVER_IP> h264`
-
-For receiving the video stream, use the following `gst-launch` pipeline on the receiver:
-
-`gst-launch-1.0 -v rtpbin latency=0 name=rtpbin udpsrc caps="application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264,payload=96" port=5000 !  rtpbin.recv_rtp_sink_0 rtpbin. ! rtph264depay ! h264parse ! avdec_h264 ! autovideosink udpsrc port=5001 ! rtpbin.recv_rtcp_sink_0 rtpbin.send_rtcp_src_0 ! udpsink port=5001 sync=false async=false host=<SENDER_IP>`
-
-For APSync images with the CC on 10.0.1.128, you can directly run `./recv_apsync_video`.
-
-Typically, this `gst-launch` command should be run on the receiver before streaming the video from the companion computer.
-
-#### Troubleshooting
-
-Sometimes you might see:
-
-```
-** (adaptive_streaming:1358): CRITICAL **: gst_rtcp_packet_get_rb: assertion 'nth < packet->count' failed
-```
-
-printed on STDOUT when running `adaptive-streaming`. In this case, please check the `<SENDER_IP>` and  `<RECEIVER_IP>` in the above commands.
