@@ -85,6 +85,10 @@ void RTSPStreamServer::get_v4l2_devices_info()
             v4l2_frmsizeenum frmsize;
             v4l2_frmivalenum frmival;
 
+            memset(&fmt, 0, sizeof(fmt));
+            memset(&frmsize, 0, sizeof(frmsize));
+            memset(&frmival, 0, sizeof(frmival));
+
             int mjpg_index = -1;
             int h264_index = -1;
 
