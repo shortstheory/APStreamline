@@ -92,13 +92,10 @@ void RTSPStreamServer::get_v4l2_devices_info()
             fmt.type = type;
 
             while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
-                printf("%s\n", fmt.description);
                 if (!strcmp((char*)fmt.description, "Motion-JPEG")) {
-                    cout << "FOUND MJPEG";
                     mjpg_index = fmt.index;
                 }
                 if (!strcmp((char*)fmt.description, "H264") || !strcmp((char*)fmt.description, "H.264")) {
-                    cout << "FOUND H264!";
                     h264_index = fmt.index;
                 }
                 fmt.index++;
@@ -175,6 +172,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
                             ;
                         }
                     }
+
                 // The PiCam doesn't list the resolutions explicitly, so we have
                 // to guess its capabilities
                 } else if (frmsize.type == V4L2_FRMSIZE_TYPE_STEPWISE) {
@@ -194,7 +192,6 @@ void RTSPStreamServer::get_v4l2_devices_info()
                 }
             }
 
-            cout << "Cam Bitmask - " << info.frame_property_bitmask << endl;
             device_properties_map.insert(pair<string, v4l2_info>(dev, info));
             close(fd);
         }

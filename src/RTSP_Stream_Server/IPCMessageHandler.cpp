@@ -69,7 +69,6 @@ bool IPCMessageHandler::send_string(string data)
     int numbytes;
     numbytes = send(client_fd, data.c_str(), data.length(), 0);
     if (numbytes > 0) {
-        cout << "Bytes sent - " << numbytes << endl;
         return true;
     }
     return false;
@@ -88,9 +87,8 @@ void IPCMessageHandler::send_device_props()
             json_message = json_message + ", " + serialise_device_props(*it);
         }
     }
-    json_message = json_message + "]";
-    cout << "\n\nJSON Msg" << json_message << endl;
 
+    json_message = json_message + "]";
     send_string(json_message);
 }
 
