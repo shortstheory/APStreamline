@@ -1,4 +1,6 @@
-# Adaptive H.264 Streaming From ArduPilot Robots Using GStreamer
+# APStreamline
+
+*Adaptive H.264 Streaming From ArduPilot Robots Using GStreamer*
 
 ## Introduction
 
@@ -16,6 +18,14 @@ Some webcams such as the Logitech C920 support hardware encoding through an onbo
 
 ## Running the Code
 
+### Hardware
+
+All the following instructions are for installing APStreamline and APWeb on the CC. A Raspberry Pi 2/3/3B+ with the latest version of Raspian or APSync is a good choice. Intel NUC's are excellent choices as well.
+
+Do note that the Raspberry Pi 3/3B+ have **very** low power WiFi antennae which aren't great for video streaming. Using a tiny WiFi router like the TPLink MR3020 can dramatically improve range. WiFi USB dongles working in hotspot mode can help as well.
+
+### Installing APStreamline
+
 Install the `gstreamer` dependencies:
 
 ```
@@ -29,28 +39,55 @@ sudo pip3 install meson
 sudo apt install ninja-build
 ```
 
-Navigate to the `adaptive-streaming` folder and run:
+Navigate to the cloned folder folder and run:
 
 ```
 meson build
 cd build
-sudo ninja install
-adaptive_streaming
+sudo ninja install # installs to /usr/local/bin for APWeb to spawn
+./stream_server
 ```
-
-By default, port 5000 is used for sending RTP packets and port 5001 is used for sending and receiving RTCP packets.
 
 On the Raspberry Pi, use `sudo modprobe bcm2835-v4l2` to load the V4L2 driver for the Raspberry Pi camera. Add `bcm2835-v4l2` to `/etc/modules` for automatically loading this module on boot.
 
+### Installing APWeb
+
+The [APWeb server](https://github.com/shortstheory/APWeb) project enables setting several flight controller parameters on the fly through the use of a Companion Computer (e.g. the Raspberry Pi). We use this APWeb server for configuring the video streams as well.
+
+Clone the forked branch with APStreamline support here:
+
+```
+git clone -b video_streaming https://github.com/shortstheory/APWeb.git
+cd APWeb
+```
+
+Install `libtalloc-dev` and get the MAVLink submodule:
+
+```
+sudo apt-get install libtalloc-dev
+git submodule init
+git submodule update
+```
+
+Build APWeb:
+
+```
+cd APWeb
+make
+./web_server -p 80
+```
+
+In case it fails to create the TCP socket, try using `sudo ./web_server -p 80`. This can clearly cause bad things to happen so be careful!
+
 ## Usage
 
-Video livestreams can be launched through both RTSP and UDP. It is recommended to use RTSP for streaming video as it provides the advantages of supporting multiple cameras, conifguring the resolution on-the-fly, and recording the livestream to a file.
+Video livestreams can be launched using RTSP. It is recommended to use RTSP for streaming video as it provides the advantages of supporting multiple cameras, conifguring the resolution on-the-fly, and recording the livestreamed video to a file.
 
 ### RTSP Streaming
 
-#### APWeb (Recommended)
+#### APWeb
 
-Start the [APWeb server](https://github.com/shortstheory/APWeb). This will serve the configuration page for the RTSP stream server.
+Start the APWeb server. This will serve the configuration page for the RTSP stream server. Connect to the web server in your favourite web browser by going to the IP address of the Companion Computer.
 
 On navigating to the new `video/` page, you will be presented with a page to start the RTSP Server:
 
@@ -66,9 +103,9 @@ The video quality can either be automatically set based on the avaialble network
 
 The APWeb page also presents an option to record the video stream to a file. For this the video stream must be opened on the client. This works with any of the manually set resolutions but does **not** work with Auto quality. This is because the dynamically changing resolution causes problems with the file recording pipeline. An exception to this is the UVC cameras which can record to a file in Auto mode as well.
 
-The RTSP streams can be viewed using any RTSP player.
+The RTSP streams can be viewed using any RTSP player. VLC is a good choice.
 
-For example, this can be done in VLC by going to "Media > Open Network Stream" and pasting in the RTSP Mount Point for the camera displayed in the APWeb configuration page. However, VLC introduces *two* seconds of latency for the jitter reduction, making it unsuitable for critical applications. To circumvent this, RTSP streams can also be viewed at zero latency by using the `gst-launch` command:
+For example, this can be done in VLC by going to "Media > Open Network Stream" and pasting in the RTSP Mount Point for the camera displayed in the APWeb configuration page. However, VLC introduces *two* seconds of latency for the jitter reduction, making it unsuitable for critical applications. To circumvent this, RTSP streams can also be viewed at lower latency by using the `gst-launch` command:
 
 `gst-launch-1.0 playbin uri=<RTSP-MOUNT-POINT> latency=100`
 
