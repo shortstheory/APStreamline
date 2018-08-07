@@ -6,11 +6,9 @@
 
 Using video cameras for live-streaming the video feed from aerial robots and other unmanned vehicles is becoming increasingly useful. Most video streaming solutions use RTP for streaming video over UDP. UDP is more efficient than TCP because it forgoes the overhead that comes with TCP's reliable delivery and congestion control mechanisms.
 
-However, this introduces new problems when streaming video from robots. In most cases, we use the Companion Computer (CC) in Wi-Fi hotspot mode for streaming the video. Due to limited Wi-Fi range, the video Quality-of-Service progressively gets worse when the robot moves further away from the receiving computer.
+However, this introduces new problems when streaming video from robots. In most cases, we use the Companion Computer (CC) in Wi-Fi hotspot mode for streaming the video. Due to the limited range of 2.4GHz Wi-Fi, the Quality-of-Service (QoS) progressively gets worse when the robot moves further away from the receiving computer.
 
-The Adaptive Streaming aims to fix this problem by dynamically adjusting the video quality. Even over UDP, we can still obtain estimates of QoS using RTCP and parsing the RTCP Receiver Report packets on the CC. These RTCP packets provide helpful QoS information (such as RTT and packet loss) which can be used for automatically changing the bitrate and resolution of the video delivered from the CC.
-
-Currently this project supports H.264 hardware encoding the video feed of the Raspberry Pi Camera on the Raspberry Pi 3B(+). H.264 software encoding is supported for all other V4L2 cameras.
+The APStreamline project aims to fix this problem by dynamically adjusting the video quality. Over UDP we can obtain estimates of QoS using RTCP packets received from the receiver. These RTCP packets provide helpful QoS information (such as RTT and packet loss) which can be used for automatically changing the bitrate and resolution of the video delivered from the sender.
 
 ### Note for hardware encoding webcams
 
@@ -22,7 +20,7 @@ Some webcams such as the Logitech C920 support hardware encoding through an onbo
 
 All the following instructions are for installing APStreamline and APWeb on the CC. A Raspberry Pi 2/3/3B+ with the latest version of Raspian or APSync is a good choice. Intel NUC's are excellent choices as well.
 
-Do note that the Raspberry Pi 3/3B+ have **very** low power WiFi antennae which aren't great for video streaming. Using a tiny WiFi router like the TPLink MR3020 can dramatically improve range. WiFi USB dongles working in hotspot mode can help as well.
+Do note that the Raspberry Pi 3 and 3B+ have **very** low power Wi-Fi antennae which aren't great for video streaming. Using a portable Wi-Fi router like the TPLink MR3020 can dramatically improve range. Wi-Fi USB dongles working in hotspot mode can help as well.
 
 ### Installing APStreamline
 
@@ -101,7 +99,7 @@ From here, the APWeb page will display the list of available RTSP streams and th
 
 The video quality can either be automatically set based on the avaialble network bandwidth or set manually for more fine-grained control.
 
-The APWeb page also presents an option to record the video stream to a file. For this the video stream must be opened on the client. This works with any of the manually set resolutions but does **not** work with Auto quality. This is because the dynamically changing resolution causes problems with the file recording pipeline. An exception to this is the UVC cameras which can record to a file in Auto mode as well.
+The APWeb page also presents an option to record the video stream to a file on the CC. For this the video stream must be opened on the client. This works with any of the manually set resolutions but does **not** work with Auto quality. This is because the dynamically changing resolution causes problems with the file recording pipeline. An exception to this is the UVC cameras which can record to a file in Auto mode as well.
 
 The RTSP streams can be viewed using any RTSP player. VLC is a good choice.
 
