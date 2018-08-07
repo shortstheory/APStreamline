@@ -25,7 +25,6 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     // weird hack to work around \0?
     char info_buffer[IPC_BUFFER_SIZE];
     info_buffer[0] = '\0';
-    cout << "BITMASK - " << device_props.second.frame_property_bitmask;
 
     RTSPAdaptiveStreaming* stream;
     stream = rtsp_stream_server->get_stream_map().at(device_props.first);
