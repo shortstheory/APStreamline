@@ -36,13 +36,13 @@ void RTSPStreamServer::get_v4l2_devices()
     struct dirent *ep;
     dp = opendir(v4l2_device_path.c_str());
     if (dp == nullptr) {
-        fprintf(stderr, "Could not open directory %d", errno);
+        cerr << "Could not open directory " << errno << endl;
     }
     while ((ep = readdir(dp))) {
         string s = ep->d_name;
         if (s.find(v4l2_device_prefix) != std::string::npos) {
             s = v4l2_device_path + s;
-            fprintf(stderr, "Found V4L2 camera device %s\n", s.c_str());
+            cout << "Found V4L2 camera device " << s << endl;
             // Add device path to list
             device_list.push_back(s);
         }
@@ -67,7 +67,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
 {
     int i = 0;
     for (string dev : device_list) {
-        fprintf(stderr, "%s\n", dev.c_str());
+        cout << dev << endl;
         int fd = open(dev.c_str(), O_RDONLY);
         v4l2_info info;
         if (fd != -1) {
@@ -78,7 +78,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
             info.mount_point = mount_point_prefix + to_string(i);
             info.frame_property_bitmask = 0;
 
-            fprintf(stderr, "name - %s driver - %s\n", caps.card, caps.driver);
+            cout << "Name - " << caps.card << " Driver - " << caps.driver << endl;
 
             v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             v4l2_fmtdesc fmt;
@@ -273,7 +273,6 @@ RTSPStreamServer* RTSPStreamServer::get_instance()
 
 RTSPStreamServer::~RTSPStreamServer()
 {
-    fprintf(stderr, "Destructor called\n");
     for (auto stream_pair : adaptive_streams_map) {
         free(stream_pair.second);
     }

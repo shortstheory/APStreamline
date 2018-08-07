@@ -60,7 +60,6 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
             device_props.second.frame_property_bitmask,
             stream->current_quality,
             stream->file_recorder.get_recording());
-    printf("SERIALIST!! %s", info_buffer);
     return string(info_buffer);
 }
 

@@ -47,7 +47,6 @@ void ipc_loop()
         while ((bytes_read=read(client_fd,buf,sizeof(buf))) > 0) {
             buf[bytes_read] = '\0';
             message_handler.process_msg(buf);
-            printf("read %u bytes: %s\n", bytes_read, buf);
         }
     }
 }
@@ -71,10 +70,10 @@ string get_ip_address(string interface = "lo")
                         NULL, 0, NI_NUMERICHOST);
         if ((strcmp(ifa->ifa_name, interface.c_str()) == 0) && (ifa->ifa_addr->sa_family==AF_INET)) {
             if (s != 0) {
-                printf("getnameinfo() failed: %s\n", gai_strerror(s));
+                cout << "getnameinfo() failed: %s\n" << gai_strerror(s) << endl;
             }
-            printf("Interface : <%s>\n",ifa->ifa_name);
-            printf("Address : <%s>\n", host);
+            cout << "Interface : " << ifa->ifa_name << endl;
+            cout << "Address : " <<  host << endl;
             freeifaddrs(ifaddr);
             return string(host);
         }
