@@ -70,11 +70,6 @@ void GenericAdaptiveStreaming::adapt_stream()
 {
     QoSReport qos_report;
     qos_report = qos_estimator.get_qos_report();
-    g_warning("QOSData - loss-%u udp-%f x264-%f rtt-%f", 
-              qos_report.fraction_lost,
-              qos_report.estimated_bitrate,
-              qos_report.encoding_bitrate,
-              qos_report.rtt);
 
     if (successive_transmissions >= SUCCESSFUL_TRANSMISSION) {
         network_state = NetworkState::STEADY;
@@ -89,7 +84,7 @@ void GenericAdaptiveStreaming::adapt_stream()
             if (qos_report.encoding_bitrate < qos_report.estimated_bitrate * 1.5) {
                 improve_quality();
             } else {
-                g_warning("Buffer overflow possible!");
+                cerr << "Buffer overflow possible!" << endl;
                 degrade_quality();
             }
         } else {
@@ -107,11 +102,9 @@ void GenericAdaptiveStreaming::improve_quality()
     set_encoding_bitrate(h264_bitrate + INC_BITRATE);
     if (current_res == ResolutionPresets::LOW &&
         h264_bitrate > bitrate_presets[ResolutionPresets::MED]) {
-        g_warning("Low->MED");
         set_resolution(ResolutionPresets::MED);
     } else if (current_res == ResolutionPresets::MED &&
                h264_bitrate > bitrate_presets[ResolutionPresets::HIGH]) {
-        g_warning("Med->HIGH");
         set_resolution(ResolutionPresets::HIGH);
     }
 }
@@ -131,7 +124,6 @@ void GenericAdaptiveStreaming::degrade_quality()
 void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 {
     string currstate = (network_state == NetworkState::STEADY) ? "STEADY" : "CONGESTED";
-    // g_warning("Curr state %s %d", currstate.c_str(), successive_transmissions);
 
     if (bitrate >= MIN_BITRATE && bitrate <= MAX_BITRATE) {
         h264_bitrate = bitrate;
@@ -164,7 +156,7 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
             bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
             bitrate_ctrl.value = h264_bitrate*1000;
             if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1) {
-                g_warning("ioctl fail :/");
+                cerr << "Camera does not support the IOCTL" << endl;
             }
         }
         break;
@@ -182,7 +174,6 @@ void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
         string caps_filter_string;
         caps_filter_string = video_presets[setting];
         set_encoding_bitrate(bitrate_presets[setting]);
-        g_warning("RES CHANGE! %d %s", setting, caps_filter_string.c_str());
         current_res = setting;
         GstCaps* src_caps;
         src_caps = gst_caps_from_string(caps_filter_string.c_str());
@@ -193,7 +184,6 @@ void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
 
 void GenericAdaptiveStreaming::change_quality_preset(int quality)
 {
-    g_warning("Changing quality!");
     current_quality = quality;
     if (current_quality == AUTO_PRESET) {
         network_state = STEADY;
@@ -236,7 +226,7 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
 
                 if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
                     ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1) {
-                    g_warning("IOCTL failed");
+                    cerr << "Camera does not support the IOCTL" << endl;
                 }
             }
             caps_filter_string = H264_CAPS_FILTERS[current_quality];

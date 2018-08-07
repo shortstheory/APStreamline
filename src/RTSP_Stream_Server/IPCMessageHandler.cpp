@@ -3,10 +3,8 @@
 RTSPMessageType IPCMessageHandler::get_message_type(char* buf)
 {
     string buffer(buf);
-    cout << "Recevied buffer - " << buf << endl;
     for (size_t i = 0; i < RTSPMessageHeader.size(); i++) {
         if (!buffer.compare(0, RTSPMessageHeader[i].size(), RTSPMessageHeader[i])) {
-            cout << "Message type - " << RTSPMessageHeader[i] << " " << static_cast<RTSPMessageType>(i) << endl;
             return static_cast<RTSPMessageType>(i);
         }
     }
@@ -38,7 +36,6 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     string port;
     port = rtsp_stream_server->get_port();
 
-    // g_warning("IP %s PORT %s", ip_address.c_str(), port.c_str());
     sprintf(info_buffer, "{"
             "\"ip\": \"%s\", "
             "\"port\": \"%s\", "
@@ -108,13 +105,11 @@ IPCMessageHandler::IPCMessageHandler(int fd, RTSPStreamServer* _rtsp_stream_serv
 void IPCMessageHandler::set_device_quality(char* buffer)
 {
     string msg_payload;
-    cout << "Got an SDP message! " << buffer << endl;
     char video_device[20];
     int camera_setting;
     int record_video;
 
     msg_payload = get_message_payload(buffer);
-    cout << "Payload string - " << msg_payload << endl;
     sscanf(msg_payload.c_str(), "%s %d %d", video_device, &camera_setting, &record_video);
 
     bool _record_stream;
@@ -124,11 +119,9 @@ void IPCMessageHandler::set_device_quality(char* buffer)
     try {
         stream = rtsp_stream_server->get_stream_map().at(string(video_device));
         if (stream->get_media_prepared()) {
-            // stream->record_stream(_record_stream);
-            // stream->change_quality_preset(camera_setting);
             stream->set_device_properties(camera_setting, _record_stream);
         } else {
-            g_warning("Stream not connected yet");
+            cerr << "Stream not connected yet" << endl;
         }
     } catch (const out_of_range& err) {
         cerr << err.what();
@@ -147,7 +140,7 @@ void IPCMessageHandler::process_msg(char* buf)
         set_device_quality(buf);
         break;
     default:
-        g_warning("Unrecognised header");
+        cerr << "Unrecognised IPC header" << endl;
         break;
     }
 }

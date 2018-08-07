@@ -1,6 +1,6 @@
 # APStreamline
 
-*Adaptive H.264 Streaming From ArduPilot Robots Using GStreamer*
+*Adaptive H.264 Streaming From ArduPilot Robots*
 
 ## Introduction
 
@@ -9,6 +9,8 @@ Using video cameras for live-streaming the video feed from aerial robots and oth
 However, this introduces new problems when streaming video from robots. In most cases, we use the Companion Computer (CC) in Wi-Fi hotspot mode for streaming the video. Due to the limited range of 2.4GHz Wi-Fi, the Quality-of-Service (QoS) progressively gets worse when the robot moves further away from the receiving computer.
 
 The APStreamline project aims to fix this problem by dynamically adjusting the video quality. Over UDP we can obtain estimates of QoS using RTCP packets received from the receiver. These RTCP packets provide helpful QoS information (such as RTT and packet loss) which can be used for automatically changing the bitrate and resolution of the video delivered from the sender.
+
+The code makes use of GStreamer libraries for creating the streaming pipelines.
 
 ### Note for hardware encoding webcams
 

@@ -12,10 +12,10 @@
 #include <iomanip>
 #include <ctime>
 #include <atomic>
-
-using namespace std;
+#include <iostream>
 
 // Manages the recording of the livestreamed video to a file on the CC
+using namespace std;
 
 class FileRecorder
 {

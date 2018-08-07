@@ -100,7 +100,6 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
     for (list_itr = list; list_itr != nullptr; list_itr = list_itr->next) {
         element = (GstElement*)list_itr->data;
         str = gst_element_get_name(element);
-        g_warning("element name = %s", str.c_str());
 
         if (str.find("bin") != std::string::npos || str.find("pipeline") != std::string::npos) {
             pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
@@ -112,16 +111,13 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         // Older gstreamer versions on the ARM boards setup multiudpsink in a different place
         if (minor < 14) {
             if (str.find("multiudpsink") != std::string::npos) {
-                g_warning("Identified %s", str.c_str());
                 multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
             }
         }
     }
 
-    if (get_element_references()) {
-        g_warning("Elements referenced!");
-    } else {
-        g_warning("Some elements not referenced");
+    if (!get_element_references()) {
+        cerr << "Some GStreamer elements not referenced" << endl;
     }
 
     set_resolution(ResolutionPresets::LOW);
@@ -166,7 +162,6 @@ void RTSPAdaptiveStreaming::deep_callback(GstBin* bin,
     element_name = gst_element_get_name(element);
     // One udpsink takes care of RTCP packets and the other RTP
     if (element_name.find("multiudpsink") != std::string::npos && !multi_udp_sink) {
-        g_warning("Identified %s", element_name.c_str());
         multi_udp_sink = element;
     }
 }
@@ -180,8 +175,9 @@ void RTSPAdaptiveStreaming::media_unprepared_callback(GstRTSPMedia* media)
 
     gst_element_set_state(rtpbin, GST_STATE_NULL);
     gst_object_unref(rtpbin);
+
     current_quality = AUTO_PRESET;
-    g_warning("Stream disconnected!");
+    cout << "Stream disconnected!" << endl;
 }
 
 GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad,
@@ -196,7 +192,6 @@ GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPa
 {
     // pad is blocked, so it's ok to unlink
     file_recorder.disable_recorder();
-    g_warning("Pad Removed");
     return GST_PAD_PROBE_REMOVE;
 }
 
@@ -212,7 +207,6 @@ GstPadProbeReturn RTSPAdaptiveStreaming::static_rtcp_callback(GstPad* pad,
 // the data and generating the QoSReport
 GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeInfo* info)
 {
-    // g_warning("H264 rate - %d", h264_bitrate);
     GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buf != nullptr) {
         GstRTCPBuffer *rtcp_buffer = (GstRTCPBuffer*)malloc(sizeof(GstRTCPBuffer));
@@ -354,8 +348,6 @@ void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
         if (file_recorder.tee_file_pad) {
             gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
                               static_probe_block_callback, this, NULL);
-        } else {
-            g_warning("File pad missing");
         }
     }
 }

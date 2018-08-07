@@ -23,7 +23,7 @@ void ipc_loop()
     int socket_fd, client_fd, bytes_read;
 
     if ((socket_fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
-        g_warning("Local socket creation failed, IPC will be disabled");
+        cerr << "Local socket creation failed, IPC will be disabled" << endl;
         return;
     }
 
@@ -33,12 +33,12 @@ void ipc_loop()
     unlink(socket_path);
 
     if (bind(socket_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
-        g_warning("Bind error");
+        cerr << "Bind error" << endl;
         return;
     }
 
     if (listen(socket_fd, 1) == -1) {
-        g_warning("Listen error");
+        cerr << "Listen error" << endl;
         return;
     }
 
@@ -80,14 +80,14 @@ string get_ip_address(string interface = "lo")
         }
     }
     freeifaddrs(ifaddr);
-    g_warning("No IP found for given interface");
+    cerr << "No IP found for given interface" << endl;
     return string("127.0.0.1");
 }
 
 // SIGTERM handler so we can clean up before destroying the stream
 void terminate_process(int signum)
 {
-    fprintf(stderr, "\nProcess terminated %d\n", signum);
+    cerr << "Process terminated " << signum << endl;
     free(RTSPStreamServer::get_instance());
     exit(1);
 }

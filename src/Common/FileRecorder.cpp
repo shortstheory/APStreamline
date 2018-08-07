@@ -11,11 +11,9 @@ FileRecorder::FileRecorder()
 
 bool FileRecorder::init_file_recorder(GstElement* _pipeline, GstElement* _tee)
 {
-    g_warning("init of FR");
-
     // In case we are already recording to a file, there's no need to reset the recorder
     if (recording) {
-        g_warning("Recording in progress");
+        cerr << "Recording in progress" << endl;
         return false;
     }
     pipeline = _pipeline;
@@ -56,9 +54,8 @@ bool FileRecorder::init_file_recorder(GstElement* _pipeline, GstElement* _tee)
 
 bool FileRecorder::disable_recorder()
 {
-    g_warning("Recorder disabled!!");
     if (!recording) {
-        g_warning("Recording not started");
+        cerr << "Recording not started" << endl;
         return false;
     }
 
