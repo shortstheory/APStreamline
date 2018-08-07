@@ -38,7 +38,6 @@ private:
     bool check_h264_ioctls(int fd);
 
     RTSPStreamServer(string _ip_addr, string _port);
-    ~RTSPStreamServer();
 public:
     static RTSPStreamServer* get_instance(string _ip_addr, string _port);
     static RTSPStreamServer* get_instance();
@@ -49,6 +48,7 @@ public:
     string get_port();
     map<string, v4l2_info> get_device_map();
     map<string, RTSPAdaptiveStreaming*> get_stream_map();
+    ~RTSPStreamServer();
 };
 
 #endif

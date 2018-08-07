@@ -87,7 +87,7 @@ string get_ip_address(string interface = "lo")
 void terminate_process(int signum)
 {
     cerr << "Process terminated " << signum << endl;
-    free(RTSPStreamServer::get_instance());
+    delete RTSPStreamServer::get_instance();
     exit(1);
 }
 
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     struct sigaction action;
     memset(&action, 0, sizeof(struct sigaction));
     action.sa_handler = terminate_process;
-    sigaction(SIGTERM, &action, NULL);
+    sigaction(SIGINT, &action, NULL);
 
     gst_init(&argc, &argv);
     GMainLoop* loop = g_main_loop_new(NULL, FALSE);

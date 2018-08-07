@@ -278,8 +278,8 @@ RTSPStreamServer* RTSPStreamServer::get_instance()
 RTSPStreamServer::~RTSPStreamServer()
 {
     for (auto stream_pair : adaptive_streams_map) {
-        free(stream_pair.second);
+        delete stream_pair.second;
     }
-    free(instance);
+    delete instance;
     initialised = false;
 }
