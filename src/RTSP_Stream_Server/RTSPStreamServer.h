@@ -27,7 +27,6 @@ private:
     void get_v4l2_devices();
     void get_v4l2_devices_info();
     void setup_streams();
-    void remove_mount_point(string mount_point);
     // Test the capabilities of a connected camera to see which mode it should be used in
     bool check_h264_ioctls(int fd);
 
@@ -36,7 +35,6 @@ public:
     ~RTSPStreamServer();
     GstRTSPServer* get_server();
 
-    void remove_stream(string device);
     void set_service_id(guint id);
     string get_ip_address();
     string get_port();

@@ -21,12 +21,14 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
 
 RTSPAdaptiveStreaming::~RTSPAdaptiveStreaming()
 {
+    if (media_factory) {
+        gst_object_unref(media_factory);
+    }
     gst_object_unref(rtsp_server);
 }
 
 void RTSPAdaptiveStreaming::init_media_factory()
 {
-    GstRTSPMediaFactory* media_factory;
     GstRTSPMountPoints* mounts;
     mounts = gst_rtsp_server_get_mount_points(rtsp_server);
     media_factory = gst_rtsp_media_factory_new();
@@ -70,7 +72,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
 
     gst_rtsp_mount_points_add_factory(mounts, uri.c_str(), media_factory);
     g_signal_connect(media_factory, "media-constructed", G_CALLBACK(static_media_constructed_callback), this);
-    g_object_unref(mounts);
+    gst_object_unref(mounts);
 }
 
 void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
@@ -113,6 +115,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
                 multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
             }
         }
+        gst_object_unref(element);
     }
 
     if (!get_element_references()) {

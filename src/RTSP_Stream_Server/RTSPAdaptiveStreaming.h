@@ -23,6 +23,8 @@ class RTSPAdaptiveStreaming : public GenericAdaptiveStreaming
 private:
     const string uri;
     GstRTSPServer* rtsp_server;
+    GstRTSPMediaFactory* media_factory;
+
     bool media_prepared;
 
     GstElement* rtpbin;
