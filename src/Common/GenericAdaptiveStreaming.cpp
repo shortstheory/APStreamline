@@ -26,14 +26,33 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     bitrate_presets[ResolutionPresets::MED] = MED_QUAL_BITRATE;
     bitrate_presets[ResolutionPresets::HIGH] = HIGH_QUAL_BITRATE;
 
-    set_state_constants();
-    text_overlay = nullptr;
     pipeline = nullptr;
+    v4l2_src = nullptr;
+    src_capsfilter = nullptr;
+    videoconvert = nullptr;
+    h264_encoder = nullptr;
+    h264_parser = nullptr;
+    rtph264_payloader = nullptr;
+    text_overlay = nullptr;
+    tee = nullptr;
+    multi_udp_sink = nullptr;
+
+    set_state_constants();
 }
 
 GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
 {
     cout << "GASDtr" << sizeof(GenericAdaptiveStreaming);
+    g_free(pipeline);
+    g_free(v4l2_src);
+    g_free(src_capsfilter);
+    g_free(videoconvert);
+    g_free(h264_encoder);
+    g_free(h264_parser);
+    g_free(rtph264_payloader);
+    g_free(text_overlay);
+    g_free(tee);
+    g_free(multi_udp_sink);
 }
 
 void GenericAdaptiveStreaming::set_state_constants()
