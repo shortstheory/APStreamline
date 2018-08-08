@@ -28,6 +28,8 @@ RTSPStreamServer::~RTSPStreamServer()
     for (auto stream_pair : adaptive_streams_map) {
         delete stream_pair.second;
     }
+    g_source_remove(service_id);
+    gst_object_unref(server);
 }
 
 void RTSPStreamServer::get_v4l2_devices()
@@ -231,6 +233,11 @@ void RTSPStreamServer::setup_streams()
                                             it->second.camera_type,
                                             it->second.mount_point, server)));
     }
+}
+
+void RTSPStreamServer::set_service_id(guint id)
+{
+    service_id = id;
 }
 
 map<string, RTSPAdaptiveStreaming*> RTSPStreamServer::get_stream_map()

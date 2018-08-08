@@ -15,6 +15,7 @@ class RTSPStreamServer
 private:
     string ip_addr;
     string port;
+    guint service_id;
 
     GstRTSPServer* server;
 
@@ -36,6 +37,7 @@ public:
     GstRTSPServer* get_server();
 
     void remove_stream(string device);
+    void set_service_id(guint id);
     string get_ip_address();
     string get_port();
     map<string, v4l2_info> get_device_map();
