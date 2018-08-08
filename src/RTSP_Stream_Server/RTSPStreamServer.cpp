@@ -29,8 +29,6 @@ RTSPStreamServer::~RTSPStreamServer()
     for (auto stream_pair : adaptive_streams_map) {
         delete stream_pair.second;
     }
-    // g_source_remove(service_id);
-    // gst_object_unref(server);
 }
 
 void RTSPStreamServer::get_v4l2_devices()

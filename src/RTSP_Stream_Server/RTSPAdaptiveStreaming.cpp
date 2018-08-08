@@ -12,7 +12,7 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
         int quality):
     GenericAdaptiveStreaming(_device, type),
     uri(_uri),
-    rtsp_server(server),
+    rtsp_server((GstRTSPServer*)gst_object_ref(server)),
     media_prepared(false)
 {
     current_quality = quality;
@@ -25,7 +25,7 @@ RTSPAdaptiveStreaming::~RTSPAdaptiveStreaming()
     if (media_factory) {
         gst_object_unref(media_factory);
     }
-    // gst_object_unref(rtsp_server);
+    gst_object_unref(rtsp_server);
 }
 
 void RTSPAdaptiveStreaming::init_media_factory()
@@ -116,7 +116,6 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
                 multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
             }
         }
-        gst_object_unref(element);
     }
 
     if (!get_element_references()) {
