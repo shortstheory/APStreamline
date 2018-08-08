@@ -13,8 +13,6 @@
 #include "RTSPStreamServer.h"
 #include "IPCMessageHandler.h"
 
-char socket_path[80] = "/tmp/rtsp_server.sock";
-
 // Separate thread for managing the IPC with the APWeb server
 void ipc_loop(RTSPStreamServer& stream_server)
 {
@@ -29,8 +27,8 @@ void ipc_loop(RTSPStreamServer& stream_server)
 
     memset(&addr, 0, sizeof(addr));
     addr.sun_family = AF_UNIX;
-    strcpy(addr.sun_path, socket_path);
-    unlink(socket_path);
+    strcpy(addr.sun_path, SOCKET_PATH.c_str());
+    unlink(SOCKET_PATH.c_str());
 
     if (bind(socket_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
         cerr << "Bind error" << endl;
@@ -44,7 +42,7 @@ void ipc_loop(RTSPStreamServer& stream_server)
 
     while ((client_fd = accept(socket_fd, NULL, NULL))) {
         IPCMessageHandler message_handler(client_fd, &stream_server);
-        while ((bytes_read=read(client_fd,buf,sizeof(buf))) > 0) {
+        while ((bytes_read=read(client_fd, buf, sizeof(buf))) > 0) {
             buf[bytes_read] = '\0';
             message_handler.process_msg(buf);
         }

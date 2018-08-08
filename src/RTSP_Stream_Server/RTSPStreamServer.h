@@ -13,10 +13,6 @@ using namespace std;
 class RTSPStreamServer
 {
 private:
-    static string v4l2_device_path;
-    static string v4l2_device_prefix;
-    static string mount_point_prefix;
-
     string ip_addr;
     string port;
 

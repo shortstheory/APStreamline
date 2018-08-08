@@ -12,10 +12,6 @@
 
 #include "RTSPStreamServer.h"
 
-string RTSPStreamServer::v4l2_device_path = "/dev/";
-string RTSPStreamServer::v4l2_device_prefix = "video";
-string RTSPStreamServer::mount_point_prefix = "/cam";
-
 RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_addr), port(_port)
 {
     server = gst_rtsp_server_new();
@@ -38,14 +34,14 @@ void RTSPStreamServer::get_v4l2_devices()
 {
     DIR *dp;
     struct dirent *ep;
-    dp = opendir(v4l2_device_path.c_str());
+    dp = opendir(V4L2_DEVICE_PATH.c_str());
     if (dp == nullptr) {
         cerr << "Could not open directory " << errno << endl;
     }
     while ((ep = readdir(dp))) {
         string s = ep->d_name;
-        if (s.find(v4l2_device_prefix) != std::string::npos) {
-            s = v4l2_device_path + s;
+        if (s.find(V4L2_DEVICE_PREFIX) != std::string::npos) {
+            s = V4L2_DEVICE_PATH + s;
             cout << "Found V4L2 camera device " << s << endl;
             // Add device path to list
             device_list.push_back(s);
@@ -79,7 +75,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
             ioctl(fd, VIDIOC_QUERYCAP, &caps);
 
             info.camera_name = string(caps.card, caps.card + sizeof caps.card / sizeof caps.card[0]);
-            info.mount_point = mount_point_prefix + to_string(i);
+            info.mount_point = MOUNT_POINT_PREFIX + to_string(i);
             info.frame_property_bitmask = 0;
 
             cout << "Name - " << caps.card << " Driver - " << caps.driver << endl;
