@@ -12,9 +12,6 @@
 
 #include "RTSPStreamServer.h"
 
-bool RTSPStreamServer::initialised = false;
-RTSPStreamServer* RTSPStreamServer::instance = nullptr;
-
 string RTSPStreamServer::v4l2_device_path = "/dev/";
 string RTSPStreamServer::v4l2_device_prefix = "video";
 string RTSPStreamServer::mount_point_prefix = "/cam";
@@ -28,6 +25,13 @@ RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_
     get_v4l2_devices();
     get_v4l2_devices_info();
     setup_streams();
+}
+
+RTSPStreamServer::~RTSPStreamServer()
+{
+    for (auto stream_pair : adaptive_streams_map) {
+        delete stream_pair.second;
+    }
 }
 
 void RTSPStreamServer::get_v4l2_devices()
@@ -256,30 +260,4 @@ string RTSPStreamServer::get_ip_address()
 string RTSPStreamServer::get_port()
 {
     return port;
-}
-
-RTSPStreamServer* RTSPStreamServer::get_instance(string _ip_addr, string _port)
-{
-    if (!initialised) {
-        instance = new RTSPStreamServer(_ip_addr, _port);
-        initialised = true;
-    }
-    return instance;
-}
-
-RTSPStreamServer* RTSPStreamServer::get_instance()
-{
-    if (initialised) {
-        return instance;
-    }
-    return nullptr;
-}
-
-RTSPStreamServer::~RTSPStreamServer()
-{
-    for (auto stream_pair : adaptive_streams_map) {
-        delete stream_pair.second;
-    }
-    delete instance;
-    initialised = false;
 }
