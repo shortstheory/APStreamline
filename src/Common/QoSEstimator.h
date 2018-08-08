@@ -27,7 +27,7 @@ private:
     gfloat smooth_enc_bitrate;
     guint64 last_bytes_sent;
     guint64 rtph_bytes_interval;
-    // not the same as encoding bitrate!
+
     timeval prev_tv;
     timeval prev_bw_tv;
 

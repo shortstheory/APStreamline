@@ -25,11 +25,12 @@ RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_
 
 RTSPStreamServer::~RTSPStreamServer()
 {
+    cout << "RTSPSSDtr";
     for (auto stream_pair : adaptive_streams_map) {
         delete stream_pair.second;
     }
-    g_source_remove(service_id);
-    gst_object_unref(server);
+    // g_source_remove(service_id);
+    // gst_object_unref(server);
 }
 
 void RTSPStreamServer::get_v4l2_devices()
@@ -208,10 +209,11 @@ void RTSPStreamServer::get_v4l2_devices_info()
 void RTSPStreamServer::setup_streams()
 {
     for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++) {
-        adaptive_streams_map.insert(pair<string,RTSPAdaptiveStreaming*>(it->first,
+        adaptive_streams_map.insert(pair<string, RTSPAdaptiveStreaming*>(it->first,
                                     new RTSPAdaptiveStreaming(it->first,
-                                            it->second.camera_type,
-                                            it->second.mount_point, server)));
+                                    it->second.camera_type,
+                                    it->second.mount_point,
+                                    server)));
     }
 }
 

@@ -21,10 +21,11 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
 
 RTSPAdaptiveStreaming::~RTSPAdaptiveStreaming()
 {
+    cerr << "RTSPDstr";
     if (media_factory) {
         gst_object_unref(media_factory);
     }
-    gst_object_unref(rtsp_server);
+    // gst_object_unref(rtsp_server);
 }
 
 void RTSPAdaptiveStreaming::init_media_factory()

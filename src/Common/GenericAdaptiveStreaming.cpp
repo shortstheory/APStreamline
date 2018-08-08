@@ -27,13 +27,16 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     bitrate_presets[ResolutionPresets::HIGH] = HIGH_QUAL_BITRATE;
 
     set_state_constants();
-    text_overlay = NULL;
+    text_overlay = nullptr;
+    pipeline = nullptr;
 }
 
 GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
 {
-    gst_element_set_state(pipeline, GST_STATE_NULL);
-    gst_object_unref(pipeline);
+    if (pipeline) {
+        gst_element_set_state(pipeline, GST_STATE_NULL);
+        gst_object_unref(pipeline);
+    }
 }
 
 bool GenericAdaptiveStreaming::play_pipeline()

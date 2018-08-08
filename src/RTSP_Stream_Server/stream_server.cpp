@@ -81,11 +81,13 @@ string get_ip_address(string interface = "lo")
     return string("127.0.0.1");
 }
 
+GMainLoop* loop;
+
 // SIGTERM handler so we can clean up before destroying the stream
 void terminate_process(int signum)
 {
+    g_main_loop_quit(loop);
     cerr << "Process terminated " << signum << endl;
-    exit(1);
 }
 
 // First argument is used as the network interface to use for the Stream Server
@@ -98,7 +100,7 @@ int main(int argc, char *argv[])
     sigaction(SIGINT, &action, NULL);
 
     gst_init(&argc, &argv);
-    GMainLoop* loop = g_main_loop_new(NULL, FALSE);
+    loop = g_main_loop_new(NULL, FALSE);
 
     string ip_addr;
     if (argc > 1) {
