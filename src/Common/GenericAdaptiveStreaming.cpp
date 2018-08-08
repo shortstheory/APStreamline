@@ -33,25 +33,7 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
 
 GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
 {
-    if (pipeline) {
-        gst_element_set_state(pipeline, GST_STATE_NULL);
-        gst_object_unref(pipeline);
-    }
-}
-
-bool GenericAdaptiveStreaming::play_pipeline()
-{
-    return gst_element_set_state(pipeline, GST_STATE_PLAYING);
-}
-
-bool GenericAdaptiveStreaming::pause_pipeline()
-{
-    return gst_element_set_state(pipeline, GST_STATE_PAUSED);
-}
-
-GstBus* GenericAdaptiveStreaming::get_pipeline_bus()
-{
-    return gst_element_get_bus(pipeline);
+    cout << "GASDtr" << sizeof(GenericAdaptiveStreaming);
 }
 
 void GenericAdaptiveStreaming::set_state_constants()

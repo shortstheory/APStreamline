@@ -74,9 +74,6 @@ public:
     bool record_stream(bool _record_stream);
     void set_resolution(ResolutionPresets setting);
     void adapt_stream();
-    bool play_pipeline();
-    bool pause_pipeline();
-    GstBus* get_pipeline_bus();
 };
 
 #endif

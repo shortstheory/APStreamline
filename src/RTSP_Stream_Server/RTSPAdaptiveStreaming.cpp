@@ -21,7 +21,7 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
 
 RTSPAdaptiveStreaming::~RTSPAdaptiveStreaming()
 {
-    cerr << "RTSPDstr";
+    cerr << "RTSPDstr" << sizeof(RTSPAdaptiveStreaming);
     if (media_factory) {
         gst_object_unref(media_factory);
     }
