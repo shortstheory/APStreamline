@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
         ip_addr = "127.0.0.1";
     }
     RTSPStreamServer rtsp_stream_server(ip_addr, "8554");
-    rtsp_stream_server.set_service_id((rtsp_stream_server.get_server(), NULL));
+    rtsp_stream_server.set_service_id(gst_rtsp_server_attach(rtsp_stream_server.get_server(), NULL));
 
     thread t(&ipc_loop, ref(rtsp_stream_server));
     t.detach();

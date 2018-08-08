@@ -73,7 +73,6 @@ void RTSPAdaptiveStreaming::init_media_factory()
     g_object_unref(mounts);
 }
 
-
 void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
 {
     GstElement* element;
