@@ -43,7 +43,6 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
 GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
 {
     cout << "GASDtr" << sizeof(GenericAdaptiveStreaming);
-    g_free(pipeline);
     g_free(v4l2_src);
     g_free(src_capsfilter);
     g_free(videoconvert);
@@ -53,6 +52,7 @@ GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
     g_free(text_overlay);
     g_free(tee);
     g_free(multi_udp_sink);
+    g_free(pipeline);
 }
 
 void GenericAdaptiveStreaming::set_state_constants()
