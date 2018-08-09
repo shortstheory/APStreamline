@@ -305,6 +305,7 @@ bool RTSPAdaptiveStreaming::get_element_references()
                         ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1) {
                             return false;
                     }
+                    return true;
                 }
             }
         case UVC_CAM:
