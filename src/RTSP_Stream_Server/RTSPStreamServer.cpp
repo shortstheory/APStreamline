@@ -177,8 +177,8 @@ void RTSPStreamServer::get_v4l2_devices_info()
                         }
                     }
 
-                // The PiCam doesn't list the resolutions explicitly, so we have
-                // to guess its capabilities
+                    // The PiCam doesn't list the resolutions explicitly, so we have
+                    // to guess its capabilities
                 } else if (frmsize.type == V4L2_FRMSIZE_TYPE_STEPWISE) {
                     // How do I get the framerates for stepwise cams?
                     info.frame_property_bitmask |= (1 << VIDEO_320x240x15);
@@ -208,9 +208,9 @@ void RTSPStreamServer::setup_streams()
     for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++) {
         adaptive_streams_map.insert(pair<string, RTSPAdaptiveStreaming*>(it->first,
                                     new RTSPAdaptiveStreaming(it->first,
-                                    it->second.camera_type,
-                                    it->second.mount_point,
-                                    server)));
+                                            it->second.camera_type,
+                                            it->second.mount_point,
+                                            server)));
     }
 }
 

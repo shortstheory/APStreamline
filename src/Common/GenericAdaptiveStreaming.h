@@ -20,7 +20,7 @@
 using namespace std;
 
 // Generic implementation of an Adaptive Video Streamer. Contains all the necessary
-// GstElements which need to be manually referenced by subclassing it. 
+// GstElements which need to be manually referenced by subclassing it.
 // All the adapatation logic is handled here
 
 class GenericAdaptiveStreaming

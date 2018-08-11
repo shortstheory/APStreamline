@@ -22,8 +22,7 @@ const static vector<string> RTSPMessageHeader = {
 
 
 // Includes some metadata about each camera
-struct v4l2_info
-{
+struct v4l2_info {
     string camera_name;
     string mount_point;
     CameraType camera_type;
@@ -31,8 +30,7 @@ struct v4l2_info
 };
 
 // Gives QoS estimates to the Adaptive Streamer for acting upon
-struct QoSReport 
-{
+struct QoSReport {
     guint8 fraction_lost;
     gfloat estimated_bitrate;
     gfloat encoding_bitrate;

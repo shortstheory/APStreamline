@@ -42,12 +42,12 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
             "\"name\": \"%s\", "
             "\"mount\": \"%s\", "
             "\"camtype\": %d, "
-        #ifdef __amd64__      
+#ifdef __amd64__
             "\"frame_property_bitmask\": %lu, "
-        #endif
-        #ifdef __arm__      
+#endif
+#ifdef __arm__
             "\"frame_property_bitmask\": %llu, "
-        #endif
+#endif
             "\"current_quality\": %u, "
             "\"recording\": %d"
             "}",

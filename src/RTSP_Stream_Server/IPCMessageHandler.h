@@ -23,7 +23,7 @@ class IPCMessageHandler
 {
 private:
     int client_fd;
-    
+
     // Requires a reference to the RTSP Stream Server for accessing the available streams
     RTSPStreamServer* rtsp_stream_server;
 

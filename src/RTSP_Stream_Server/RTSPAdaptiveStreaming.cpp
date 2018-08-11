@@ -147,17 +147,17 @@ void RTSPAdaptiveStreaming::static_media_unprepared_callback(GstRTSPMedia* media
 }
 
 void RTSPAdaptiveStreaming::static_deep_callback(GstBin* bin,
-                                                 GstBin* sub_bin,
-                                                 GstElement* element,
-                                                 gpointer data)
+        GstBin* sub_bin,
+        GstElement* element,
+        gpointer data)
 {
     RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
     ptr->deep_callback(bin, sub_bin, element);
 }
 
 void RTSPAdaptiveStreaming::deep_callback(GstBin* bin,
-                                          GstBin* sub_bin,
-                                          GstElement* element)
+        GstBin* sub_bin,
+        GstElement* element)
 {
     string element_name;
     element_name = gst_element_get_name(element);
@@ -271,7 +271,7 @@ bool RTSPAdaptiveStreaming::get_element_references()
                              "valignment", 2,
                              "halignment", 0,
                              "font-desc", "Sans, 8", NULL);
-                g_object_set(G_OBJECT(h264_encoder), 
+                g_object_set(G_OBJECT(h264_encoder),
                              "tune", 0x00000004,
                              "threads", 4,
                              "key-int-max", I_FRAME_INTERVAL,
@@ -302,7 +302,7 @@ bool RTSPAdaptiveStreaming::get_element_references()
                     if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &veritcal_flip) == -1 ||
                         ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1 ||
                         ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1) {
-                            return false;
+                        return false;
                     }
                     return true;
                 }

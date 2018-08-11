@@ -146,10 +146,10 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
             string state = (network_state == NetworkState::STEADY) ? "Steady" : "Congested";
             string stats = "Bitrate: "
-                         + to_string((long)qos_report.encoding_bitrate)
-                         + " kbps Network: " + to_string((long)qos_report.estimated_bitrate)
-                         + " kbps State: "
-                         + state;
+                           + to_string((long)qos_report.encoding_bitrate)
+                           + " kbps Network: " + to_string((long)qos_report.estimated_bitrate)
+                           + " kbps State: "
+                           + state;
             g_object_set(G_OBJECT(text_overlay), "text", stats.c_str(), NULL);
         }
         break;
