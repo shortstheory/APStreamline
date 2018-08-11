@@ -21,7 +21,6 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
 
 RTSPAdaptiveStreaming::~RTSPAdaptiveStreaming()
 {
-    cerr << "RTSPDstr" << sizeof(RTSPAdaptiveStreaming);
     if (media_factory) {
         gst_object_unref(media_factory);
     }
@@ -271,7 +270,7 @@ bool RTSPAdaptiveStreaming::get_element_references()
                 g_object_set(G_OBJECT(text_overlay),
                              "valignment", 2,
                              "halignment", 0,
-                             "font-desc", "Sans, 9", NULL);
+                             "font-desc", "Sans, 8", NULL);
                 g_object_set(G_OBJECT(h264_encoder), 
                              "tune", 0x00000004,
                              "threads", 4,

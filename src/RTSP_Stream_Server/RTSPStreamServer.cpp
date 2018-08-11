@@ -25,7 +25,6 @@ RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_
 
 RTSPStreamServer::~RTSPStreamServer()
 {
-    cout << "RTSPSSDtr" << sizeof(RTSPStreamServer);
     for (auto stream_pair : adaptive_streams_map) {
         delete stream_pair.second;
     }

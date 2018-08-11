@@ -42,7 +42,6 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
 
 GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
 {
-    cout << "GASDtr" << sizeof(GenericAdaptiveStreaming);
     // g_free(v4l2_src);
     // g_free(src_capsfilter);
     // g_free(videoconvert);
@@ -145,10 +144,12 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
         if (text_overlay) {
             QoSReport qos_report = qos_estimator.get_qos_report();
 
-            string state = (network_state == NetworkState::STEADY) ? "STEADY" : "CONGESTED";
-            string stats = "BR: " + to_string(h264_bitrate) + " H264: " +
-                           to_string(qos_report.encoding_bitrate)
-                           + " BW: " + to_string(qos_report.estimated_bitrate) + " STATE: " + state;
+            string state = (network_state == NetworkState::STEADY) ? "Steady" : "Congested";
+            string stats = "Bitrate: "
+                         + to_string((long)qos_report.encoding_bitrate)
+                         + " kbps Network: " + to_string((long)qos_report.estimated_bitrate)
+                         + " kbps State: "
+                         + state;
             g_object_set(G_OBJECT(text_overlay), "text", stats.c_str(), NULL);
         }
         break;
