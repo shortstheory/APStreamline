@@ -44,7 +44,8 @@ Navigate to the cloned folder folder and run:
 ```
 meson build
 cd build
-sudo ninja install # installs to /usr/local/bin for APWeb to spawn
+meson configure --prefix=$HOME/apsync/ap_streamline
+sudo ninja install # installs to ~/apsync/ap_streamline for APWeb to spawn the process
 ./stream_server
 ```
 
