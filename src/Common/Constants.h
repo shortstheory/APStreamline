@@ -14,13 +14,17 @@ static const bool AMD64 = true;
 static const bool ARM = false;
 #endif
 
+#ifdef __aarch64__
+static const guint32 MAX_STEADY_BITRATE = 4000;
+static const bool AMD64 = true;
+static const bool ARM = false;
+#endif
+
 #ifdef __arm__
 static const guint32 MAX_STEADY_BITRATE = 4000;
 static const bool AMD64 = false;
 static const bool ARM = true;
 #endif
-
-static const bool RECORD_VIDEO = true;
 
 static const guint32 MIN_STEADY_BITRATE = 500;
 static const guint32 INC_STEADY_BITRATE = 500;
