@@ -55,7 +55,7 @@ public:
     FileRecorder file_recorder;
 
     GstElement* pipeline;
-    GstElement* v4l2_src;
+    GstElement* camera;
     GstElement* src_capsfilter;
     GstElement* videoconvert;
     GstElement* h264_encoder;

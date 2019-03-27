@@ -27,7 +27,7 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     bitrate_presets[ResolutionPresets::HIGH] = HIGH_QUAL_BITRATE;
 
     pipeline = nullptr;
-    v4l2_src = nullptr;
+    camera = nullptr;
     src_capsfilter = nullptr;
     videoconvert = nullptr;
     h264_encoder = nullptr;
@@ -42,7 +42,7 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
 
 GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
 {
-    // g_free(v4l2_src);
+    // g_free(camera);
     // g_free(src_capsfilter);
     // g_free(videoconvert);
     // g_free(h264_encoder);
@@ -155,7 +155,7 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
         break;
     case H264_CAM:
         int v4l2_cam_fd;
-        g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
+        g_object_get(camera, "device-fd", &v4l2_cam_fd, NULL);
         if (v4l2_cam_fd > 0) {
             v4l2_control bitrate_ctrl;
             bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
@@ -166,7 +166,7 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
         }
         break;
     case UVC_CAM:
-        g_object_set(v4l2_src, "average-bitrate", h264_bitrate*1000, NULL);
+        g_object_set(camera, "average-bitrate", h264_bitrate*1000, NULL);
         break;
     };
 }
@@ -218,7 +218,7 @@ void GenericAdaptiveStreaming::change_quality_preset(int quality)
             g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
         } else if (camera_type == CameraType::H264_CAM) {
             int v4l2_cam_fd;
-            g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
+            g_object_get(camera, "device-fd", &v4l2_cam_fd, NULL);
             if (v4l2_cam_fd > 0) {
                 v4l2_control bitrate_ctrl;
                 v4l2_control i_frame_interval;

@@ -259,14 +259,14 @@ bool RTSPAdaptiveStreaming::get_element_references()
     if (pipeline) {
         tee = gst_bin_get_by_name(GST_BIN(pipeline), "tee_element");
         rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), "pay0");
-        v4l2_src = gst_bin_get_by_name(GST_BIN(pipeline), "src");
+        camera = gst_bin_get_by_name(GST_BIN(pipeline), "src");
         src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter");
 
         switch (camera_type) {
         case RAW_CAM:
             h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), "x264enc");
             text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), "textoverlay");
-            if (tee && rtph264_payloader && v4l2_src && src_capsfilter && h264_encoder && text_overlay) {
+            if (tee && rtph264_payloader && camera && src_capsfilter && h264_encoder && text_overlay) {
                 g_object_set(G_OBJECT(text_overlay),
                              "valignment", 2,
                              "halignment", 0,
@@ -284,8 +284,8 @@ bool RTSPAdaptiveStreaming::get_element_references()
             }
         case H264_CAM:
             int v4l2_cam_fd;
-            if (v4l2_src) {
-                g_object_get(v4l2_src, "device-fd", &v4l2_cam_fd, NULL);
+            if (camera) {
+                g_object_get(camera, "device-fd", &v4l2_cam_fd, NULL);
                 if (v4l2_cam_fd > 0) {
                     v4l2_control veritcal_flip;
                     veritcal_flip.id = V4L2_CID_VFLIP;
@@ -308,7 +308,7 @@ bool RTSPAdaptiveStreaming::get_element_references()
                 }
             }
         case UVC_CAM:
-            if (tee && rtph264_payloader && v4l2_src && src_capsfilter) {
+            if (tee && rtph264_payloader && camera && src_capsfilter) {
                 return true;
             } else {
                 return false;
