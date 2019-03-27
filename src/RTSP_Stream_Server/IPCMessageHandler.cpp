@@ -42,7 +42,7 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
             "\"name\": \"%s\", "
             "\"mount\": \"%s\", "
             "\"camtype\": %d, "
-#ifdef __amd64__
+#if defined(__amd64__) || defined(__aarch64__)
             "\"frame_property_bitmask\": %lu, "
 #endif
 #ifdef __arm__
