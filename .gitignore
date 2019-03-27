@@ -1,2 +1,5 @@
 build/ 
 b/
+.idea/
+.vscode/
+cmake-build-debug
