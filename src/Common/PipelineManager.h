@@ -31,6 +31,13 @@ private:
     guint32 DEC_BITRATE;
     guint32 INC_BITRATE;
 
+    GstElement *camera;
+    GstElement *src_capsfilter;
+    GstElement *videoconvert;
+    GstElement *h264_encoder;
+    GstElement *h264_parser;
+    GstElement *text_overlay;
+
     enum NetworkState {STEADY, CONGESTION} network_state;
     guint32 successive_transmissions;
 
@@ -48,21 +55,15 @@ private:
     int current_quality;
     const CameraType camera_type;
 
-public:
+  public:
     ResolutionPresets current_res;
     guint32 h264_bitrate;
     FileRecorder file_recorder;
 
     GstElement* pipeline;
-    GstElement* camera;
-    GstElement* src_capsfilter;
-    GstElement* videoconvert;
-    GstElement* h264_encoder;
-    GstElement* h264_parser;
-    GstElement* rtph264_payloader;
-    GstElement* text_overlay;
-    GstElement* tee;
     GstElement* multi_udp_sink;
+    GstElement *rtph264_payloader;
+    GstElement *tee;
 
     QoSEstimator qos_estimator;
 
