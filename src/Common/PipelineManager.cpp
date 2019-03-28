@@ -8,9 +8,8 @@
 
 #include "PipelineManager.h"
 
-PipelineManager::PipelineManager(string _device, CameraType type, int quality) :
-    network_state(NetworkState::STEADY), successive_transmissions(0),
-    device(_device), camera_type(type), current_quality(quality)
+PipelineManager::PipelineManager(string _device, int quality, CameraType type) : network_state(NetworkState::STEADY), successive_transmissions(0),
+                                                                                 device(_device), current_quality(quality), camera_type(type)
 {
     if (camera_type == CameraType::RAW_CAM) {
         video_presets[ResolutionPresets::LOW] = RAW_CAPS_FILTERS[VIDEO_320x240x30];
@@ -303,4 +302,24 @@ bool PipelineManager::get_element_references()
         };
     }
     return false;
+}
+
+int PipelineManager::get_current_quality()
+{
+    return current_quality;
+}
+
+void PipelineManager::set_current_quality(int quality)
+{
+    current_quality = quality;
+}
+
+string PipelineManager::get_device()
+{
+    return device;
+}
+
+CameraType PipelineManager::get_camera_type()
+{
+    return camera_type;
 }

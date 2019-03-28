@@ -44,12 +44,11 @@ private:
 
     void improve_quality();
     void degrade_quality();
-
-public:
     string device;
+    int current_quality;
     const CameraType camera_type;
 
-    int current_quality;
+public:
     ResolutionPresets current_res;
     guint32 h264_bitrate;
     FileRecorder file_recorder;
@@ -67,13 +66,17 @@ public:
 
     QoSEstimator qos_estimator;
 
-    PipelineManager(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM, int quality = AUTO_PRESET);
+    PipelineManager(string _device = "/dev/video0", int quality = AUTO_PRESET, CameraType type = CameraType::RAW_CAM);
 
     virtual ~PipelineManager();
     void change_quality_preset(int quality);
     bool record_stream(bool _record_stream);
     void set_resolution(ResolutionPresets setting);
     void adapt_stream();
+    int get_current_quality();
+    void set_current_quality(int quality);
+    string get_device();
+    CameraType get_camera_type();
 
     // Takes the pipeline created by the launch string and iterates through it to
     // find the elements for configuration

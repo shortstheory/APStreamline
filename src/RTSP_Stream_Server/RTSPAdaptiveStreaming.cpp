@@ -13,7 +13,7 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
     uri(_uri),
     rtsp_server((GstRTSPServer*)gst_object_ref(server)),
     media_prepared(false),
-    pipeline_manager(_device, type, quality)
+    pipeline_manager(_device, quality, type)
 {
     // current_quality = quality;
     init_media_factory();
@@ -34,10 +34,10 @@ void RTSPAdaptiveStreaming::init_media_factory()
     media_factory = gst_rtsp_media_factory_new();
 
     string launch_string;
-    string device = pipeline_manager.device;
+    string device = pipeline_manager.get_device();
 
     // Set launch string according to the type of camera
-    switch (pipeline_manager.camera_type) {
+    switch (pipeline_manager.get_camera_type()) {
     case RAW_CAM:
         launch_string = "v4l2src name=src device=" + device +
                         " ! capsfilter name=capsfilter caps=image/jpeg,width=320,height=240,framerate=30/1"
@@ -178,7 +178,7 @@ void RTSPAdaptiveStreaming::media_unprepared_callback(GstRTSPMedia* media)
     gst_element_set_state(rtpbin, GST_STATE_NULL);
     gst_object_unref(rtpbin);
 
-    pipeline_manager.current_quality = AUTO_PRESET;
+    pipeline_manager.set_current_quality(AUTO_PRESET);
     cout << "Stream disconnected!" << endl;
 }
 
@@ -219,7 +219,7 @@ GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeI
         //same buffer can have an SDES and an RTCP pkt
         while (more) {
             pipeline_manager.qos_estimator.handle_rtcp_packet(packet);
-            if (pipeline_manager.current_quality == AUTO_PRESET && gst_rtcp_packet_get_type(packet) == GST_RTCP_TYPE_RR) {
+            if (pipeline_manager.get_current_quality() == AUTO_PRESET && gst_rtcp_packet_get_type(packet) == GST_RTCP_TYPE_RR) {
                 pipeline_manager.adapt_stream();
             }
             more = gst_rtcp_packet_move_to_next(packet);
@@ -296,13 +296,13 @@ void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
 void RTSPAdaptiveStreaming::set_device_properties(int quality, bool _record_stream)
 {
     // We can't have the capsfilter changing when recording from the CC, so we disable it for AUTO mode
-    if (pipeline_manager.camera_type != H264_CAM) {
-        if (quality == AUTO_PRESET && pipeline_manager.camera_type != UVC_CAM) {
+    if (pipeline_manager.get_camera_type() != H264_CAM) {
+        if (quality == AUTO_PRESET && pipeline_manager.get_camera_type() != UVC_CAM) {
             record_stream(false);
             pipeline_manager.change_quality_preset(quality);
             return;
         }
-        if (quality == pipeline_manager.current_quality) {
+        if (quality == pipeline_manager.get_current_quality()) {
             record_stream(_record_stream);
         } else {
             record_stream(false);
@@ -316,7 +316,7 @@ void RTSPAdaptiveStreaming::set_device_properties(int quality, bool _record_stre
 
 int RTSPAdaptiveStreaming::get_current_quality()
 {
-    return pipeline_manager.current_quality;
+    return pipeline_manager.get_current_quality();
 }
 
 bool RTSPAdaptiveStreaming::get_recording()
