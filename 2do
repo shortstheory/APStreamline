@@ -1,4 +1,3 @@
-*make GAS a part of RASP
 *add tegra support
 *see how its cameras work and which way to interface with the nvidia elements
 *if tegra doesn't support it, just remove the file recorder. it's too buggy

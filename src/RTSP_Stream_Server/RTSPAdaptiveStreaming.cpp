@@ -118,7 +118,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         }
     }
 
-    if (!get_element_references()) {
+    if (!pipeline_manager.get_element_references()) {
         cerr << "Some GStreamer elements not referenced" << endl;
     }
 
@@ -253,70 +253,6 @@ GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadP
         pipeline_manager.qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
     }
     return GST_PAD_PROBE_OK;
-}
-
-bool RTSPAdaptiveStreaming::get_element_references()
-{
-    if (pipeline_manager.pipeline) {
-        pipeline_manager.tee = gst_bin_get_by_name(GST_BIN(pipeline_manager.pipeline), "tee_element");
-        pipeline_manager.rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline_manager.pipeline), "pay0");
-        pipeline_manager.camera = gst_bin_get_by_name(GST_BIN(pipeline_manager.pipeline), "src");
-        pipeline_manager.src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline_manager.pipeline), "capsfilter");
-
-        switch (pipeline_manager.camera_type) {
-        case RAW_CAM:
-            pipeline_manager.h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline_manager.pipeline), "x264enc");
-            pipeline_manager.text_overlay = gst_bin_get_by_name(GST_BIN(pipeline_manager.pipeline), "textoverlay");
-            if (pipeline_manager.tee && pipeline_manager.rtph264_payloader && pipeline_manager.camera && pipeline_manager.src_capsfilter && pipeline_manager.h264_encoder && pipeline_manager.text_overlay) {
-                g_object_set(G_OBJECT(pipeline_manager.text_overlay),
-                             "valignment", 2,
-                             "halignment", 0,
-                             "font-desc", "Sans, 8", NULL);
-                g_object_set(G_OBJECT(pipeline_manager.h264_encoder),
-                             "tune", 0x00000004,
-                             "threads", 4,
-                             "key-int-max", I_FRAME_INTERVAL,
-                             // intra-refresh breaks an iframe over multiple frames
-                             "intra-refresh", TRUE,
-                             NULL);
-                return true;
-            } else {
-                return false;
-            }
-        case H264_CAM:
-            int v4l2_cam_fd;
-            if (pipeline_manager.camera) {
-                g_object_get(pipeline_manager.camera, "device-fd", &v4l2_cam_fd, NULL);
-                if (v4l2_cam_fd > 0) {
-                    v4l2_control veritcal_flip;
-                    veritcal_flip.id = V4L2_CID_VFLIP;
-                    veritcal_flip.value = TRUE;
-
-                    v4l2_control horizontal_flip;
-                    horizontal_flip.id = V4L2_CID_HFLIP;
-                    horizontal_flip.value = TRUE;
-
-                    v4l2_control i_frame_interval;
-                    i_frame_interval.id = V4L2_CID_MPEG_VIDEO_H264_I_PERIOD;
-                    i_frame_interval.value = I_FRAME_INTERVAL;
-
-                    if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &veritcal_flip) == -1 ||
-                        ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1 ||
-                        ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1) {
-                        return false;
-                    }
-                    return true;
-                }
-            }
-        case UVC_CAM:
-            if (pipeline_manager.tee && pipeline_manager.rtph264_payloader && pipeline_manager.camera && pipeline_manager.src_capsfilter) {
-                return true;
-            } else {
-                return false;
-            }
-        };
-    }
-    return false;
 }
 
 void RTSPAdaptiveStreaming::add_rtpbin_probes()

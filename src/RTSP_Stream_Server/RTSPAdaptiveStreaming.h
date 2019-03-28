@@ -65,9 +65,6 @@ private:
             GstPadProbeInfo* info,
             gpointer data);
 
-    // Takes the pipeline created by the launch string and iterates through it to
-    // find the elements for configuration
-    bool get_element_references();
     void record_stream(bool _record_stream);
 
 public:

@@ -74,6 +74,10 @@ public:
     bool record_stream(bool _record_stream);
     void set_resolution(ResolutionPresets setting);
     void adapt_stream();
+
+    // Takes the pipeline created by the launch string and iterates through it to
+    // find the elements for configuration
+    bool get_element_references();
 };
 
 #endif

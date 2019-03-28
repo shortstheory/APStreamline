@@ -240,3 +240,78 @@ void PipelineManager::change_quality_preset(int quality)
         }
     }
 }
+
+bool PipelineManager::get_element_references()
+{
+    if (pipeline)
+    {
+        tee = gst_bin_get_by_name(GST_BIN(pipeline), "tee_element");
+        rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), "pay0");
+        camera = gst_bin_get_by_name(GST_BIN(pipeline), "src");
+        src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter");
+
+        switch (camera_type)
+        {
+        case RAW_CAM:
+            h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), "x264enc");
+            text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), "textoverlay");
+            if (tee && rtph264_payloader && camera && src_capsfilter && h264_encoder && text_overlay)
+            {
+                g_object_set(G_OBJECT(text_overlay),
+                             "valignment", 2,
+                             "halignment", 0,
+                             "font-desc", "Sans, 8", NULL);
+                g_object_set(G_OBJECT(h264_encoder),
+                             "tune", 0x00000004,
+                             "threads", 4,
+                             "key-int-max", I_FRAME_INTERVAL,
+                             // intra-refresh breaks an iframe over multiple frames
+                             "intra-refresh", TRUE,
+                             NULL);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        case H264_CAM:
+            int v4l2_cam_fd;
+            if (camera)
+            {
+                g_object_get(camera, "device-fd", &v4l2_cam_fd, NULL);
+                if (v4l2_cam_fd > 0)
+                {
+                    v4l2_control vertical_flip;
+                    vertical_flip.id = V4L2_CID_VFLIP;
+                    vertical_flip.value = TRUE;
+
+                    v4l2_control horizontal_flip;
+                    horizontal_flip.id = V4L2_CID_HFLIP;
+                    horizontal_flip.value = TRUE;
+
+                    v4l2_control i_frame_interval;
+                    i_frame_interval.id = V4L2_CID_MPEG_VIDEO_H264_I_PERIOD;
+                    i_frame_interval.value = I_FRAME_INTERVAL;
+
+                    if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &vertical_flip) == -1 ||
+                        ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1 ||
+                        ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+            }
+        case UVC_CAM:
+            if (tee && rtph264_payloader && camera && src_capsfilter)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        };
+    }
+    return false;
+}
