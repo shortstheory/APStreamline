@@ -243,20 +243,17 @@ void PipelineManager::change_quality_preset(int quality)
 
 bool PipelineManager::get_element_references()
 {
-    if (pipeline)
-    {
+    if (pipeline) {
         tee = gst_bin_get_by_name(GST_BIN(pipeline), "tee_element");
         rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), "pay0");
         camera = gst_bin_get_by_name(GST_BIN(pipeline), "src");
         src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter");
 
-        switch (camera_type)
-        {
+        switch (camera_type) {
         case RAW_CAM:
             h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), "x264enc");
             text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), "textoverlay");
-            if (tee && rtph264_payloader && camera && src_capsfilter && h264_encoder && text_overlay)
-            {
+            if (tee && rtph264_payloader && camera && src_capsfilter && h264_encoder && text_overlay) {
                 g_object_set(G_OBJECT(text_overlay),
                              "valignment", 2,
                              "halignment", 0,
@@ -269,18 +266,14 @@ bool PipelineManager::get_element_references()
                              "intra-refresh", TRUE,
                              NULL);
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         case H264_CAM:
             int v4l2_cam_fd;
-            if (camera)
-            {
+            if (camera) {
                 g_object_get(camera, "device-fd", &v4l2_cam_fd, NULL);
-                if (v4l2_cam_fd > 0)
-                {
+                if (v4l2_cam_fd > 0) {
                     v4l2_control vertical_flip;
                     vertical_flip.id = V4L2_CID_VFLIP;
                     vertical_flip.value = TRUE;
@@ -295,20 +288,16 @@ bool PipelineManager::get_element_references()
 
                     if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &vertical_flip) == -1 ||
                         ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1 ||
-                        ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1)
-                    {
+                        ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1) {
                         return false;
                     }
                     return true;
                 }
             }
         case UVC_CAM:
-            if (tee && rtph264_payloader && camera && src_capsfilter)
-            {
+            if (tee && rtph264_payloader && camera && src_capsfilter) {
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         };
