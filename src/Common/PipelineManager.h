@@ -60,8 +60,8 @@ private:
     guint32 h264_bitrate;
     FileRecorder file_recorder;
 
-    GstElement* pipeline;
-    GstElement* multi_udp_sink;
+    GstElement *pipeline;
+    GstElement *multi_udp_sink;
     GstElement *rtph264_payloader;
     GstElement *tee;
 
@@ -69,7 +69,6 @@ private:
 
     PipelineManager(string _device = "/dev/video0", int quality = AUTO_PRESET, CameraType type = CameraType::RAW_CAM);
 
-    virtual ~PipelineManager();
     void change_quality_preset(int quality);
     bool record_stream(bool _record_stream);
     void set_resolution(ResolutionPresets setting);

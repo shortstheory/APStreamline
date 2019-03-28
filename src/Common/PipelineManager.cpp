@@ -39,20 +39,6 @@ PipelineManager::PipelineManager(string _device, int quality, CameraType type) :
     set_state_constants();
 }
 
-PipelineManager::~PipelineManager()
-{
-    // g_free(camera);
-    // g_free(src_capsfilter);
-    // g_free(videoconvert);
-    // g_free(h264_encoder);
-    // g_free(h264_parser);
-    // g_free(rtph264_payloader);
-    // g_free(text_overlay);
-    // g_free(tee);
-    // g_free(multi_udp_sink);
-    // g_free(pipeline);
-}
-
 void PipelineManager::set_state_constants()
 {
     if (network_state == NetworkState::STEADY) {
