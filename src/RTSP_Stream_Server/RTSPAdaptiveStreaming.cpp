@@ -10,12 +10,12 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
         string _uri,
         GstRTSPServer* server,
         int quality):
-    GenericAdaptiveStreaming(_device, type),
     uri(_uri),
     rtsp_server((GstRTSPServer*)gst_object_ref(server)),
-    media_prepared(false)
+    media_prepared(false),
+    pipeline_manager(_device, type, quality)
 {
-    current_quality = quality;
+    // current_quality = quality;
     init_media_factory();
 }
 
@@ -34,9 +34,10 @@ void RTSPAdaptiveStreaming::init_media_factory()
     media_factory = gst_rtsp_media_factory_new();
 
     string launch_string;
+    string device = pipeline_manager.device;
 
     // Set launch string according to the type of camera
-    switch (camera_type) {
+    switch (pipeline_manager.camera_type) {
     case RAW_CAM:
         launch_string = "v4l2src name=src device=" + device +
                         " ! capsfilter name=capsfilter caps=image/jpeg,width=320,height=240,framerate=30/1"
@@ -84,7 +85,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
 
     element = gst_rtsp_media_get_element(media);
     parent = (GstElement*)gst_object_get_parent(GST_OBJECT(element));
-    multi_udp_sink = nullptr;
+    pipeline_manager.multi_udp_sink = nullptr;
 
     guint major;
     guint minor;
@@ -103,7 +104,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         str = gst_element_get_name(element);
 
         if (str.find("bin") != std::string::npos || str.find("pipeline") != std::string::npos) {
-            pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+            pipeline_manager.pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
         }
         if (str.find("rtpbin") != std::string::npos) {
             rtpbin = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
@@ -112,7 +113,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         // Older gstreamer versions on the ARM boards setup multiudpsink in a different place
         if (minor < 14) {
             if (str.find("multiudpsink") != std::string::npos) {
-                multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+                pipeline_manager.multi_udp_sink = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
             }
         }
     }
@@ -121,7 +122,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         cerr << "Some GStreamer elements not referenced" << endl;
     }
 
-    set_resolution(ResolutionPresets::LOW);
+    pipeline_manager.set_resolution(ResolutionPresets::LOW);
     add_rtpbin_probes();
     media_prepared = true;
 }
@@ -162,22 +163,22 @@ void RTSPAdaptiveStreaming::deep_callback(GstBin* bin,
     string element_name;
     element_name = gst_element_get_name(element);
     // One udpsink takes care of RTCP packets and the other RTP
-    if (element_name.find("multiudpsink") != std::string::npos && !multi_udp_sink) {
-        multi_udp_sink = element;
+    if (element_name.find("multiudpsink") != std::string::npos && !pipeline_manager.multi_udp_sink) {
+        pipeline_manager.multi_udp_sink = element;
     }
 }
 
 // Called once the client has disconnected, allowing us to clean up the stream
 void RTSPAdaptiveStreaming::media_unprepared_callback(GstRTSPMedia* media)
 {
-    file_recorder.disable_recorder();
-    gst_element_set_state(pipeline, GST_STATE_NULL);
-    gst_object_unref(pipeline);
+    pipeline_manager.file_recorder.disable_recorder();
+    gst_element_set_state(pipeline_manager.pipeline, GST_STATE_NULL);
+    gst_object_unref(pipeline_manager.pipeline);
 
     gst_element_set_state(rtpbin, GST_STATE_NULL);
     gst_object_unref(rtpbin);
 
-    current_quality = AUTO_PRESET;
+    pipeline_manager.current_quality = AUTO_PRESET;
     cout << "Stream disconnected!" << endl;
 }
 
@@ -192,7 +193,7 @@ GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad
 GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPadProbeInfo* info)
 {
     // pad is blocked, so it's ok to unlink
-    file_recorder.disable_recorder();
+    pipeline_manager.file_recorder.disable_recorder();
     return GST_PAD_PROBE_REMOVE;
 }
 
@@ -217,9 +218,9 @@ GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeI
         gboolean more = gst_rtcp_buffer_get_first_packet(rtcp_buffer, packet);
         //same buffer can have an SDES and an RTCP pkt
         while (more) {
-            qos_estimator.handle_rtcp_packet(packet);
-            if (current_quality == AUTO_PRESET && gst_rtcp_packet_get_type(packet) == GST_RTCP_TYPE_RR) {
-                adapt_stream();
+            pipeline_manager.qos_estimator.handle_rtcp_packet(packet);
+            if (pipeline_manager.current_quality == AUTO_PRESET && gst_rtcp_packet_get_type(packet) == GST_RTCP_TYPE_RR) {
+                pipeline_manager.adapt_stream();
             }
             more = gst_rtcp_packet_move_to_next(packet);
         }
@@ -246,32 +247,32 @@ GstPadProbeReturn RTSPAdaptiveStreaming::payloader_callback(GstPad* pad, GstPadP
     GstBuffer* buf = GST_PAD_PROBE_INFO_BUFFER(info);
     if (buf != nullptr) {
         buffer_size = gst_buffer_get_size(buf);
-        if (multi_udp_sink) {
-            g_object_get(multi_udp_sink, "bytes-served", &bytes_sent, NULL);
+        if (pipeline_manager.multi_udp_sink) {
+            g_object_get(pipeline_manager.multi_udp_sink, "bytes-served", &bytes_sent, NULL);
         }
-        qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
+        pipeline_manager.qos_estimator.calculate_bitrates(bytes_sent, buffer_size);
     }
     return GST_PAD_PROBE_OK;
 }
 
 bool RTSPAdaptiveStreaming::get_element_references()
 {
-    if (pipeline) {
-        tee = gst_bin_get_by_name(GST_BIN(pipeline), "tee_element");
-        rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), "pay0");
-        camera = gst_bin_get_by_name(GST_BIN(pipeline), "src");
-        src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter");
+    if (pipeline_manager.pipeline) {
+        pipeline_manager.tee = gst_bin_get_by_name(GST_BIN(pipeline_manager.pipeline), "tee_element");
+        pipeline_manager.rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline_manager.pipeline), "pay0");
+        pipeline_manager.camera = gst_bin_get_by_name(GST_BIN(pipeline_manager.pipeline), "src");
+        pipeline_manager.src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline_manager.pipeline), "capsfilter");
 
-        switch (camera_type) {
+        switch (pipeline_manager.camera_type) {
         case RAW_CAM:
-            h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), "x264enc");
-            text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), "textoverlay");
-            if (tee && rtph264_payloader && camera && src_capsfilter && h264_encoder && text_overlay) {
-                g_object_set(G_OBJECT(text_overlay),
+            pipeline_manager.h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline_manager.pipeline), "x264enc");
+            pipeline_manager.text_overlay = gst_bin_get_by_name(GST_BIN(pipeline_manager.pipeline), "textoverlay");
+            if (pipeline_manager.tee && pipeline_manager.rtph264_payloader && pipeline_manager.camera && pipeline_manager.src_capsfilter && pipeline_manager.h264_encoder && pipeline_manager.text_overlay) {
+                g_object_set(G_OBJECT(pipeline_manager.text_overlay),
                              "valignment", 2,
                              "halignment", 0,
                              "font-desc", "Sans, 8", NULL);
-                g_object_set(G_OBJECT(h264_encoder),
+                g_object_set(G_OBJECT(pipeline_manager.h264_encoder),
                              "tune", 0x00000004,
                              "threads", 4,
                              "key-int-max", I_FRAME_INTERVAL,
@@ -284,8 +285,8 @@ bool RTSPAdaptiveStreaming::get_element_references()
             }
         case H264_CAM:
             int v4l2_cam_fd;
-            if (camera) {
-                g_object_get(camera, "device-fd", &v4l2_cam_fd, NULL);
+            if (pipeline_manager.camera) {
+                g_object_get(pipeline_manager.camera, "device-fd", &v4l2_cam_fd, NULL);
                 if (v4l2_cam_fd > 0) {
                     v4l2_control veritcal_flip;
                     veritcal_flip.id = V4L2_CID_VFLIP;
@@ -308,7 +309,7 @@ bool RTSPAdaptiveStreaming::get_element_references()
                 }
             }
         case UVC_CAM:
-            if (tee && rtph264_payloader && camera && src_capsfilter) {
+            if (pipeline_manager.tee && pipeline_manager.rtph264_payloader && pipeline_manager.camera && pipeline_manager.src_capsfilter) {
                 return true;
             } else {
                 return false;
@@ -332,7 +333,7 @@ void RTSPAdaptiveStreaming::add_rtpbin_probes()
     gst_pad_add_probe(rtcp_sr_pad, GST_PAD_PROBE_TYPE_BUFFER, static_rtcp_callback, this, NULL);
     gst_object_unref(rtcp_sr_pad);
 
-    payloader_pad = gst_element_get_static_pad(rtph264_payloader, "sink");
+    payloader_pad = gst_element_get_static_pad(pipeline_manager.rtph264_payloader, "sink");
     gst_pad_add_probe(payloader_pad, GST_PAD_PROBE_TYPE_BUFFER, static_payloader_callback, this, NULL);
     gst_object_unref(payloader_pad);
 }
@@ -345,10 +346,10 @@ bool RTSPAdaptiveStreaming::get_media_prepared()
 void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
 {
     if (_record_stream) {
-        file_recorder.init_file_recorder(pipeline, tee);
+        pipeline_manager.file_recorder.init_file_recorder(pipeline_manager.pipeline, pipeline_manager.tee);
     } else {
-        if (file_recorder.tee_file_pad) {
-            gst_pad_add_probe(file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
+        if (pipeline_manager.file_recorder.tee_file_pad) {
+            gst_pad_add_probe(pipeline_manager.file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
                               static_probe_block_callback, this, NULL);
         }
     }
@@ -359,20 +360,30 @@ void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
 void RTSPAdaptiveStreaming::set_device_properties(int quality, bool _record_stream)
 {
     // We can't have the capsfilter changing when recording from the CC, so we disable it for AUTO mode
-    if (camera_type != H264_CAM) {
-        if (quality == AUTO_PRESET && camera_type != UVC_CAM) {
+    if (pipeline_manager.camera_type != H264_CAM) {
+        if (quality == AUTO_PRESET && pipeline_manager.camera_type != UVC_CAM) {
             record_stream(false);
-            change_quality_preset(quality);
+            pipeline_manager.change_quality_preset(quality);
             return;
         }
-        if (quality == current_quality) {
+        if (quality == pipeline_manager.current_quality) {
             record_stream(_record_stream);
         } else {
             record_stream(false);
-            change_quality_preset(quality);
+            pipeline_manager.change_quality_preset(quality);
         }
     } else {
         record_stream(false);
-        change_quality_preset(quality);
+        pipeline_manager.change_quality_preset(quality);
     }
+}
+
+int RTSPAdaptiveStreaming::get_current_quality()
+{
+    return pipeline_manager.current_quality;
+}
+
+bool RTSPAdaptiveStreaming::get_recording()
+{
+    return pipeline_manager.file_recorder.get_recording();
 }

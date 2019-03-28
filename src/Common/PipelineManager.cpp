@@ -6,11 +6,11 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#include "GenericAdaptiveStreaming.h"
+#include "PipelineManager.h"
 
-GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType type) :
+PipelineManager::PipelineManager(string _device, CameraType type, int quality) :
     network_state(NetworkState::STEADY), successive_transmissions(0),
-    device(_device), camera_type(type)
+    device(_device), camera_type(type), current_quality(quality)
 {
     if (camera_type == CameraType::RAW_CAM) {
         video_presets[ResolutionPresets::LOW] = RAW_CAPS_FILTERS[VIDEO_320x240x30];
@@ -40,7 +40,7 @@ GenericAdaptiveStreaming::GenericAdaptiveStreaming(string _device, CameraType ty
     set_state_constants();
 }
 
-GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
+PipelineManager::~PipelineManager()
 {
     // g_free(camera);
     // g_free(src_capsfilter);
@@ -54,7 +54,7 @@ GenericAdaptiveStreaming::~GenericAdaptiveStreaming()
     // g_free(pipeline);
 }
 
-void GenericAdaptiveStreaming::set_state_constants()
+void PipelineManager::set_state_constants()
 {
     if (network_state == NetworkState::STEADY) {
         MAX_BITRATE = MAX_STEADY_BITRATE;
@@ -69,7 +69,7 @@ void GenericAdaptiveStreaming::set_state_constants()
     }
 }
 
-void GenericAdaptiveStreaming::adapt_stream()
+void PipelineManager::adapt_stream()
 {
     QoSReport qos_report;
     qos_report = qos_estimator.get_qos_report();
@@ -100,7 +100,7 @@ void GenericAdaptiveStreaming::adapt_stream()
     }
 }
 
-void GenericAdaptiveStreaming::improve_quality()
+void PipelineManager::improve_quality()
 {
     set_encoding_bitrate(h264_bitrate + INC_BITRATE);
     if (current_res == ResolutionPresets::LOW &&
@@ -112,7 +112,7 @@ void GenericAdaptiveStreaming::improve_quality()
     }
 }
 
-void GenericAdaptiveStreaming::degrade_quality()
+void PipelineManager::degrade_quality()
 {
     set_encoding_bitrate(h264_bitrate - DEC_BITRATE);
     if (current_res == ResolutionPresets::HIGH &&
@@ -124,7 +124,7 @@ void GenericAdaptiveStreaming::degrade_quality()
     }
 }
 
-void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
+void PipelineManager::set_encoding_bitrate(guint32 bitrate)
 {
     string currstate = (network_state == NetworkState::STEADY) ? "STEADY" : "CONGESTED";
 
@@ -173,7 +173,7 @@ void GenericAdaptiveStreaming::set_encoding_bitrate(guint32 bitrate)
 
 // Swap out capsfilters for changing the resolution. This doesn't work with UVC cameras.
 
-void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
+void PipelineManager::set_resolution(ResolutionPresets setting)
 {
     if (camera_type != UVC_CAM) {
         string caps_filter_string;
@@ -187,7 +187,7 @@ void GenericAdaptiveStreaming::set_resolution(ResolutionPresets setting)
     }
 }
 
-void GenericAdaptiveStreaming::change_quality_preset(int quality)
+void PipelineManager::change_quality_preset(int quality)
 {
     current_quality = quality;
     if (current_quality == AUTO_PRESET) {

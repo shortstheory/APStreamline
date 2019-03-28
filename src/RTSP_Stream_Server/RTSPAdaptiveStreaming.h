@@ -18,7 +18,7 @@ using namespace std;
 
 // Subclass of GenericAdaptiveStreaming, handling the streaming over RTSP
 
-class RTSPAdaptiveStreaming : public GenericAdaptiveStreaming
+class RTSPAdaptiveStreaming
 {
 private:
     const string uri;
@@ -28,6 +28,8 @@ private:
     bool media_prepared;
 
     GstElement* rtpbin;
+
+    PipelineManager pipeline_manager;
 
     void init_media_factory();
     void add_rtpbin_probes();
@@ -73,9 +75,11 @@ public:
                           CameraType type = CameraType::RAW_CAM,
                           string _uri = "/test", GstRTSPServer* server = nullptr,
                           int quality = AUTO_PRESET);
-    ~RTSPAdaptiveStreaming() override;
+    ~RTSPAdaptiveStreaming();
     void set_device_properties(int quality, bool record_stream);
     bool get_media_prepared();
+    int get_current_quality();
+    bool get_recording();
 };
 
 #endif

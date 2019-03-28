@@ -23,7 +23,7 @@ using namespace std;
 // GstElements which need to be manually referenced by subclassing it.
 // All the adapatation logic is handled here
 
-class GenericAdaptiveStreaming
+class PipelineManager
 {
 private:
     guint32 MIN_BITRATE;
@@ -67,9 +67,9 @@ public:
 
     QoSEstimator qos_estimator;
 
-    GenericAdaptiveStreaming(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM);
+    PipelineManager(string _device = "/dev/video0", CameraType type = CameraType::RAW_CAM, int quality = AUTO_PRESET);
 
-    virtual ~GenericAdaptiveStreaming();
+    virtual ~PipelineManager();
     void change_quality_preset(int quality);
     bool record_stream(bool _record_stream);
     void set_resolution(ResolutionPresets setting);

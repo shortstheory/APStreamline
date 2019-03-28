@@ -4,7 +4,7 @@
 #include "DeviceDatatypes.h"
 #include "NTPTime.h"
 #include "QoSEstimator.h"
-#include "GenericAdaptiveStreaming.h"
+#include "PipelineManager.h"
 #include "Constants.h"
 #include "FileRecorder.h"
 
