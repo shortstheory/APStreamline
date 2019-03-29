@@ -154,6 +154,9 @@ void PipelineManager::set_encoding_bitrate(guint32 bitrate)
         g_object_set(camera, "average-bitrate", h264_bitrate*1000, NULL);
         break;
     case JETSON_CAM:
+        if (h264_encoder) {
+            g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate*1000, NULL);
+        }
         break;
     };
 }
@@ -288,7 +291,12 @@ bool PipelineManager::get_element_references()
                 return false;
             }
         case JETSON_CAM:
-            return true;
+            h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), "omxh264enc");
+            if (tee && rtph264_payloader && camera && src_capsfilter && h264_encoder) {
+                return true;
+            } else {
+                return false;
+            }
         };
     }
     return false;
