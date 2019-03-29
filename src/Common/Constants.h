@@ -70,6 +70,7 @@ static const string SOCKET_PATH = "/tmp/rtsp_server.sock";
 static const string V4L2_DEVICE_PATH = "/dev/";
 static const string V4L2_DEVICE_PREFIX = "video";
 static const string MOUNT_POINT_PREFIX = "/cam";
+static const string JETSON_CAM_DRIVER = "tegra-video";
 
 
 #endif

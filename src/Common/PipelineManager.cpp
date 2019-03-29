@@ -153,6 +153,8 @@ void PipelineManager::set_encoding_bitrate(guint32 bitrate)
     case UVC_CAM:
         g_object_set(camera, "average-bitrate", h264_bitrate*1000, NULL);
         break;
+    case JETSON_CAM:
+        break;
     };
 }
 
@@ -285,6 +287,8 @@ bool PipelineManager::get_element_references()
             } else {
                 return false;
             }
+        case JETSON_CAM:
+            return true;
         };
     }
     return false;
