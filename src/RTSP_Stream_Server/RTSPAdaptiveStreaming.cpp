@@ -140,7 +140,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         cerr << "Some GStreamer elements not referenced" << endl;
     }
 
-    pipeline_manager.set_resolution(ResolutionPresets::LOW);
+    pipeline_manager.change_quality_preset(pipeline_manager.get_current_quality());
     add_rtpbin_probes();
     media_prepared = true;
 }
