@@ -69,6 +69,7 @@ private:
 
     PipelineManager(string _device = "/dev/video0", int quality = AUTO_PRESET, CameraType type = CameraType::RAW_CAM);
 
+    static int get_quality_bitrate(int quality);
     void change_quality_preset(int quality);
     bool record_stream(bool _record_stream);
     void set_resolution(ResolutionPresets setting);

@@ -15,7 +15,6 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
     media_prepared(false),
     pipeline_manager(_device, quality, type)
 {
-    // current_quality = quality;
     init_media_factory();
 }
 
@@ -34,41 +33,58 @@ void RTSPAdaptiveStreaming::init_media_factory()
     media_factory = gst_rtsp_media_factory_new();
 
     string launch_string;
-    string device = pipeline_manager.get_device();
+    string device;
+    device = pipeline_manager.get_device();
+
+    int quality;
+    quality = pipeline_manager.get_current_quality();
+
+    int h264_bitrate;
+    h264_bitrate = PipelineManager::get_quality_bitrate(quality);
+
+    string resolution_caps;
 
     // Set launch string according to the type of camera
     switch (pipeline_manager.get_camera_type()) {
     case RAW_CAM:
-        launch_string = "v4l2src name=src device=" + device +
-                        " ! capsfilter name=capsfilter caps=image/jpeg,width=320,height=240,framerate=30/1"
+        resolution_caps = (quality == AUTO_PRESET) ? RAW_CAPS_FILTERS[VIDEO_320x240x30] : RAW_CAPS_FILTERS[quality];
+        launch_string = "v4l2src name=src device=" + device + " ! capsfilter name=capsfilter caps=" + resolution_caps +
                         " ! jpegdec"
                         " ! videoconvert"
                         " ! textoverlay name=textoverlay"
-                        " ! x264enc name=x264enc tune=zerolatency threads=4 bitrate=500"
+                        " ! x264enc name=x264enc tune=zerolatency threads=4 bitrate=" + to_string(h264_bitrate) +
                         " ! tee name=tee_element tee_element."
                         " ! queue"
                         " ! h264parse"
                         " ! rtph264pay name=pay0";
         break;
     case UVC_CAM:
-        launch_string = "uvch264src device=" + device +
+        resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_1280x720x30] : H264_CAPS_FILTERS[quality];
+        launch_string = "uvch264src device=" + device + " average-bitrate=" + to_string(h264_bitrate*1000) +
                         " name=src auto-start=true src.vidsrc"
                         " ! queue"
-                        " ! capsfilter name=capsfilter caps=video/x-h264,width=1280,height=720,framerate=30/1"
+                        " ! capsfilter name=capsfilter caps=" + resolution_caps +
                         " ! tee name=tee_element tee_element."
                         " ! queue"
                         " ! h264parse"
                         " ! rtph264pay name=pay0";
         break;
     case H264_CAM:
+        resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_320x240x30] : H264_CAPS_FILTERS[quality];
         launch_string = "v4l2src name=src device=" + device +
                         " ! queue"
-                        " ! capsfilter name=capsfilter caps=video/x-h264,width=320,height=240,framerate=30/1"
+                        " ! capsfilter name=capsfilter caps=" + resolution_caps +
                         " ! queue"
                         " ! h264parse"
                         " ! rtph264pay name=pay0";
     case JETSON_CAM:
-        launch_string = "nvcamerasrc intent=3 name=src ! capsfilter name=capsfilter caps=\"video/x-raw(memory:NVMM),width=(int)1280,height=(int)720,format=(string)I420,framerate=(fraction)30/1\" ! omxh264enc name=omxh264enc control-rate=1 bitrate=500000 ! capsfilter caps=\"video/x-h264,profile=baseline,stream-format=(string)byte-stream\" ! h264parse ! rtph264pay name=pay0";
+        resolution_caps = (quality == AUTO_PRESET) ? JETSON_CAPS_FILTERS[VIDEO_640x480x30] : JETSON_CAPS_FILTERS[quality];
+        launch_string = "nvcamerasrc intent=3 name=src "
+                        " ! capsfilter name=capsfilter caps=" + resolution_caps +
+                        " ! omxh264enc name=omxh264enc control-rate=1 bitrate=" + to_string(h264_bitrate * 1000) +
+                        " ! capsfilter caps=" + resolution_caps +
+                        " ! h264parse "
+                        " ! rtph264pay name=pay0";
         break;
     };
     gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());

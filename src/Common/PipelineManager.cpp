@@ -48,6 +48,18 @@ PipelineManager::PipelineManager(string _device, int quality, CameraType type) :
     set_state_constants();
 }
 
+int PipelineManager::get_quality_bitrate(int quality)
+{
+    if (quality == VIDEO_320x240x15 || quality == VIDEO_320x240x30 || quality == VIDEO_320x240x60) {
+        return LOW_QUAL_BITRATE;
+    } else if (quality == VIDEO_640x480x15 || quality == VIDEO_640x480x30 || quality == VIDEO_640x480x60) {
+        return MED_QUAL_BITRATE;
+    } else if (quality == VIDEO_1280x720x15 || quality == VIDEO_1280x720x30 || quality == VIDEO_1280x720x60) {
+        return HIGH_QUAL_BITRATE;
+    }
+    return LOW_QUAL_BITRATE;
+}
+
 void PipelineManager::set_state_constants()
 {
     if (network_state == NetworkState::STEADY) {
@@ -200,15 +212,7 @@ void PipelineManager::change_quality_preset(int quality)
         GstCaps* src_caps;
 
         // Set the bitrate to the presets we use in AUTO mode
-
-        if (quality == VIDEO_320x240x15 || quality == VIDEO_320x240x30 || quality == VIDEO_320x240x60) {
-            h264_bitrate = LOW_QUAL_BITRATE;
-        } else if (quality == VIDEO_640x480x15 || quality == VIDEO_640x480x30 || quality == VIDEO_640x480x60) {
-            h264_bitrate = MED_QUAL_BITRATE;
-        } else if (quality == VIDEO_1280x720x15 || quality == VIDEO_1280x720x30 || quality ==VIDEO_1280x720x60) {
-            h264_bitrate = HIGH_QUAL_BITRATE;
-        }
-
+        h264_bitrate = get_quality_bitrate(quality);
         if (camera_type == CameraType::RAW_CAM) {
             g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate, NULL);
 
