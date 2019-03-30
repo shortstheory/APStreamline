@@ -170,7 +170,7 @@ void PipelineManager::set_encoding_bitrate(guint32 bitrate)
     };
 }
 
-// Swap out capsfilters for changing the resolution. This doesn't work with UVC cameras.
+// Swap out capsfilters for changing the resolution. This doesn't work with UVC/CSI cameras.
 
 void PipelineManager::set_resolution(ResolutionPresets setting)
 {

@@ -190,9 +190,8 @@ void RTSPStreamServer::get_v4l2_devices_info()
                                 ;
                             }
                         }
-
-                        // The PiCam doesn't list the resolutions explicitly, so we have
-                        // to guess its capabilities
+                    // The PiCam doesn't list the resolutions explicitly, so we have
+                    // to guess its capabilities
                     } else if (frmsize.type == V4L2_FRMSIZE_TYPE_STEPWISE) {
                         // How do I get the framerates for stepwise cams?
                         info.frame_property_bitmask |= (1 << VIDEO_320x240x15);
