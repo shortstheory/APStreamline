@@ -11,14 +11,23 @@
 PipelineManager::PipelineManager(string _device, int quality, CameraType type) : network_state(NetworkState::STEADY), successive_transmissions(0),
                                                                                  device(_device), current_quality(quality), camera_type(type)
 {
-    if (camera_type == CameraType::RAW_CAM) {
+    switch (camera_type) {
+    case CameraType::RAW_CAM:
         video_presets[ResolutionPresets::LOW] = RAW_CAPS_FILTERS[VIDEO_320x240x30];
         video_presets[ResolutionPresets::MED] = RAW_CAPS_FILTERS[VIDEO_640x480x30];
         video_presets[ResolutionPresets::HIGH] = RAW_CAPS_FILTERS[VIDEO_1280x720x30];
-    } else if (camera_type == CameraType::H264_CAM || camera_type == CameraType::UVC_CAM) {
+        break;
+    case CameraType::H264_CAM:
+    case CameraType::UVC_CAM:
         video_presets[ResolutionPresets::LOW] = H264_CAPS_FILTERS[VIDEO_320x240x30];
         video_presets[ResolutionPresets::MED] = H264_CAPS_FILTERS[VIDEO_640x480x30];
         video_presets[ResolutionPresets::HIGH] = H264_CAPS_FILTERS[VIDEO_1280x720x30];
+        break;
+    case CameraType::JETSON_CAM:
+        video_presets[ResolutionPresets::LOW] = JETSON_CAPS_FILTERS[VIDEO_320x240x30];
+        video_presets[ResolutionPresets::MED] = JETSON_CAPS_FILTERS[VIDEO_640x480x30];
+        video_presets[ResolutionPresets::HIGH] = JETSON_CAPS_FILTERS[VIDEO_1280x720x30];
+        break;
     }
 
     bitrate_presets[ResolutionPresets::LOW] = LOW_QUAL_BITRATE;
@@ -292,7 +301,7 @@ bool PipelineManager::get_element_references()
             }
         case JETSON_CAM:
             h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), "omxh264enc");
-            if (tee && rtph264_payloader && camera && src_capsfilter && h264_encoder) {
+            if (rtph264_payloader && camera && src_capsfilter && h264_encoder) {
                 return true;
             } else {
                 return false;
