@@ -68,13 +68,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
                         " ! h264parse"
                         " ! rtph264pay name=pay0";
     case JETSON_CAM:
-        launch_string = "nvcamerasrc intent=3 name=src"
-                        " ! nvvidconv flip-method=6"
-                        " ! capsfilter name=capsfilter caps=video/x-raw(memory:NVMM), width=(int)1920, height=(int)1080, format=(string)I420, framerate=(fraction)60/1"
-                        " ! omxh264enc name=omxh264enc control-rate=1 bitrate=500"
-                        " ! video/x-h264, stream-format=(string)byte-stream"
-                        " ! h264parse"
-                        " ! rtph264pay name=pay0";
+        launch_string = "nvcamerasrc intent=3 name=src ! nvvidconv flip-method=6 ! capsfilter name=capsfilter caps=\"video/x-raw(memory:NVMM),width=(int)320,height=(int)240,format=(string)I420,framerate=(fraction)30/1\" ! omxh264enc name=omxh264enc control-rate=1 bitrate=500000 ! capsfilter caps=\"video/x-h264,profile=baseline,stream-format=(string)byte-stream\" ! h264parse ! rtph264pay name=pay0";
         break;
     };
     gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
