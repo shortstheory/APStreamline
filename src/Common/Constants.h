@@ -4,6 +4,8 @@
 #include <gst/gst.h>
 #include <vector>
 
+using namespace std;
+
 // This generalisation is hardly rigid, but we can target higher bitrates on
 // x86/amd64 systems which are typically laptops. ARM devices such as the
 // Raspberry Pi are far more limited.
