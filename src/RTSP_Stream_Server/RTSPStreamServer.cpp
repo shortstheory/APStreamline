@@ -228,6 +228,13 @@ void RTSPStreamServer::setup_streams()
     }
 }
 
+void RTSPStreamServer::set_stream_quality(string device, int _quality)
+{
+    auto it = device_properties_map.find(device);
+    cout << "DEVICE - " << it->first;
+    it->second.quality = _quality;
+}
+
 void RTSPStreamServer::set_service_id(guint id)
 {
     service_id = id;

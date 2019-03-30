@@ -58,7 +58,7 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
             device_props.second.mount_point.c_str(),
             device_props.second.camera_type,
             device_props.second.frame_property_bitmask,
-            stream->get_current_quality(),
+            device_props.second.quality,
             stream->get_recording());
     return string(info_buffer);
 }
@@ -114,7 +114,10 @@ void IPCMessageHandler::set_device_quality(char* buffer)
 
     try {
         stream = rtsp_stream_server->get_stream_map().at(string(video_device));
-        rtsp_stream_server->get_device_map().at(string(video_device)).quality = camera_setting;
+        // rtsp_stream_server->get_device_map().at(string(video_device)).set_quality(camera_setting);
+        cout << "PreCamSet - " << camera_setting;
+        rtsp_stream_server->set_stream_quality(string(video_device), camera_setting);
+        cout << "Camera sett - " << rtsp_stream_server->get_device_map().at(string(video_device)).quality << endl;
         if (stream->get_media_prepared()) {
             stream->set_device_properties(camera_setting, _record_stream);
         } else {

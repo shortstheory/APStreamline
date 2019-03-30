@@ -36,6 +36,7 @@ public:
     GstRTSPServer* get_server();
 
     void set_service_id(guint id);
+    void set_stream_quality(string device, int quality);
     string get_ip_address();
     string get_port();
     map<string, v4l2_info> get_device_map();
