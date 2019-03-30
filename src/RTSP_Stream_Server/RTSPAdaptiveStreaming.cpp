@@ -81,7 +81,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
         resolution_caps = (quality == AUTO_PRESET) ? JETSON_CAPS_FILTERS[VIDEO_640x480x30] : JETSON_CAPS_FILTERS[quality];
         launch_string = "nvcamerasrc intent=3 name=src "
                         " ! capsfilter name=capsfilter caps=" + resolution_caps +
-                        " ! omxh264enc name=omxh264enc control-rate=1 bitrate=" + to_string(h264_bitrate * 1000) +
+                        " ! omxh264enc name=omxh264enc control-rate=1 bitrate=" + to_string(h264_bitrate*1000) +
                         " ! capsfilter caps=" + resolution_caps +
                         " ! h264parse "
                         " ! rtph264pay name=pay0";

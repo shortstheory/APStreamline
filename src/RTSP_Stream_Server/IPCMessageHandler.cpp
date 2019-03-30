@@ -114,6 +114,7 @@ void IPCMessageHandler::set_device_quality(char* buffer)
 
     try {
         stream = rtsp_stream_server->get_stream_map().at(string(video_device));
+        rtsp_stream_server->get_device_map().at(string(video_device)).quality = camera_setting;
         if (stream->get_media_prepared()) {
             stream->set_device_properties(camera_setting, _record_stream);
         } else {

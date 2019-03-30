@@ -223,7 +223,8 @@ void RTSPStreamServer::setup_streams()
                                     new RTSPAdaptiveStreaming(it->first,
                                             it->second.camera_type,
                                             it->second.mount_point,
-                                            server)));
+                                            server,
+                                            it->second.quality)));
     }
 }
 

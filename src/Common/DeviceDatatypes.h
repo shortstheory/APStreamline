@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <gst/gst.h>
+#include "Common.h"
 
 using namespace std;
 
@@ -27,6 +28,12 @@ struct v4l2_info {
     string mount_point;
     CameraType camera_type;
     guint64 frame_property_bitmask;
+    int quality;
+
+    v4l2_info()
+    {
+        quality = AUTO_PRESET;
+    }
 };
 
 // Gives QoS estimates to the Adaptive Streamer for acting upon
