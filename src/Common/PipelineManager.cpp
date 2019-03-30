@@ -174,7 +174,7 @@ void PipelineManager::set_encoding_bitrate(guint32 bitrate)
 
 void PipelineManager::set_resolution(ResolutionPresets setting)
 {
-    if (camera_type != UVC_CAM) {
+    if (camera_type != UVC_CAM && camera_type != JETSON_CAM) {
         string caps_filter_string;
         caps_filter_string = video_presets[setting];
         set_encoding_bitrate(bitrate_presets[setting]);
