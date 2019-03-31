@@ -67,7 +67,7 @@ private:
 
     QoSEstimator qos_estimator;
 
-    PipelineManager(string _device = "/dev/video0", int quality = AUTO_PRESET, CameraType type = CameraType::RAW_CAM);
+    PipelineManager(string _device = "/dev/video0", int quality = AUTO_PRESET, CameraType type = CameraType::MJPG_CAM);
 
     static int get_quality_bitrate(int quality);
     void change_quality_preset(int quality);

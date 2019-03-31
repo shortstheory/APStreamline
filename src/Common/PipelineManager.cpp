@@ -12,7 +12,7 @@ PipelineManager::PipelineManager(string _device, int quality, CameraType type) :
                                                                                  device(_device), current_quality(quality), camera_type(type)
 {
     switch (camera_type) {
-    case CameraType::RAW_CAM:
+    case CameraType::MJPG_CAM:
         video_presets[ResolutionPresets::LOW] = RAW_CAPS_FILTERS[VIDEO_320x240x30];
         video_presets[ResolutionPresets::MED] = RAW_CAPS_FILTERS[VIDEO_640x480x30];
         video_presets[ResolutionPresets::HIGH] = RAW_CAPS_FILTERS[VIDEO_1280x720x30];
@@ -143,7 +143,7 @@ void PipelineManager::set_encoding_bitrate(guint32 bitrate)
     }
 
     switch (camera_type) {
-    case RAW_CAM:
+    case MJPG_CAM:
         if (h264_encoder) {
             g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate, NULL);
         }
@@ -213,7 +213,7 @@ void PipelineManager::change_quality_preset(int quality)
 
         // Set the bitrate to the presets we use in AUTO mode
         h264_bitrate = get_quality_bitrate(quality);
-        if (camera_type == CameraType::RAW_CAM) {
+        if (camera_type == CameraType::MJPG_CAM) {
             g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate, NULL);
 
             caps_filter_string = RAW_CAPS_FILTERS[current_quality];
@@ -253,7 +253,7 @@ bool PipelineManager::get_element_references()
         src_capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter");
 
         switch (camera_type) {
-        case RAW_CAM:
+        case MJPG_CAM:
             h264_encoder = gst_bin_get_by_name(GST_BIN(pipeline), "x264enc");
             text_overlay = gst_bin_get_by_name(GST_BIN(pipeline), "textoverlay");
             if (tee && rtph264_payloader && camera && src_capsfilter && h264_encoder && text_overlay) {

@@ -131,7 +131,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
                         info.camera_type = UVC_CAM;
                     }
                 } else {
-                    info.camera_type = RAW_CAM;
+                    info.camera_type = MJPG_CAM;
                 }
 
                 frmsize.pixel_format = fmt.pixelformat;
