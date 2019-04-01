@@ -69,11 +69,11 @@ private:
     PipelineManager(string _device = "/dev/video0", int quality = AUTO_PRESET, CameraType type = CameraType::MJPG_CAM);
 
     static int get_quality_bitrate(int quality);
-    void set_quality(int quality);
     bool record_stream(bool _record_stream);
     void set_resolution(ResolutionPresets setting);
     void adapt_stream();
     int get_quality();
+    void set_quality(int quality);
     string get_device();
     CameraType get_camera_type();
 

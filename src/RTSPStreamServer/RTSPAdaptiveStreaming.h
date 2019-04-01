@@ -72,8 +72,8 @@ public:
     ~RTSPAdaptiveStreaming();
     void init_media_factory();
     bool get_media_prepared();
-    void set_quality(int quality);
     int get_quality();
+    void set_quality(int quality);
 };
 
 #endif

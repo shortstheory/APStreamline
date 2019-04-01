@@ -296,14 +296,15 @@ bool RTSPAdaptiveStreaming::get_media_prepared()
     return media_prepared;
 }
 
+
+int RTSPAdaptiveStreaming::get_quality()
+{
+    return pipeline_manager.get_quality();
+}
+
 void RTSPAdaptiveStreaming::set_quality(int quality)
 {
     if (quality != pipeline_manager.get_quality()) {
         pipeline_manager.set_quality(quality);
     }
-}
-
-int RTSPAdaptiveStreaming::get_quality()
-{
-    return pipeline_manager.get_quality();
 }
