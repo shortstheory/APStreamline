@@ -36,21 +36,21 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     port = rtsp_stream_server->get_port();
 
     sprintf(info_buffer, "{"
-            "\"ip\": \"%s\", "
-            "\"port\": \"%s\", "
-            "\"dev_mount\": \"%s\", "
-            "\"name\": \"%s\", "
-            "\"mount\": \"%s\", "
-            "\"camtype\": %d, "
+                            "\"ip\": \"%s\", "
+                            "\"port\": \"%s\", "
+                            "\"dev_mount\": \"%s\", "
+                            "\"name\": \"%s\", "
+                            "\"mount\": \"%s\", "
+                            "\"camtype\": %d, "
 #if defined(__amd64__) || defined(__aarch64__)
-            "\"frame_property_bitmask\": %lu, "
+                            "\"frame_property_bitmask\": %lu, "
 #endif
 #ifdef __arm__
-            "\"frame_property_bitmask\": %llu, "
+                            "\"frame_property_bitmask\": %llu, "
 #endif
-            "\"current_quality\": %u, "
-            "\"recording\": %d"
-            "}",
+                            "\"current_quality\": %u, "
+                            "\"recording\": %d"
+                            "}",
             ip_address.c_str(),
             port.c_str(),
             device_props.first.c_str(),
@@ -58,7 +58,7 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
             device_props.second.mount_point.c_str(),
             device_props.second.camera_type,
             device_props.second.frame_property_bitmask,
-            device_props.second.quality,
+            stream->get_current_quality(),
             stream->get_recording());
     return string(info_buffer);
 }
@@ -114,9 +114,8 @@ void IPCMessageHandler::set_device_quality(char* buffer)
 
     try {
         stream = rtsp_stream_server->get_stream_map().at(string(video_device));
-        rtsp_stream_server->set_stream_quality(string(video_device), camera_setting);
+        stream->set_device_properties(camera_setting, _record_stream);
         if (stream->get_media_prepared()) {
-            stream->set_device_properties(camera_setting, _record_stream);
         } else {
             cerr << "Stream not connected yet" << endl;
         }

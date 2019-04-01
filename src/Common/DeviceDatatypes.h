@@ -28,17 +28,17 @@ struct v4l2_info {
     string mount_point;
     CameraType camera_type;
     guint64 frame_property_bitmask;
-    int quality;
+    // int quality;
 
-    v4l2_info()
-    {
-        quality = AUTO_PRESET;
-    }
+    // v4l2_info()
+    // {
+    //     quality = AUTO_PRESET;
+    // }
 
-    void set_quality(int _quality)
-    {
-        quality = _quality;
-    }
+    // void set_quality(int _quality)
+    // {
+    //     quality = _quality;
+    // }
 };
 
 // Gives QoS estimates to the Adaptive Streamer for acting upon
