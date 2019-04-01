@@ -189,7 +189,6 @@ void PipelineManager::set_resolution(ResolutionPresets setting)
     if (camera_type != UVC_CAM && camera_type != JETSON_CAM) {
         string caps_filter_string;
         caps_filter_string = video_presets[setting];
-        cout << "CAPS SETTING - " << caps_filter_string << endl;
         set_encoding_bitrate(bitrate_presets[setting]);
         current_res = setting;
         GstCaps* src_caps;

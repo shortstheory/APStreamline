@@ -49,7 +49,6 @@ void RTSPAdaptiveStreaming::init_media_factory()
         switch (pipeline_manager.get_camera_type()) {
         case MJPG_CAM:
             resolution_caps = (quality == AUTO_PRESET) ? RAW_CAPS_FILTERS[VIDEO_320x240x30] : RAW_CAPS_FILTERS[quality];
-            cout << "QUALITY " << quality << " CAPS " << resolution_caps << endl;
             launch_string = "v4l2src name=src device=" + device + " ! capsfilter name=capsfilter caps=" + resolution_caps +
                             " ! jpegdec"
                             " ! videoconvert"
