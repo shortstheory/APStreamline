@@ -38,7 +38,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
         device = pipeline_manager.get_device();
 
         int quality;
-        quality = pipeline_manager.get_current_quality();
+        quality = pipeline_manager.get_quality();
 
         int h264_bitrate;
         h264_bitrate = PipelineManager::get_quality_bitrate(quality);
@@ -143,7 +143,6 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         cerr << "Some GStreamer elements not referenced" << endl;
     }
 
-    pipeline_manager.change_quality_preset(get_current_quality());
     add_rtpbin_probes();
     media_prepared = true;
 }
@@ -238,7 +237,7 @@ GstPadProbeReturn RTSPAdaptiveStreaming::rtcp_callback(GstPad* pad, GstPadProbeI
         //same buffer can have an SDES and an RTCP pkt
         while (more) {
             pipeline_manager.qos_estimator.handle_rtcp_packet(packet);
-            if (pipeline_manager.get_current_quality() == AUTO_PRESET && gst_rtcp_packet_get_type(packet) == GST_RTCP_TYPE_RR) {
+            if (pipeline_manager.get_quality() == AUTO_PRESET && gst_rtcp_packet_get_type(packet) == GST_RTCP_TYPE_RR) {
                 pipeline_manager.adapt_stream();
             }
             more = gst_rtcp_packet_move_to_next(packet);
@@ -302,18 +301,12 @@ bool RTSPAdaptiveStreaming::get_media_prepared()
 // to avoid any serious concurrency issues which can otherwise occur
 void RTSPAdaptiveStreaming::set_device_properties(int quality)
 {
-    // We can't have the capsfilter changing when recording from the CC, so we disable it for AUTO mode
-    // if (pipeline_manager.get_camera_type() != H264_CAM) {
-    if (quality == AUTO_PRESET && pipeline_manager.get_camera_type() != UVC_CAM) {
-        pipeline_manager.change_quality_preset(quality);
-        return;
-    }
-    if (quality != pipeline_manager.get_current_quality()) {
-        pipeline_manager.change_quality_preset(quality);
+    if (quality != pipeline_manager.get_quality()) {
+        pipeline_manager.set_quality(quality);
     }
 }
 
-int RTSPAdaptiveStreaming::get_current_quality()
+int RTSPAdaptiveStreaming::get_quality()
 {
-    return pipeline_manager.get_current_quality();
+    return pipeline_manager.get_quality();
 }

@@ -58,7 +58,7 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
             device_props.second.mount_point.c_str(),
             device_props.second.camera_type,
             device_props.second.frame_property_bitmask,
-            stream->get_current_quality(),
+            stream->get_quality(),
             false);
     return string(info_buffer);
 }

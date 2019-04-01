@@ -52,7 +52,7 @@ private:
     void improve_quality();
     void degrade_quality();
     string device;
-    int current_quality;
+    int quality;
     const CameraType camera_type;
 
   public:
@@ -69,12 +69,11 @@ private:
     PipelineManager(string _device = "/dev/video0", int quality = AUTO_PRESET, CameraType type = CameraType::MJPG_CAM);
 
     static int get_quality_bitrate(int quality);
-    void change_quality_preset(int quality);
+    void set_quality(int quality);
     bool record_stream(bool _record_stream);
     void set_resolution(ResolutionPresets setting);
     void adapt_stream();
-    int get_current_quality();
-    void set_current_quality(int quality);
+    int get_quality();
     string get_device();
     CameraType get_camera_type();
 

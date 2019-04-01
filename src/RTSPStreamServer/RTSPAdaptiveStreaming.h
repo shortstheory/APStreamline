@@ -73,7 +73,7 @@ public:
     void init_media_factory();
     void set_device_properties(int quality);
     bool get_media_prepared();
-    int get_current_quality();
+    int get_quality();
 };
 
 #endif

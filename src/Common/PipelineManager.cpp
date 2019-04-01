@@ -9,7 +9,7 @@
 #include "PipelineManager.h"
 
 PipelineManager::PipelineManager(string _device, int quality, CameraType type) : network_state(NetworkState::STEADY), successive_transmissions(0),
-                                                                                 device(_device), current_quality(quality), camera_type(type)
+                                                                                 device(_device), quality(quality), camera_type(type)
 {
     switch (camera_type) {
     case CameraType::MJPG_CAM:
@@ -199,10 +199,10 @@ void PipelineManager::set_resolution(ResolutionPresets setting)
     }
 }
 
-void PipelineManager::change_quality_preset(int quality)
+void PipelineManager::set_quality(int _quality)
 {
-    current_quality = quality;
-    if (current_quality == AUTO_PRESET) {
+    quality = _quality;
+    if (quality == AUTO_PRESET) {
         network_state = STEADY;
         set_state_constants();
         h264_bitrate = MIN_BITRATE;
@@ -217,7 +217,7 @@ void PipelineManager::change_quality_preset(int quality)
             switch(camera_type) {
             case CameraType::MJPG_CAM:
                 g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate, NULL);
-                caps_filter_string = RAW_CAPS_FILTERS[current_quality];
+                caps_filter_string = RAW_CAPS_FILTERS[quality];
                 src_caps = gst_caps_from_string(caps_filter_string.c_str());
                 g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
                 break;
@@ -241,7 +241,7 @@ void PipelineManager::change_quality_preset(int quality)
                         cerr << "Camera does not support the IOCTL" << endl;
                     }
                 }
-                caps_filter_string = H264_CAPS_FILTERS[current_quality];
+                caps_filter_string = H264_CAPS_FILTERS[quality];
                 src_caps = gst_caps_from_string(caps_filter_string.c_str());
                 g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
                 break;
@@ -325,14 +325,9 @@ bool PipelineManager::get_element_references()
     return false;
 }
 
-int PipelineManager::get_current_quality()
+int PipelineManager::get_quality()
 {
-    return current_quality;
-}
-
-void PipelineManager::set_current_quality(int quality)
-{
-    current_quality = quality;
+    return quality;
 }
 
 string PipelineManager::get_device()
