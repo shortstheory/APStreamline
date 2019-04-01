@@ -82,7 +82,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
         launch_string = "nvcamerasrc intent=3 name=src "
                         " ! capsfilter name=capsfilter caps=" + resolution_caps +
                         " ! omxh264enc name=omxh264enc control-rate=1 bitrate=" + to_string(h264_bitrate*1000) +
-                        " ! capsfilter caps=" + resolution_caps +
+                        " ! capsfilter caps =\"video/x-h264,profile=baseline,stream-format=(string)byte-stream\""
                         " ! h264parse "
                         " ! rtph264pay name=pay0";
         break;
