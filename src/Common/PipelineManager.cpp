@@ -189,6 +189,7 @@ void PipelineManager::set_resolution(ResolutionPresets setting)
     if (camera_type != UVC_CAM && camera_type != JETSON_CAM) {
         string caps_filter_string;
         caps_filter_string = video_presets[setting];
+        cout << "CAPS SETTING - " << caps_filter_string << endl;
         set_encoding_bitrate(bitrate_presets[setting]);
         current_res = setting;
         GstCaps* src_caps;
@@ -208,39 +209,47 @@ void PipelineManager::change_quality_preset(int quality)
         set_resolution(ResolutionPresets::LOW);
         successive_transmissions = 0;
     } else {
-        string caps_filter_string;
-        GstCaps* src_caps;
-
         // Set the bitrate to the presets we use in AUTO mode
         h264_bitrate = get_quality_bitrate(quality);
         if (camera != nullptr) {
-            if (camera_type == CameraType::MJPG_CAM) {
+            string caps_filter_string;
+            GstCaps* src_caps;
+            switch(camera_type) {
+            case CameraType::MJPG_CAM:
                 g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate, NULL);
 
                 caps_filter_string = RAW_CAPS_FILTERS[current_quality];
                 src_caps = gst_caps_from_string(caps_filter_string.c_str());
                 g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
-            } else if (camera_type == CameraType::H264_CAM) {
+                break;
+            case CameraType::H264_CAM:
                 int v4l2_cam_fd;
                 g_object_get(camera, "device-fd", &v4l2_cam_fd, NULL);
-                if (v4l2_cam_fd > 0) {
+                if (v4l2_cam_fd > 0)
+                {
                     v4l2_control bitrate_ctrl;
                     v4l2_control i_frame_interval;
 
                     bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
-                    bitrate_ctrl.value = h264_bitrate*1000;
+                    bitrate_ctrl.value = h264_bitrate * 1000;
 
                     i_frame_interval.id = V4L2_CID_MPEG_VIDEO_H264_I_PERIOD;
                     i_frame_interval.value = 60;
 
                     if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
-                        ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1) {
+                        ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &i_frame_interval) == -1)
+                    {
                         cerr << "Camera does not support the IOCTL" << endl;
                     }
                 }
                 caps_filter_string = H264_CAPS_FILTERS[current_quality];
                 src_caps = gst_caps_from_string(caps_filter_string.c_str());
                 g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
+                break;
+            case CameraType::UVC_CAM:
+                break;
+            case CameraType::JETSON_CAM:
+                break;
             }
         }
     }
