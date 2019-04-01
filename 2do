@@ -1,6 +1,0 @@
-*add tegra support
-*see how its cameras work and which way to interface with the nvidia elements
-*if tegra doesn't support it, just remove the file recorder. it's too buggy
-*detect omxh264enc and give the option to use it?
-*simplify camera detecting logic
-*https://stackoverflow.com/questions/13744560/using-gstreamer-to-serve-rtsp-stream-working-example-sought - try makign things work with this example
