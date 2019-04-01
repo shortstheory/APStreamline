@@ -115,6 +115,7 @@ void IPCMessageHandler::set_device_quality(char* buffer)
         stream->set_device_properties(camera_setting);
         if (!stream->get_media_prepared()) {
             cerr << "Stream not connected yet" << endl;
+            stream->init_media_factory();
         }
     } catch (const out_of_range& err) {
         cerr << err.what();

@@ -31,7 +31,6 @@ private:
 
     PipelineManager pipeline_manager;
 
-    void init_media_factory();
     void add_rtpbin_probes();
 
     // Several GStreamer functions operate using callbacks, however we need to first
@@ -71,6 +70,7 @@ public:
                           string _uri = "/test", GstRTSPServer* server = nullptr,
                           int quality = AUTO_PRESET);
     ~RTSPAdaptiveStreaming();
+    void init_media_factory();
     void set_device_properties(int quality);
     bool get_media_prepared();
     int get_current_quality();

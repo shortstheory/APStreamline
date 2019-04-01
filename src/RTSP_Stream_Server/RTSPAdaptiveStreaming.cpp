@@ -28,71 +28,73 @@ RTSPAdaptiveStreaming::~RTSPAdaptiveStreaming()
 
 void RTSPAdaptiveStreaming::init_media_factory()
 {
-    GstRTSPMountPoints* mounts;
-    mounts = gst_rtsp_server_get_mount_points(rtsp_server);
-    media_factory = gst_rtsp_media_factory_new();
+    if (!media_prepared) {
+        GstRTSPMountPoints* mounts;
+        mounts = gst_rtsp_server_get_mount_points(rtsp_server);
+        media_factory = gst_rtsp_media_factory_new();
 
-    string launch_string;
-    string device;
-    device = pipeline_manager.get_device();
+        string launch_string;
+        string device;
+        device = pipeline_manager.get_device();
 
-    int quality;
-    quality = pipeline_manager.get_current_quality();
+        int quality;
+        quality = pipeline_manager.get_current_quality();
 
-    int h264_bitrate;
-    h264_bitrate = PipelineManager::get_quality_bitrate(quality);
+        int h264_bitrate;
+        h264_bitrate = PipelineManager::get_quality_bitrate(quality);
 
-    string resolution_caps;
+        string resolution_caps;
 
-    // Set launch string according to the type of camera
-    switch (pipeline_manager.get_camera_type()) {
-    case MJPG_CAM:
-        resolution_caps = (quality == AUTO_PRESET) ? RAW_CAPS_FILTERS[VIDEO_320x240x30] : RAW_CAPS_FILTERS[quality];
-        cout << "QUALITY " << quality << " CAPS " << resolution_caps << endl;
-        launch_string = "v4l2src name=src device=" + device + " ! capsfilter name=capsfilter caps=" + resolution_caps +
-                        " ! jpegdec"
-                        " ! videoconvert"
-                        " ! textoverlay name=textoverlay"
-                        " ! x264enc name=x264enc tune=zerolatency threads=4 bitrate=" + to_string(h264_bitrate) +
-                        " ! tee name=tee_element tee_element."
-                        " ! queue"
-                        " ! h264parse"
-                        " ! rtph264pay name=pay0";
-        break;
-    case UVC_CAM:
-        resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_1280x720x30] : H264_CAPS_FILTERS[quality];
-        launch_string = "uvch264src device=" + device + " average-bitrate=" + to_string(h264_bitrate*1000) +
-                        " name=src auto-start=true src.vidsrc"
-                        " ! queue"
-                        " ! capsfilter name=capsfilter caps=" + resolution_caps +
-                        " ! tee name=tee_element tee_element."
-                        " ! queue"
-                        " ! h264parse"
-                        " ! rtph264pay name=pay0";
-        break;
-    case H264_CAM:
-        resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_320x240x30] : H264_CAPS_FILTERS[quality];
-        launch_string = "v4l2src name=src device=" + device +
-                        " ! queue"
-                        " ! capsfilter name=capsfilter caps=" + resolution_caps +
-                        " ! queue"
-                        " ! h264parse"
-                        " ! rtph264pay name=pay0";
-    case JETSON_CAM:
-        resolution_caps = (quality == AUTO_PRESET) ? JETSON_CAPS_FILTERS[VIDEO_640x480x30] : JETSON_CAPS_FILTERS[quality];
-        launch_string = "nvcamerasrc intent=3 name=src "
-                        " ! capsfilter name=capsfilter caps=" + resolution_caps +
-                        " ! omxh264enc name=omxh264enc control-rate=1 bitrate=" + to_string(h264_bitrate*1000) +
-                        " ! capsfilter caps =\"video/x-h264,profile=baseline,stream-format=(string)byte-stream\""
-                        " ! h264parse "
-                        " ! rtph264pay name=pay0";
-        break;
-    };
-    gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
+        // Set launch string according to the type of camera
+        switch (pipeline_manager.get_camera_type()) {
+        case MJPG_CAM:
+            resolution_caps = (quality == AUTO_PRESET) ? RAW_CAPS_FILTERS[VIDEO_320x240x30] : RAW_CAPS_FILTERS[quality];
+            cout << "QUALITY " << quality << " CAPS " << resolution_caps << endl;
+            launch_string = "v4l2src name=src device=" + device + " ! capsfilter name=capsfilter caps=" + resolution_caps +
+                            " ! jpegdec"
+                            " ! videoconvert"
+                            " ! textoverlay name=textoverlay"
+                            " ! x264enc name=x264enc tune=zerolatency threads=4 bitrate=" + to_string(h264_bitrate) +
+                            " ! tee name=tee_element tee_element."
+                            " ! queue"
+                            " ! h264parse"
+                            " ! rtph264pay name=pay0";
+            break;
+        case UVC_CAM:
+            resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_1280x720x30] : H264_CAPS_FILTERS[quality];
+            launch_string = "uvch264src device=" + device + " average-bitrate=" + to_string(h264_bitrate*1000) +
+                            " name=src auto-start=true src.vidsrc"
+                            " ! queue"
+                            " ! capsfilter name=capsfilter caps=" + resolution_caps +
+                            " ! tee name=tee_element tee_element."
+                            " ! queue"
+                            " ! h264parse"
+                            " ! rtph264pay name=pay0";
+            break;
+        case H264_CAM:
+            resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_320x240x30] : H264_CAPS_FILTERS[quality];
+            launch_string = "v4l2src name=src device=" + device +
+                            " ! queue"
+                            " ! capsfilter name=capsfilter caps=" + resolution_caps +
+                            " ! queue"
+                            " ! h264parse"
+                            " ! rtph264pay name=pay0";
+        case JETSON_CAM:
+            resolution_caps = (quality == AUTO_PRESET) ? JETSON_CAPS_FILTERS[VIDEO_640x480x30] : JETSON_CAPS_FILTERS[quality];
+            launch_string = "nvcamerasrc intent=3 name=src "
+                            " ! capsfilter name=capsfilter caps=" + resolution_caps +
+                            " ! omxh264enc name=omxh264enc control-rate=1 bitrate=" + to_string(h264_bitrate*1000) +
+                            " ! capsfilter caps =\"video/x-h264,profile=baseline,stream-format=(string)byte-stream\""
+                            " ! h264parse "
+                            " ! rtph264pay name=pay0";
+            break;
+        };
+        gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
 
-    gst_rtsp_mount_points_add_factory(mounts, uri.c_str(), media_factory);
-    g_signal_connect(media_factory, "media-constructed", G_CALLBACK(static_media_constructed_callback), this);
-    gst_object_unref(mounts);
+        gst_rtsp_mount_points_add_factory(mounts, uri.c_str(), media_factory);
+        g_signal_connect(media_factory, "media-constructed", G_CALLBACK(static_media_constructed_callback), this);
+        gst_object_unref(mounts);
+    }
 }
 
 void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
@@ -195,8 +197,8 @@ void RTSPAdaptiveStreaming::media_unprepared_callback(GstRTSPMedia* media)
 
     gst_element_set_state(rtpbin, GST_STATE_NULL);
     gst_object_unref(rtpbin);
-
-    pipeline_manager.set_current_quality(AUTO_PRESET);
+    media_prepared = false;
+    init_media_factory();
     cout << "Stream disconnected!" << endl;
 }
 
