@@ -58,7 +58,6 @@ private:
   public:
     ResolutionPresets current_res;
     guint32 h264_bitrate;
-    FileRecorder file_recorder;
 
     GstElement *pipeline;
     GstElement *multi_udp_sink;

@@ -59,7 +59,7 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
             device_props.second.camera_type,
             device_props.second.frame_property_bitmask,
             stream->get_current_quality(),
-            stream->get_recording());
+            false);
     return string(info_buffer);
 }
 
@@ -108,15 +108,12 @@ void IPCMessageHandler::set_device_quality(char* buffer)
     msg_payload = get_message_payload(buffer);
     sscanf(msg_payload.c_str(), "%s %d %d", video_device, &camera_setting, &record_video);
 
-    bool _record_stream;
-    _record_stream = (record_video) ? true : false;
     RTSPAdaptiveStreaming* stream;
 
     try {
         stream = rtsp_stream_server->get_stream_map().at(string(video_device));
-        stream->set_device_properties(camera_setting, _record_stream);
-        if (stream->get_media_prepared()) {
-        } else {
+        stream->set_device_properties(camera_setting);
+        if (!stream->get_media_prepared()) {
             cerr << "Stream not connected yet" << endl;
         }
     } catch (const out_of_range& err) {

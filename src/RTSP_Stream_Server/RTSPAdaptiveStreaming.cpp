@@ -189,7 +189,6 @@ void RTSPAdaptiveStreaming::deep_callback(GstBin* bin,
 // Called once the client has disconnected, allowing us to clean up the stream
 void RTSPAdaptiveStreaming::media_unprepared_callback(GstRTSPMedia* media)
 {
-    pipeline_manager.file_recorder.disable_recorder();
     gst_element_set_state(pipeline_manager.pipeline, GST_STATE_NULL);
     gst_object_unref(pipeline_manager.pipeline);
 
@@ -211,7 +210,6 @@ GstPadProbeReturn RTSPAdaptiveStreaming::static_probe_block_callback(GstPad* pad
 GstPadProbeReturn RTSPAdaptiveStreaming::probe_block_callback(GstPad* pad, GstPadProbeInfo* info)
 {
     // pad is blocked, so it's ok to unlink
-    pipeline_manager.file_recorder.disable_recorder();
     return GST_PAD_PROBE_REMOVE;
 }
 
@@ -297,37 +295,17 @@ bool RTSPAdaptiveStreaming::get_media_prepared()
     return media_prepared;
 }
 
-void RTSPAdaptiveStreaming::record_stream(bool _record_stream)
-{
-    if (_record_stream) {
-        pipeline_manager.file_recorder.init_file_recorder(pipeline_manager.pipeline, pipeline_manager.tee);
-    } else {
-        if (pipeline_manager.file_recorder.tee_file_pad) {
-            gst_pad_add_probe(pipeline_manager.file_recorder.tee_file_pad, GST_PAD_PROBE_TYPE_BLOCK,
-                              static_probe_block_callback, this, NULL);
-        }
-    }
-}
-
 // On changing the resolution while the CC is recording, we stop the recording,
 // to avoid any serious concurrency issues which can otherwise occur
-void RTSPAdaptiveStreaming::set_device_properties(int quality, bool _record_stream)
+void RTSPAdaptiveStreaming::set_device_properties(int quality)
 {
     // We can't have the capsfilter changing when recording from the CC, so we disable it for AUTO mode
-    if (pipeline_manager.get_camera_type() != H264_CAM) {
-        if (quality == AUTO_PRESET && pipeline_manager.get_camera_type() != UVC_CAM) {
-            record_stream(false);
-            pipeline_manager.change_quality_preset(quality);
-            return;
-        }
-        if (quality == pipeline_manager.get_current_quality()) {
-            record_stream(_record_stream);
-        } else {
-            record_stream(false);
-            pipeline_manager.change_quality_preset(quality);
-        }
-    } else {
-        record_stream(false);
+    // if (pipeline_manager.get_camera_type() != H264_CAM) {
+    if (quality == AUTO_PRESET && pipeline_manager.get_camera_type() != UVC_CAM) {
+        pipeline_manager.change_quality_preset(quality);
+        return;
+    }
+    if (quality != pipeline_manager.get_current_quality()) {
         pipeline_manager.change_quality_preset(quality);
     }
 }
@@ -335,9 +313,4 @@ void RTSPAdaptiveStreaming::set_device_properties(int quality, bool _record_stre
 int RTSPAdaptiveStreaming::get_current_quality()
 {
     return pipeline_manager.get_current_quality();
-}
-
-bool RTSPAdaptiveStreaming::get_recording()
-{
-    return pipeline_manager.file_recorder.get_recording();
 }

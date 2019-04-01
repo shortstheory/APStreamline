@@ -65,18 +65,15 @@ private:
             GstPadProbeInfo* info,
             gpointer data);
 
-    void record_stream(bool _record_stream);
-
 public:
     RTSPAdaptiveStreaming(string _device = "/dev/video0",
                           CameraType type = CameraType::MJPG_CAM,
                           string _uri = "/test", GstRTSPServer* server = nullptr,
                           int quality = AUTO_PRESET);
     ~RTSPAdaptiveStreaming();
-    void set_device_properties(int quality, bool record_stream);
+    void set_device_properties(int quality);
     bool get_media_prepared();
     int get_current_quality();
-    bool get_recording();
 };
 
 #endif
