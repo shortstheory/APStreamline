@@ -12,11 +12,33 @@ The APStreamline project aims to fix this problem by dynamically adjusting the v
 
 The code makes use of GStreamer libraries for creating the streaming pipelines.
 
+### Recent Changes
+
+APStreamline was first released in a beta image of APSync in [September 2018](https://discuss.ardupilot.org/t/apsync-with-apstreamline-beta/33247). The latest release supports the following features and needs to built from source:
+
+* ***NEW***: Support for using the hardware encoder for Jetson TX1/TX2 CSI cameras
+
+* ***NEW***: More flexiblity for UVC/CSI cameras with more options to change the camera's resolution and frame-rate
+
+* **Automatic** quality selection based on **bandwidth** and **packet loss** estimates 
+
+* **Selection** of network interfaces to stream the video 
+
+* <s>Options to **record** the live-streamed video feed to the companion computer</s>. This had to be removed because of stability issues.
+
+* **Manual control** over resolution and framerates 
+
+* **Multiple** camera support using RTSP 
+
+* **Hardware-accelerated** encoding for the **Raspberry Pi** camera on the Raspberry Pi
+
+* Camera settings **configurable** through the **APWeb GUI**
+
 ## Running the Code
 
 ### Hardware
 
-All the following instructions are for installing APStreamline and APWeb on the CC. A Raspberry Pi 2/3/3B+ with the latest version of Raspian or APSync is a good choice. Intel NUC's are excellent choices as well. As of April 2019, APStreamline also provides support for the Nvidia Jetson TX1/TX2 boards and its CSI cameras with the `tegra-video` drivers. 
+All the following instructions are for installing APStreamline and APWeb on the CC. A Raspberry Pi 2/3/3B+ with the latest version of Raspian or APSync is a good choice. Intel NUC's are good choices as well. As of April 2019, APStreamline also provides support for the Nvidia Jetson TX1/TX2 boards and its CSI cameras with the `tegra-video` drivers. 
 
 Do note that the Raspberry Pi 3 and 3B+ have **very** low power Wi-Fi antennae which aren't great for video streaming. Using a portable Wi-Fi router like the TPLink MR3020 can dramatically improve range. Wi-Fi USB dongles working in hotspot mode can help as well.
 
@@ -25,13 +47,14 @@ Do note that the Raspberry Pi 3 and 3B+ have **very** low power Wi-Fi antennae w
 Install the `gstreamer` dependencies:
 
 ```
-sudo apt install libgstreamer-plugins-base1.0* libgstreamer1.0-dev libgstrtspserver-1.0-dev gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly python3-pip
+sudo apt install libgstreamer-plugins-base1.0* libgstreamer1.0-dev libgstrtspserver-1.0-dev gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly python3-pip python-pip
 ```
 
 Install `meson` from `pip` and `ninja` for building the code:
 
 ```
 sudo pip3 install meson
+sudo pip install pymavlink
 sudo apt install ninja-build
 ```
 
@@ -42,7 +65,6 @@ meson build
 cd build
 meson configure -Dprefix=$HOME/start_apstreamline/
 ninja install # installs to ~/start_apstreamline for APWeb to spawn the process
-./stream_server
 ```
 
 On the Raspberry Pi, use `sudo modprobe bcm2835-v4l2` to load the V4L2 driver for the Raspberry Pi camera. Add `bcm2835-v4l2` to `/etc/modules` for automatically loading this module on boot.
@@ -70,10 +92,8 @@ Build APWeb:
 ```
 cd APWeb
 make
-./web_server -p 80
+sudo ./web_server -p 80
 ```
-
-In case it fails to create the TCP socket, try using `sudo ./web_server -p 80`. This can clearly cause bad things to happen so be careful!
 
 ## Usage
 
@@ -97,20 +117,18 @@ From here, the APWeb page will display the list of available RTSP streams and th
 
 The video quality can either be automatically set based on the avaialble network bandwidth or set manually for more fine-grained control.
 
-The APWeb page also presents an option to record the video stream to a file on the CC. For this the video stream must be opened on the client. This works with any of the manually set resolutions but does **not** work with Auto quality. This is because the dynamically changing resolution causes problems with the file recording pipeline. An exception to this is the UVC cameras which can record to a file in Auto mode as well.
-
 The RTSP streams can be viewed using any RTSP player. VLC is a good choice.
 
 For example, this can be done in VLC by going to "Media > Open Network Stream" and pasting in the RTSP Mount Point for the camera displayed in the APWeb configuration page. However, VLC introduces *two* seconds of latency for the jitter reduction, making it unsuitable for critical applications. To circumvent this, RTSP streams can also be viewed at lower latency by using the `gst-launch` command:
 
 `gst-launch-1.0 playbin uri=<RTSP-MOUNT-POINT> latency=100`
 
-As an example RTSP Mount Point looks like: `rtsp://192.168.0.17:8554/cam0`. Refer to the APWeb page to see the mount points given for your camera.
+An RTSP Mount Point looks like this: `rtsp://192.168.0.17:8554/cam0`. Refer to the APWeb page to see the mount points given for your camera.
 
 #### Standalone
 
 Launch the RTSP stream server by running:
 
-`stream_server <interface>`
+`./stream_server <interface>`
 
 The list of available network interfaces can be found by running `ifconfig`.
