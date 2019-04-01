@@ -217,7 +217,6 @@ void PipelineManager::change_quality_preset(int quality)
             switch(camera_type) {
             case CameraType::MJPG_CAM:
                 g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate, NULL);
-
                 caps_filter_string = RAW_CAPS_FILTERS[current_quality];
                 src_caps = gst_caps_from_string(caps_filter_string.c_str());
                 g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
@@ -249,6 +248,10 @@ void PipelineManager::change_quality_preset(int quality)
             case CameraType::UVC_CAM:
                 break;
             case CameraType::JETSON_CAM:
+                g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate, NULL);
+                caps_filter_string = JETSON_CAPS_FILTERS[current_quality];
+                src_caps = gst_caps_from_string(caps_filter_string.c_str());
+                g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
                 break;
             }
         }
