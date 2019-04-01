@@ -71,8 +71,8 @@ public:
                           int quality = AUTO_PRESET);
     ~RTSPAdaptiveStreaming();
     void init_media_factory();
-    void set_device_properties(int quality);
     bool get_media_prepared();
+    void set_quality(int quality);
     int get_quality();
 };
 

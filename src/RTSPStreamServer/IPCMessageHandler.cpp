@@ -112,7 +112,7 @@ void IPCMessageHandler::set_device_quality(char* buffer)
 
     try {
         stream = rtsp_stream_server->get_stream_map().at(string(video_device));
-        stream->set_device_properties(camera_setting);
+        stream->set_quality(camera_setting);
         if (!stream->get_media_prepared()) {
             cerr << "Stream not connected yet" << endl;
             stream->init_media_factory();

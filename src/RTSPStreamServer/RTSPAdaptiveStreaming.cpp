@@ -296,9 +296,7 @@ bool RTSPAdaptiveStreaming::get_media_prepared()
     return media_prepared;
 }
 
-// On changing the resolution while the CC is recording, we stop the recording,
-// to avoid any serious concurrency issues which can otherwise occur
-void RTSPAdaptiveStreaming::set_device_properties(int quality)
+void RTSPAdaptiveStreaming::set_quality(int quality)
 {
     if (quality != pipeline_manager.get_quality()) {
         pipeline_manager.set_quality(quality);
