@@ -12,15 +12,11 @@ The APStreamline project aims to fix this problem by dynamically adjusting the v
 
 The code makes use of GStreamer libraries for creating the streaming pipelines.
 
-### Note for hardware encoding webcams
-
-Some webcams such as the Logitech C920 support hardware encoding through an onboard processor, however bugs in the UVC driver has resulted in some reduced functionality. These webcams are configured to adaptively stream only in 480p through adjusting the H.264 video bitrate. Switching the resolution results in the video client closing due to the transmission of an EOS event once the resolution has changed.
-
 ## Running the Code
 
 ### Hardware
 
-All the following instructions are for installing APStreamline and APWeb on the CC. A Raspberry Pi 2/3/3B+ with the latest version of Raspian or APSync is a good choice. Intel NUC's are excellent choices as well.
+All the following instructions are for installing APStreamline and APWeb on the CC. A Raspberry Pi 2/3/3B+ with the latest version of Raspian or APSync is a good choice. Intel NUC's are excellent choices as well. As of April 2019, APStreamline also provides support for the Nvidia Jetson TX1/TX2 boards and its CSI cameras with the `tegra-video` drivers. 
 
 Do note that the Raspberry Pi 3 and 3B+ have **very** low power Wi-Fi antennae which aren't great for video streaming. Using a portable Wi-Fi router like the TPLink MR3020 can dramatically improve range. Wi-Fi USB dongles working in hotspot mode can help as well.
 
@@ -45,7 +41,7 @@ Navigate to the cloned folder folder and run:
 meson build
 cd build
 meson configure -Dprefix=$HOME/start_apstreamline/
-sudo ninja install # installs to ~/start_apstreamline for APWeb to spawn the process
+ninja install # installs to ~/start_apstreamline for APWeb to spawn the process
 ./stream_server
 ```
 
@@ -66,8 +62,7 @@ Install `libtalloc-dev` and get the MAVLink submodule:
 
 ```
 sudo apt-get install libtalloc-dev
-git submodule init
-git submodule update
+git submodule update --init --recursive
 ```
 
 Build APWeb:
