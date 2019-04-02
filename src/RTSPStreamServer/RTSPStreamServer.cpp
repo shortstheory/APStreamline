@@ -42,7 +42,6 @@ void RTSPStreamServer::get_v4l2_devices()
         string s = ep->d_name;
         if (s.find(V4L2_DEVICE_PREFIX) != std::string::npos) {
             s = V4L2_DEVICE_PATH + s;
-            cout << "Found V4L2 camera device " << s << endl;
             // Add device path to list
             device_list.push_back(s);
         }
@@ -67,7 +66,6 @@ void RTSPStreamServer::get_v4l2_devices_info()
 {
     int i = 0;
     for (string dev : device_list) {
-        cout << dev << endl;
         int fd = open(dev.c_str(), O_RDONLY);
         v4l2_info info;
         if (fd != -1) {
@@ -77,8 +75,6 @@ void RTSPStreamServer::get_v4l2_devices_info()
             info.camera_name = string(caps.card, caps.card + sizeof caps.card / sizeof caps.card[0]);
             info.mount_point = MOUNT_POINT_PREFIX + to_string(i);
             info.frame_property_bitmask = 0;
-
-            cout << "Name - " << caps.card << " Driver - " << caps.driver << endl;
 
             if (string((char*)caps.driver) == JETSON_CAM_DRIVER) {
                 info.camera_type = JETSON_CAM;
@@ -218,12 +214,14 @@ void RTSPStreamServer::get_v4l2_devices_info()
 
 void RTSPStreamServer::setup_streams()
 {
+    cerr << "***APStreamline***\nAccess the following video streams using VLC or gst-launch following the instructions here: https://github.com/shortstheory/adaptive-streaming#usage\n==============================\n";
     for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++) {
         adaptive_streams_map.insert(pair<string, RTSPAdaptiveStreaming*>(it->first,
                                     new RTSPAdaptiveStreaming(it->first,
                                             it->second.camera_type,
                                             it->second.mount_point,
                                             server)));
+        cerr << it->first << " (" << it->second.camera_name << "): rtsp://" << ip_addr << ":" << port << it->second.mount_point << endl;
     }
 }
 
