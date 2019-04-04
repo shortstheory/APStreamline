@@ -67,17 +67,17 @@ static const vector<string> H264_CAPS_FILTERS = {
 };
 
 static const vector<string> JETSON_CAPS_FILTERS = {
-    "video/x-raw(memory:NVMM),width=(int)320,height=(int)240,format=(string)I420,framerate=(fraction)15/1",
-    "video/x-raw(memory:NVMM),width=(int)640,height=(int)480,format=(string)I420,framerate=(fraction)15/1",
-    "video/x-raw(memory:NVMM),width=(int)1280,height=(int)720,format=(string)I420,framerate=(fraction)15/1",
+    "video/x-raw(memory:NVMM),width=(int)320,height=(int)240,format=(string)NV12,framerate=(fraction)15/1",
+    "video/x-raw(memory:NVMM),width=(int)640,height=(int)480,format=(string)NV12,framerate=(fraction)15/1",
+    "video/x-raw(memory:NVMM),width=(int)1280,height=(int)720,format=(string)NV12,framerate=(fraction)15/1",
 
-    "video/x-raw(memory:NVMM),width=(int)320,height=(int)240,format=(string)I420,framerate=(fraction)30/1",
-    "video/x-raw(memory:NVMM),width=(int)640,height=(int)480,format=(string)I420,framerate=(fraction)30/1",
-    "video/x-raw(memory:NVMM),width=(int)1280,height=(int)720,format=(string)I420,framerate=(fraction)30/1",
+    "video/x-raw(memory:NVMM),width=(int)320,height=(int)240,format=(string)NV12,framerate=(fraction)30/1",
+    "video/x-raw(memory:NVMM),width=(int)640,height=(int)480,format=(string)NV12,framerate=(fraction)30/1",
+    "video/x-raw(memory:NVMM),width=(int)1280,height=(int)720,format=(string)NV12,framerate=(fraction)30/1",
 
-    "video/x-raw(memory:NVMM),width=(int)320,height=(int)240,format=(string)I420,framerate=(fraction)60/1",
-    "video/x-raw(memory:NVMM),width=(int)640,height=(int)480,format=(string)I420,framerate=(fraction)60/1",
-    "video/x-raw(memory:NVMM),width=(int)1280,height=(int)720,format=(string)I420,framerate=(fraction)60/1"
+    "video/x-raw(memory:NVMM),width=(int)320,height=(int)240,format=(string)NV12,framerate=(fraction)60/1",
+    "video/x-raw(memory:NVMM),width=(int)640,height=(int)480,format=(string)NV12,framerate=(fraction)60/1",
+    "video/x-raw(memory:NVMM),width=(int)1280,height=(int)720,format=(string)NV12,framerate=(fraction)60/1"
 };
 
 static const int AUTO_PRESET = 1024;
