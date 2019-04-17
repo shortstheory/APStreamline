@@ -78,6 +78,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
                             " ! queue"
                             " ! h264parse"
                             " ! rtph264pay name=pay0";
+            break;
         case JETSON_CAM:
             resolution_caps = (quality == AUTO_PRESET) ? JETSON_CAPS_FILTERS[VIDEO_640x480x30] : JETSON_CAPS_FILTERS[quality];
             launch_string = "nvarguscamerasrc name=src "
