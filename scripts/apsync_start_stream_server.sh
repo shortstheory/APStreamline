@@ -1,1 +1,0 @@
-../build/stream_server wlan0
