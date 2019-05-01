@@ -3,3 +3,5 @@ b/
 .idea/
 .vscode/
 cmake-build-debug
+scripts/
+screenshots/

@@ -107,13 +107,13 @@ Start the APWeb server. This will serve the configuration page for the RTSP stre
 
 On navigating to the new `video/` page, you will be presented with a page to start the RTSP Server:
 
-![Screenshot](screenshots/server_stop.png)
+![Imgur](https://i.imgur.com/tgxesUP.png)
 
 On selecting the desired interface and starting the RTSP Server, the APWeb server will spawn the Stream Server process. The stream server will search for all the V4L2 cameras available in `/dev/`. It will query the capabilities of all these cameras and select hardware encoding or software encoding accordingly. The list of available cameras can be refreshed by simply stopping and starting the server.
 
 From here, the APWeb page will display the list of available RTSP streams and their mount points:
 
-![Screenshot](screenshots/server_start.png)
+![Imgur](https://i.imgur.com/Ac76ScX.png)
 
 The video quality can either be automatically set based on the avaialble network bandwidth or set manually for more fine-grained control.
 
