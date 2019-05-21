@@ -60,7 +60,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
                             " ! rtph264pay name=pay0";
             break;
         case UVC_CAM:
-            resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_320x240x30] : H264_CAPS_FILTERS[quality];
+            resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_640x480x30] : H264_CAPS_FILTERS[quality];
             launch_string = "uvch264src device=" + device + " average-bitrate=" + to_string(h264_bitrate*1000) +
                             " name=src auto-start=true src.vidsrc"
                             " ! queue"
@@ -71,7 +71,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
                             " ! rtph264pay name=pay0";
             break;
         case H264_CAM:
-            resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_1280x720x30] : H264_CAPS_FILTERS[quality];
+            resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_320x240x30] : H264_CAPS_FILTERS[quality];
             launch_string = "v4l2src name=src device=" + device +
                             " ! queue"
                             " ! capsfilter name=capsfilter caps=" + resolution_caps +
