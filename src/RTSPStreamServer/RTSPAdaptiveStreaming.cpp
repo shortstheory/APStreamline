@@ -56,7 +56,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
                             " ! x264enc name=x264enc tune=zerolatency threads=4 bitrate=" + to_string(h264_bitrate) +
                             " ! tee name=tee_element tee_element."
                             " ! queue"
-                            " ! h264parse"
+                            " ! h264parse config-interval=3"
                             " ! rtph264pay name=pay0";
             break;
         case UVC_CAM:
@@ -67,7 +67,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
                             " ! capsfilter name=capsfilter caps=" + resolution_caps +
                             " ! tee name=tee_element tee_element."
                             " ! queue"
-                            " ! h264parse"
+                            " ! h264parse config-interval=3"
                             " ! rtph264pay name=pay0";
             break;
         case H264_CAM:
@@ -76,7 +76,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
                             " ! queue"
                             " ! capsfilter name=capsfilter caps=" + resolution_caps +
                             " ! queue"
-                            " ! h264parse"
+                            " ! h264parse config-interval=3"
                             " ! rtph264pay name=pay0";
             break;
         case JETSON_CAM:
@@ -85,7 +85,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
                             " ! capsfilter name=capsfilter caps=" + resolution_caps +
                             " ! omxh264enc name=omxh264enc control-rate=1 bitrate=" + to_string(h264_bitrate*1000) +
                             " ! capsfilter caps =\"video/x-h264,profile=baseline,stream-format=(string)byte-stream\""
-                            " ! h264parse "
+                            " ! h264parse config-interval=3"
                             " ! rtph264pay name=pay0";
             break;
         };
