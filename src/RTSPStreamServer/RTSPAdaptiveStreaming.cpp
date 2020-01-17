@@ -1,9 +1,13 @@
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <ctime>
 #include <sstream>
+#include <map>
 
 #include "RTSPAdaptiveStreaming.h"
+
+static void replace_all(string &input, string &to_find, string &replace_with);
 
 RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
         CameraType type,
@@ -26,6 +30,37 @@ RTSPAdaptiveStreaming::~RTSPAdaptiveStreaming()
     gst_object_unref(rtsp_server);
 }
 
+string RTSPAdaptiveStreaming::read_file_template(const string &filename, const string &def_value) {
+    string output;
+    ifstream input(filename);
+    if(input) {
+        input.seekg(0, ios::end);
+        output.reserve(input.tellg());
+        input.seekg(0, ios::beg);
+        output.assign((std::istreambuf_iterator<char>(input)),
+                      std::istreambuf_iterator<char>());
+        input.close();
+    }
+
+    return output.empty()? def_value: output;
+}
+
+string RTSPAdaptiveStreaming::to_launch_string(string &config, string &device, string &res_caps, string &bitrate) {
+    map<const char *, string> replacements;
+    replacements["$(device)"] = device;
+    replacements["$(resolution_caps)"] = res_caps;
+    replacements["$(bitrate)"] = bitrate;
+
+    for(map<const char *, string>::iterator e = replacements.begin(); e != replacements.end(); ++e) {
+        string to_replace = string(e->first);
+        string value = e->second;
+
+        replace_all(config, to_replace, value);
+    }
+
+    return config;
+}
+
 void RTSPAdaptiveStreaming::init_media_factory()
 {
     if (!media_prepared) {
@@ -43,56 +78,43 @@ void RTSPAdaptiveStreaming::init_media_factory()
         int h264_bitrate;
         h264_bitrate = PipelineManager::get_quality_bitrate(quality);
 
+        string config;
         string resolution_caps;
+        string bitrate;
 
         // Set launch string according to the type of camera
         switch (pipeline_manager.get_camera_type()) {
         case MJPG_CAM:
+            config = read_file_template(MJPG_CONF_NAME, DEFAULT_MJPG_PIPELINE);
+            bitrate = to_string(h264_bitrate);
             resolution_caps = (quality == AUTO_PRESET) ? RAW_CAPS_FILTERS[VIDEO_320x240x30] : RAW_CAPS_FILTERS[quality];
-            launch_string = "v4l2src name=src device=" + device + " ! capsfilter name=capsfilter caps=" + resolution_caps +
-                            " ! jpegdec"
-                            " ! videoconvert"
-                            " ! textoverlay name=textoverlay"
-                            " ! x264enc name=x264enc tune=zerolatency threads=4 bitrate=" + to_string(h264_bitrate) +
-                            " ! tee name=tee_element tee_element."
-                            " ! queue"
-                            " ! h264parse"
-                            " ! rtph264pay name=pay0";
             break;
         case UVC_CAM:
+            config = read_file_template(UVC_CONF_NAME, DEFAULT_UVC_PIPELINE);
+            bitrate = to_string(h264_bitrate*1000);
             resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_640x480x30] : H264_CAPS_FILTERS[quality];
-            launch_string = "uvch264src device=" + device + " average-bitrate=" + to_string(h264_bitrate*1000) +
-                            " name=src auto-start=true src.vidsrc"
-                            " ! queue"
-                            " ! capsfilter name=capsfilter caps=" + resolution_caps +
-                            " ! tee name=tee_element tee_element."
-                            " ! queue"
-                            " ! h264parse"
-                            " ! rtph264pay name=pay0";
             break;
         case H264_CAM:
+            config = read_file_template(H264_CONF_NAME, DEFAULT_H264_PIPELINE);
             resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_320x240x30] : H264_CAPS_FILTERS[quality];
-            launch_string = "v4l2src name=src device=" + device +
-                            " ! queue"
-                            " ! capsfilter name=capsfilter caps=" + resolution_caps +
-                            " ! queue"
-                            " ! h264parse"
-                            " ! rtph264pay name=pay0";
             break;
         case JETSON_CAM:
+            config = read_file_template(JETSON_CONF_NAME, DEFAULT_JETSON_PIPELINE);
             resolution_caps = (quality == AUTO_PRESET) ? JETSON_CAPS_FILTERS[VIDEO_640x480x30] : JETSON_CAPS_FILTERS[quality];
-            launch_string = "nvarguscamerasrc name=src "
-                            " ! capsfilter name=capsfilter caps=" + resolution_caps +
-                            " ! omxh264enc name=omxh264enc control-rate=1 bitrate=" + to_string(h264_bitrate*1000) +
-                            " ! capsfilter caps =\"video/x-h264,profile=baseline,stream-format=(string)byte-stream\""
-                            " ! h264parse "
-                            " ! rtph264pay name=pay0";
+            bitrate = to_string(h264_bitrate*1000);
             break;
         };
-        gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
-        gst_rtsp_mount_points_add_factory(mounts, uri.c_str(), media_factory);
-        g_signal_connect(media_factory, "media-constructed", G_CALLBACK(static_media_constructed_callback), this);
-        gst_object_unref(mounts);
+
+        if(!config.empty()) {
+            launch_string = to_launch_string(config, device, resolution_caps, bitrate);
+
+            gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
+            gst_rtsp_mount_points_add_factory(mounts, uri.c_str(), media_factory);
+            g_signal_connect(media_factory, "media-constructed", G_CALLBACK(static_media_constructed_callback), this);
+            gst_object_unref(mounts);
+        } else {
+            cerr << "No config available for cam type " << pipeline_manager.get_camera_type() << endl;
+        }
     }
 }
 
@@ -306,5 +328,22 @@ void RTSPAdaptiveStreaming::set_quality(int quality)
 {
     if (quality != pipeline_manager.get_quality()) {
         pipeline_manager.set_quality(quality);
+    }
+}
+
+static void replace_all(string &input, string &to_find, string &replace_with)
+{
+    size_t index = 0;
+    size_t len = to_find.length();
+
+    while (true)
+    {
+        index = input.find(to_find, index);
+        if (index == string::npos)
+            break;
+
+        input.replace(index, len, replace_with);
+
+        index += len;
     }
 }

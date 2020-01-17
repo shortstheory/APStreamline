@@ -64,6 +64,9 @@ private:
             GstPadProbeInfo* info,
             gpointer data);
 
+    static string read_file_template(const string &filename, const string &def_value);
+    static string to_launch_string(string &config, string &device, string &res_caps, string &bitrate);
+
 public:
     RTSPAdaptiveStreaming(string _device = "/dev/video0",
                           CameraType type = CameraType::MJPG_CAM,

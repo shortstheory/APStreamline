@@ -76,6 +76,47 @@ static const vector<string> JETSON_CAPS_FILTERS = {
     "video/x-raw(memory:NVMM),width=(int)1280,height=(int)720,format=(string)NV12,framerate=(fraction)60/1"
 };
 
+// Pipeline config
+// Each of the following is a pair of config filename, and a default template to use in case
+// the specified file does not exist, or cannot be read for some other reason.
+
+static const string MJPG_CONF_NAME = "mjpg_cam.conf";
+static const string DEFAULT_MJPG_PIPELINE = "v4l2src name=src device=$(device) ! capsfilter name=capsfilter caps=$(resolution_caps)"
+                                            " ! jpegdec"
+                                            " ! videoconvert"
+                                            " ! textoverlay name=textoverlay"
+                                            " ! x264enc name=x264enc tune=zerolatency threads=4 bitrate=$(bitrate)"
+                                            " ! tee name=tee_element tee_element."
+                                            " ! queue"
+                                            " ! h264parse"
+                                            " ! rtph264pay name=pay0";
+
+static const string UVC_CONF_NAME = "uvc_cam.conf";
+static const string DEFAULT_UVC_PIPELINE = "uvch264src device=$(device) average-bitrate=$(bitrate)"
+                                           " name=src auto-start=true src.vidsrc"
+                                           " ! queue"
+                                           " ! capsfilter name=capsfilter caps=$(resolution_caps)"
+                                           " ! tee name=tee_element tee_element."
+                                           " ! queue"
+                                           " ! h264parse"
+                                           " ! rtph264pay name=pay0";
+
+static const string H264_CONF_NAME = "h264_cam.conf";
+static const string DEFAULT_H264_PIPELINE = "v4l2src name=src device=$(device)"
+                                            " ! queue"
+                                            " ! capsfilter name=capsfilter caps=$(resolution_caps)"
+                                            " ! queue"
+                                            " ! h264parse"
+                                            " ! rtph264pay name=pay0";
+
+static const string JETSON_CONF_NAME = "jetson_cam.conf";
+static const string DEFAULT_JETSON_PIPELINE = "nvarguscamerasrc name=src "
+                                              " ! capsfilter name=capsfilter caps=$(resolution_caps)"
+                                              " ! omxh264enc name=omxh264enc control-rate=1 bitrate=$(bitrate)"
+                                              " ! capsfilter caps =\"video/x-h264,profile=baseline,stream-format=(string)byte-stream\""
+                                              " ! h264parse "
+                                              " ! rtph264pay name=pay0";
+
 static const int AUTO_PRESET = 1024;
 static const string SOCKET_PATH = "/tmp/rtsp_server.sock";
 
