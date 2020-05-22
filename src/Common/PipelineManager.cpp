@@ -17,7 +17,7 @@ PipelineManager::PipelineManager(string _device, int quality, CameraType type) :
         video_presets[ResolutionPresets::MED] = RAW_CAPS_FILTERS[VIDEO_640x480x30];
         video_presets[ResolutionPresets::HIGH] = RAW_CAPS_FILTERS[VIDEO_1280x720x30];
         break;
-    case CameraType::H264_CAM:
+    case CameraType::RPI_CAM:
     case CameraType::UVC_CAM:
         video_presets[ResolutionPresets::LOW] = H264_CAPS_FILTERS[VIDEO_320x240x30];
         video_presets[ResolutionPresets::MED] = H264_CAPS_FILTERS[VIDEO_640x480x30];
@@ -159,7 +159,7 @@ void PipelineManager::set_encoding_bitrate(guint32 bitrate)
             g_object_set(G_OBJECT(text_overlay), "text", stats.c_str(), NULL);
         }
         break;
-    case H264_CAM:
+    case RPI_CAM:
         int v4l2_cam_fd;
         g_object_get(camera, "device-fd", &v4l2_cam_fd, NULL);
         if (v4l2_cam_fd > 0) {
@@ -226,7 +226,7 @@ bool PipelineManager::get_element_references()
             } else {
                 return false;
             }
-        case H264_CAM:
+        case RPI_CAM:
             int v4l2_cam_fd;
             if (camera) {
                 g_object_get(camera, "device-fd", &v4l2_cam_fd, NULL);
@@ -296,7 +296,7 @@ void PipelineManager::set_quality(int _quality)
                 src_caps = gst_caps_from_string(caps_filter_string.c_str());
                 g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
                 break;
-            case CameraType::H264_CAM:
+            case CameraType::RPI_CAM:
                 int v4l2_cam_fd;
                 g_object_get(camera, "device-fd", &v4l2_cam_fd, NULL);
                 if (v4l2_cam_fd > 0)

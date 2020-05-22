@@ -8,7 +8,7 @@
 
 using namespace std;
 
-enum CameraType {MJPG_CAM, UVC_CAM, H264_CAM, JETSON_CAM};
+enum CameraType {MJPG_CAM, UVC_CAM, RPI_CAM, JETSON_CAM};
 enum ResolutionPresets {LOW, MED, HIGH};
 enum FramePresets {FRAME_320x240, FRAME_640x480, FRAME_1280x720, FRAME_COUNT};
 enum VideoPresets {VIDEO_320x240x15, VIDEO_640x480x15, VIDEO_1280x720x15,

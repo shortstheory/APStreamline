@@ -70,7 +70,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
                             " ! h264parse"
                             " ! rtph264pay name=pay0";
             break;
-        case H264_CAM:
+        case RPI_CAM:
             resolution_caps = (quality == AUTO_PRESET) ? H264_CAPS_FILTERS[VIDEO_320x240x30] : H264_CAPS_FILTERS[quality];
             launch_string = "v4l2src name=src device=" + device +
                             " ! queue"
