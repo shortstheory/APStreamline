@@ -13,9 +13,9 @@ PipelineManager::PipelineManager(string _device, int quality, CameraType type) :
 {
     switch (camera_type) {
     case CameraType::MJPG_CAM:
-        video_presets[ResolutionPresets::LOW] = RAW_CAPS_FILTERS[VIDEO_320x240x30];
-        video_presets[ResolutionPresets::MED] = RAW_CAPS_FILTERS[VIDEO_640x480x30];
-        video_presets[ResolutionPresets::HIGH] = RAW_CAPS_FILTERS[VIDEO_1280x720x30];
+        video_presets[ResolutionPresets::LOW] = MJPG_CAPS_FILTERS[VIDEO_320x240x30];
+        video_presets[ResolutionPresets::MED] = MJPG_CAPS_FILTERS[VIDEO_640x480x30];
+        video_presets[ResolutionPresets::HIGH] = MJPG_CAPS_FILTERS[VIDEO_1280x720x30];
         break;
     case CameraType::RPI_CAM:
     case CameraType::UVC_CAM:
@@ -292,7 +292,7 @@ void PipelineManager::set_quality(int _quality)
             switch(camera_type) {
             case CameraType::MJPG_CAM:
                 g_object_set(G_OBJECT(h264_encoder), "bitrate", h264_bitrate, NULL);
-                caps_filter_string = RAW_CAPS_FILTERS[quality];
+                caps_filter_string = MJPG_CAPS_FILTERS[quality];
                 src_caps = gst_caps_from_string(caps_filter_string.c_str());
                 g_object_set(G_OBJECT(src_capsfilter), "caps", src_caps, NULL);
                 break;
