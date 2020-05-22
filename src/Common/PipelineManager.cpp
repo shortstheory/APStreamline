@@ -5,7 +5,7 @@
 #include <linux/v4l2-controls.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-
+#include <iostream>
 #include "PipelineManager.h"
 
 PipelineManager::PipelineManager(string _device, int quality, CameraType type) : network_state(NetworkState::STEADY), successive_transmissions(0),

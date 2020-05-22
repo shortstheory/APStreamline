@@ -6,6 +6,5 @@
 #include "QoSEstimator.h"
 #include "PipelineManager.h"
 #include "Constants.h"
-#include "FileRecorder.h"
 
 #endif
