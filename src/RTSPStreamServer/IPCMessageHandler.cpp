@@ -26,7 +26,7 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     char info_buffer[IPC_BUFFER_SIZE];
     info_buffer[0] = '\0';
 
-    RTSPAdaptiveStreaming* stream;
+    shared_ptr<RTSPAdaptiveStreaming> stream;
     stream = rtsp_stream_server->get_stream_map().at(device_props.first);
 
     string ip_address;
@@ -108,7 +108,7 @@ void IPCMessageHandler::set_device_quality(char* buffer)
     msg_payload = get_message_payload(buffer);
     sscanf(msg_payload.c_str(), "%s %d %d", video_device, &camera_setting, &record_video);
 
-    RTSPAdaptiveStreaming* stream;
+    shared_ptr<RTSPAdaptiveStreaming> stream;
 
     try {
         stream = rtsp_stream_server->get_stream_map().at(string(video_device));

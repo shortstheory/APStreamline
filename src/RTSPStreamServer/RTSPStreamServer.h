@@ -4,7 +4,7 @@
 #include <map>
 #include <iterator>
 #include <gst/rtsp-server/rtsp-server.h>
-
+#include <memory>
 #include "RTSPAdaptiveStreaming.h"
 
 using namespace std;
@@ -21,7 +21,7 @@ private:
 
     // Manage the list of streams by using maps keyed by the device name
     vector<string> device_list;
-    map<string, RTSPAdaptiveStreaming*> adaptive_streams_map;
+    map<string, shared_ptr<RTSPAdaptiveStreaming>> adaptive_streams_map;
     map<string, v4l2_info> device_properties_map;
 
     void get_v4l2_devices();
@@ -39,7 +39,7 @@ public:
     string get_ip_address();
     string get_port();
     map<string, v4l2_info> get_device_map();
-    map<string, RTSPAdaptiveStreaming*> get_stream_map();
+    map<string, shared_ptr<RTSPAdaptiveStreaming>> get_stream_map();
 };
 
 #endif

@@ -25,9 +25,6 @@ RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_
 
 RTSPStreamServer::~RTSPStreamServer()
 {
-    for (auto stream_pair : adaptive_streams_map) {
-        delete stream_pair.second;
-    }
 }
 
 void RTSPStreamServer::get_v4l2_devices()
@@ -222,7 +219,7 @@ void RTSPStreamServer::set_service_id(guint id)
     service_id = id;
 }
 
-map<string, RTSPAdaptiveStreaming*> RTSPStreamServer::get_stream_map()
+map<string, shared_ptr<RTSPAdaptiveStreaming>> RTSPStreamServer::get_stream_map()
 {
     return adaptive_streams_map;
 }
