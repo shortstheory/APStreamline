@@ -8,8 +8,9 @@
 #include <iostream>
 #include <fcntl.h>
 #include <algorithm>
-
+#include <experimental/filesystem>
 #include "RTSPStreamServer.h"
+namespace fs = std::experimental::filesystem;
 
 RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_addr), port(_port)
 {
@@ -31,21 +32,13 @@ RTSPStreamServer::~RTSPStreamServer()
 
 void RTSPStreamServer::get_v4l2_devices()
 {
-    DIR *dp;
-    struct dirent *ep;
-    dp = opendir(V4L2_DEVICE_PATH.c_str());
-    if (dp == nullptr) {
-        cerr << "Could not open directory " << errno << endl;
-    }
-    while ((ep = readdir(dp))) {
-        string s = ep->d_name;
+    for (const auto & entry : fs::directory_iterator(V4L2_DEVICE_PATH)) {
+        string s = entry.path();
         if (s.find(V4L2_DEVICE_PREFIX) != std::string::npos) {
-            s = V4L2_DEVICE_PATH + s;
             // Add device path to list
             device_list.push_back(s);
         }
     }
-    closedir(dp);
     // To make mount points and the device names in the same order
     reverse(device_list.begin(), device_list.end());
 }
