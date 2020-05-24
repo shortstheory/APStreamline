@@ -205,7 +205,8 @@ void RTSPStreamServer::setup_streams()
 {
     cerr << "***APStreamline***\nAccess the following video streams using VLC or gst-launch following the instructions here: https://github.com/shortstheory/adaptive-streaming#usage\n==============================\n";
     for (auto it = device_properties_map.begin(); it != device_properties_map.end(); it++) {
-        adaptive_streams_map.insert(pair<string, RTSPAdaptiveStreaming*>(it->first,
+        // why is this a pointer?
+        adaptive_streams_map.insert(pair<string, shared_ptr<RTSPAdaptiveStreaming>>(it->first,
                                     new RTSPAdaptiveStreaming(it->first,
                                             it->second.camera_type,
                                             it->second.mount_point,
