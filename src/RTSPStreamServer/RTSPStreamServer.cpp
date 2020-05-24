@@ -9,6 +9,8 @@
 #include <fcntl.h>
 #include <algorithm>
 #include <experimental/filesystem>
+#include <libconfig.h++>
+
 #include "RTSPStreamServer.h"
 namespace fs = std::experimental::filesystem;
 
@@ -89,7 +91,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
                 memset(&frmival, 0, sizeof(frmival));
 
                 int mjpg_index = -1;
-                int h264_index = -1;
+                int h264_index = -1;JETSON
 
                 fmt.index = 0;
                 fmt.type = type;
