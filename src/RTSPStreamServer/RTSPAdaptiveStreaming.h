@@ -16,8 +16,6 @@
 
 using namespace std;
 
-// Subclass of GenericAdaptiveStreaming, handling the streaming over RTSP
-
 class RTSPAdaptiveStreaming
 {
 private:

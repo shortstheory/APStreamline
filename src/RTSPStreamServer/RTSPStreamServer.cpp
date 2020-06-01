@@ -91,7 +91,7 @@ void RTSPStreamServer::get_v4l2_devices_info()
                 memset(&frmival, 0, sizeof(frmival));
 
                 int mjpg_index = -1;
-                int h264_index = -1;JETSON
+                int h264_index = -1;
 
                 fmt.index = 0;
                 fmt.type = type;
