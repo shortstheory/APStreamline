@@ -3,7 +3,9 @@
 #include <unordered_map>
 #include <gst/gst.h>
 #include "Constants.h"
+#include "Quality.h"
 #include <libconfig.h++>
+#include <iostream>
 #include <regex>
 
 using namespace std;
@@ -20,8 +22,7 @@ private:
     bool dynamic_bitrate;
     unordered_map<string, bool> encoder_params_bool;
     unordered_map<string, int> encoder_params_int;
-    enum QualityProperty {WIDTH, HEIGHT, FRAMERATE};
-    typedef tuple<int,int,int> Quality;
+
     Quality low;
     Quality med;
     Quality high;
@@ -29,13 +30,12 @@ private:
     int default_res;
 public:
     virtual bool set_element_references(GstElement *pipeline) = 0;
-    virtual void set_resolution(ResolutionPresets setting) {}
     virtual void set_bitrate(int bitrate) {}
-    virtual void set_quality(int quality) {}
+    virtual void set_quality(Quality q) {}
     virtual bool read_configuration(Setting &camera_config)
     {
-        launch_string = camera_config.lookup("properties.launch_string");
-        capsfilter = camera_config.lookup("properties.capsfilter");
+        launch_string = static_cast<const char*>(camera_config.lookup("properties.launch_string"));
+        capsfilter = static_cast<const char*>(camera_config.lookup("properties.capsfilter"));
         fallback = camera_config.lookup("properties.fallback");
         dynamic_res = camera_config.lookup("properties.dynamic_res");
         dynamic_bitrate = camera_config.lookup("properties.dynamic_bitrate");
@@ -62,17 +62,17 @@ public:
         }
         return true;
     }
-    virtual string generate_capsfilter(int width, int height, int framerate) const
+    virtual string generate_capsfilter(Quality q) const
     {
         regex w("%width");
         regex h("%height");
         regex f("%framerate");
         string caps;
         caps = capsfilter;
-        regex_replace(caps, w, to_string(width));
-        regex_replace(caps, h, to_string(height));
-        regex_replace(caps, f, to_string(framerate));
+        regex_replace(caps, w, to_string(q.getWidth()));
+        regex_replace(caps, h, to_string(q.getHeight()));
+        regex_replace(caps, f, to_string(q.getFramerate()));
         return caps;
     }
-    virtual string generate_launch_string(string device, string capsfilter, string bitrate) const = 0;
+    virtual string generate_launch_string(int bitrate) const = 0;
 };
