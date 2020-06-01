@@ -39,7 +39,6 @@ PipelineManager::PipelineManager(string _device, int quality, CameraType type) :
     src_capsfilter = nullptr;
     videoconvert = nullptr;
     h264_encoder = nullptr;
-    h264_parser = nullptr;
     rtph264_payloader = nullptr;
     text_overlay = nullptr;
     tee = nullptr;

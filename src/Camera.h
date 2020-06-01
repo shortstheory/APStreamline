@@ -77,4 +77,12 @@ public:
         return caps;
     }
     virtual string generate_launch_string(Quality q, int bitrate) const = 0;
+    bool dynamic_res_capability() const
+    {
+        return dynamic_res;
+    }
+    bool dynamic_bitrate_capability() const
+    {
+        return dynamic_bitrate;
+    }
 };

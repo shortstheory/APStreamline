@@ -34,7 +34,6 @@ private:
     GstElement *src_capsfilter;
     GstElement *videoconvert;
     GstElement *h264_encoder;
-    GstElement *h264_parser;
     GstElement *text_overlay;
 
     enum NetworkState {STEADY, CONGESTION} network_state;
