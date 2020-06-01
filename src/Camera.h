@@ -13,7 +13,7 @@ using namespace libconfig;
 
 class Camera
 {
-private:
+protected:
     string device_path;
     string launch_string;
     string capsfilter;
@@ -23,15 +23,18 @@ private:
     unordered_map<string, bool> encoder_params_bool;
     unordered_map<string, int> encoder_params_int;
 
-    Quality low;
-    Quality med;
-    Quality high;
     int default_framerate;
     int default_res;
 public:
     virtual bool set_element_references(GstElement *pipeline) = 0;
-    virtual void set_bitrate(int bitrate) {}
-    virtual void set_quality(Quality q) {}
+    virtual bool set_bitrate(int bitrate) 
+    {
+        return dynamic_bitrate;
+    }
+    virtual bool set_quality(Quality q) 
+    {
+        return dynamic_res;
+    }
     virtual bool read_configuration(Setting &camera_config)
     {
         launch_string = static_cast<const char*>(camera_config.lookup("properties.launch_string"));
@@ -47,8 +50,7 @@ public:
             Setting::Type type;
             key = camera_config["encoder_params"][i].getName();
             type = camera_config["encoder_params"][i].getType();
-            switch (type)
-            {
+            switch (type) {
             case Setting::Type::TypeBoolean:
                 encoder_params_bool[key] = camera_config["encoder_params"].lookup(key);
                 break;
@@ -74,5 +76,5 @@ public:
         regex_replace(caps, f, to_string(q.getFramerate()));
         return caps;
     }
-    virtual string generate_launch_string(int bitrate) const = 0;
+    virtual string generate_launch_string(Quality q, int bitrate) const = 0;
 };
