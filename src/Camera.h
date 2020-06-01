@@ -74,4 +74,5 @@ public:
         regex_replace(caps, f, to_string(framerate));
         return caps;
     }
+    virtual string generate_launch_string(string device, string capsfilter, string bitrate) const = 0;
 };
