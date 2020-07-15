@@ -60,6 +60,10 @@ public:
     {
         return dynamic_res;
     }
+    string get_device()
+    {
+        return device_path;
+    }
     void set_bitrates_constants(bool congested)
     {
         if (congested)
@@ -137,7 +141,7 @@ public:
         regex_replace(caps, f, to_string(q.getFramerate()));
         return caps;
     }
-    virtual string generate_launch_string(Quality q, int bitrate) const = 0;
+    virtual string generate_launch_string(Quality q) const = 0;
     virtual void improve_quality(bool congested) = 0;
     virtual void degrade_quality(bool congested) = 0;
     bool dynamic_res_capability() const

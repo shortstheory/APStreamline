@@ -44,6 +44,7 @@ private:
     // string device;
     // int quality;
     const CameraType camera_type;
+    bool auto_mode;
 
   public:
     ResolutionPresets current_res;
@@ -62,12 +63,14 @@ private:
     // int get_quality();
     // void set_quality(int quality);
     string get_device();
-    CameraType get_camera_type();
+    // CameraType get_camera_type();
     void set_pipeline_element(GstElement* _element);
+    shared_ptr<Camera> get_camera();
 
     // Takes the pipeline created by the launch string and iterates through it to
     // find the elements for configuration
     bool get_element_references();
+    bool is_auto();
 };
 
 #endif

@@ -21,7 +21,7 @@ public:
                                                        framerate(framerate_)
     {
     }
-
+// overload == operator
     int getWidth() const
     {
         return width;
@@ -63,6 +63,31 @@ public:
         case HIGH:
             return Quality(1280, 720, 30);
         };
+    }
+
+    // Hacky lookup table! Sorry folks!
+    static Quality int_to_Quality(int qual)
+    {
+        Quality quality(0,0,0);
+        if (qual == 0) {
+            quality = Quality(320,240,15);
+        } else if (qual == 1) {
+            quality = Quality(640,480,15);
+        } else if (qual == 2) {
+            quality = Quality(1280,720,15);
+        } else if (qual == 3) {
+            quality = Quality(320,240,30);
+        } else if (qual == 4) {
+            quality = Quality(640,480,30);
+        } else if (qual == 5) {
+            quality = Quality(1280,720,30);
+        } else if (qual == 6) {
+            quality = Quality(320,240,60);
+        } else if (qual == 7) {
+            quality = Quality(640,480,60);
+        } else if (qual == 8) {
+            quality = Quality(1280,720,60);
+        }
     }
 };
 
