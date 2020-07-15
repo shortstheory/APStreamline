@@ -1,6 +1,6 @@
 #ifndef QUALITY_H
 #define QUALITY_H
-
+#include <vector>
 using namespace std;
 class Quality
 {
@@ -69,6 +69,8 @@ public:
             return Quality(640, 480, 30);
         case HIGH:
             return Quality(1280, 720, 30);
+        default:
+            return Quality(320, 240, 30);
         };
     }
 
@@ -80,7 +82,7 @@ public:
 
     static int Quality_to_int(Quality q)
     {
-        for (int i = 0; i < quality_table.size(); i++) {
+        for (unsigned long int i = 0; i < quality_table.size(); i++) {
             if (quality_table[i] == q) {
                 return i;
             }

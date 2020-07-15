@@ -1,3 +1,6 @@
+#ifndef CAMERA_H
+#define CAMERA_H
+
 #include <utility>
 #include <string>
 #include <unordered_map>
@@ -51,6 +54,7 @@ public:
     Camera(string device, Quality q) : device_path(device), current_quality(q)
     {
     }
+    virtual ~Camera(){}
     virtual bool set_element_references(GstElement *pipeline) = 0;
     virtual bool set_bitrate(guint32 _bitrate)
     {
@@ -157,3 +161,5 @@ public:
         return dynamic_bitrate;
     }
 };
+
+#endif

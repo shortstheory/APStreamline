@@ -4,19 +4,25 @@
 class MJPGCamera : public Camera
 {
 protected:
-    GstElement *encoder;
-    GstElement *capsfilter;
+    GstElement* encoder;
+    GstElement* capsfilter;
     string encoder_name;
     guint32 bitrate;
 
 public:
     MJPGCamera(string device, Quality q) : Camera(device, q)
     {
+        encoder = nullptr;
+        capsfilter = nullptr;
     }
     virtual bool set_element_references(GstElement *pipeline) override
     {
         encoder = gst_bin_get_by_name(GST_BIN(pipeline), encoder_name.c_str());
         capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter");
+        if (encoder && capsfilter) {
+            return true;
+        }
+        return false;
     }
     virtual bool set_bitrate(guint32 _bitrate) override
     {
@@ -48,14 +54,12 @@ public:
         return true;
     }
     // call from ctr
-    // set min bitrate in ctr
-    // and quality
-    // camera_name
     virtual bool read_configuration(Setting &config) override
     {
         Camera::read_configuration(config);
         // change this here
         encoder_name = static_cast<const char *>(config.lookup("encoder_name"));
+        return true;
     }
     virtual string generate_launch_string(Quality q) const override
     {
