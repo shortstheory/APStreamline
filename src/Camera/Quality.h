@@ -89,6 +89,14 @@ public:
             quality = Quality(1280,720,60);
         }
     }
+
+    bool operator==(Quality& rhs) const
+    {
+        if (width == rhs.width && height == rhs.height && framerate == rhs.framerate) {
+            return true;
+        }
+        return false;
+    }
 };
 
 #endif
