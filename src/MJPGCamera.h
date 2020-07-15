@@ -7,6 +7,7 @@ protected:
     GstElement *encoder;
     GstElement *capsfilter;
     string encoder_name;
+
 public:
     virtual bool set_element_references(GstElement *pipeline) override
     {
@@ -22,7 +23,7 @@ public:
     {
         string capsfilter_string;
         capsfilter_string = generate_capsfilter(q);
-        GstCaps* caps;
+        GstCaps *caps;
         caps = gst_caps_from_string(capsfilter_string.c_str());
         g_object_set(G_OBJECT(capsfilter), "caps", caps, NULL);
         gst_caps_unref(caps);
@@ -31,7 +32,7 @@ public:
     virtual bool read_configuration(Setting &camera_config) override
     {
         Camera::read_configuration(camera_config);
-        encoder_name = static_cast<const char*>(camera_config.lookup("encoder_name"));
+        encoder_name = static_cast<const char *>(camera_config.lookup("encoder_name"));
     }
     virtual string generate_launch_string(Quality q, int bitrate) const override
     {
