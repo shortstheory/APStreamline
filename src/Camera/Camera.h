@@ -15,6 +15,7 @@ class Camera
 protected:
     string device_path;
     string launch_string;
+    string camera_name;
     string capsfilter;
     bool fallback;
     bool dynamic_res;
@@ -25,12 +26,33 @@ protected:
     int default_framerate;
     int default_res;
 
+    guint32 steady_state_min;
+    guint32 steady_state_max;
+    guint32 steady_state_increment;
+    guint32 steady_state_decrement;
+
+    guint32 congested_state_min;
+    guint32 congested_state_max;
+    guint32 congested_state_increment;
+    guint32 congested_state_decrement;
+
+    guint32 low_bitrate;
+    guint32 medium_bitrate;
+    guint32 high_bitrate;
+
+    guint32 min_bitrate;
+    guint32 max_bitrate;
+    guint32 increment_bitrate;
+    guint32 decrement_bitrate;
+
+    Quality current_quality;
+
 public:
-    Camera()
+    Camera(string device, Quality q) : device_path(device), current_quality(q)
     {
     }
-    virtual bool set_element_references(GstElement* pipeline) = 0;
-    virtual bool set_bitrate(int bitrate)
+    virtual bool set_element_references(GstElement *pipeline) = 0;
+    virtual bool set_bitrate(guint32 _bitrate)
     {
         return dynamic_bitrate;
     }
@@ -38,8 +60,43 @@ public:
     {
         return dynamic_res;
     }
-    virtual bool read_configuration(Setting &camera_config)
+    void set_bitrates_constants(bool congested)
     {
+        if (congested)
+        {
+            min_bitrate = congested_state_min;
+            max_bitrate = congested_state_max;
+            increment_bitrate = congested_state_increment;
+            decrement_bitrate = congested_state_decrement;
+        }
+        else
+        {
+            min_bitrate = steady_state_min;
+            max_bitrate = steady_state_max;
+            increment_bitrate = steady_state_increment;
+            decrement_bitrate = steady_state_decrement;
+        }
+    }
+    virtual bool read_configuration(Setting &config_root)
+    {
+        Setting &quality_config = config_root["quality"];
+        string camera_name_path = "cameras." + camera_name;
+        Setting &camera_config = config_root[camera_name_path.c_str()];
+
+        steady_state_min = quality_config.lookup("steady_state.min");
+        steady_state_max = quality_config.lookup("steady_state.max");
+        steady_state_increment = quality_config.lookup("steady_state.increment");
+        steady_state_decrement = quality_config.lookup("steady_state.decrement");
+
+        congested_state_min = quality_config.lookup("congested_state.min");
+        congested_state_max = quality_config.lookup("congested_state.max");
+        congested_state_increment = quality_config.lookup("congested_state.increment");
+        congested_state_decrement = quality_config.lookup("congested_state.decrement");
+
+        low_bitrate = quality_config.lookup("bitrate.low");
+        medium_bitrate = quality_config.lookup("bitrate.med");
+        high_bitrate = quality_config.lookup("bitrate.high");
+
         launch_string = static_cast<const char *>(camera_config.lookup("properties.launch_string"));
         capsfilter = static_cast<const char *>(camera_config.lookup("properties.capsfilter"));
         fallback = camera_config.lookup("properties.fallback");
