@@ -38,7 +38,9 @@ public:
     virtual bool set_quality(Quality q) override
     {
         string capsfilter_string;
-        capsfilter_string = generate_capsfilter(q);
+        // TODO: add checks for if Q is valid or not
+        current_quality = q;
+        capsfilter_string = generate_capsfilter(current_quality);
         GstCaps *caps;
         caps = gst_caps_from_string(capsfilter_string.c_str());
         g_object_set(G_OBJECT(capsfilter), "caps", caps, NULL);

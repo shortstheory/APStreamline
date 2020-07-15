@@ -60,6 +60,10 @@ public:
     {
         return dynamic_res;
     }
+    Quality get_quality()
+    {
+        return current_quality;
+    }
     string get_device()
     {
         return device_path;

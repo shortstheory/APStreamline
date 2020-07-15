@@ -300,12 +300,22 @@ bool RTSPAdaptiveStreaming::get_media_prepared()
 
 int RTSPAdaptiveStreaming::get_quality()
 {
-    return pipeline_manager.get_quality();
+    if (pipeline_manager.is_auto()) {
+        return AUTO_PRESET;
+    } else {
+        Quality q = pipeline_manager.get_camera()->get_quality();
+        return Quality::Quality_to_int(q);
+    }
 }
+
 // TODO: Do the conversion of int -> quality here
 void RTSPAdaptiveStreaming::set_quality(int quality)
 {
-    if (quality != pipeline_manager.get_quality()) {
-        pipeline_manager.set_quality(quality);
+    if (quality == AUTO_PRESET) {
+        pipeline_manager.set_auto(true);
+    } else {
+        pipeline_manager.set_auto(false);
+        Quality q(quality);
+        pipeline_manager.get_camera()->set_quality(q);
     }
 }

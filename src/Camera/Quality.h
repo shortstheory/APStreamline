@@ -17,6 +17,12 @@ public:
         MEDIUM,
         HIGH
     } current_quality;
+    Quality(int quality)
+    {
+        width = quality_table[quality].width;
+        height = quality_table[quality].height;
+        framerate = quality_table[quality].framerate;
+    }
     Quality(int width_, int height_, int framerate_) : width(width_),
                                                        height(height_),
                                                        framerate(framerate_)
