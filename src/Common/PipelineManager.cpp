@@ -89,3 +89,8 @@ bool PipelineManager::is_auto()
 {
     return auto_mode;
 }
+
+void PipelineManager::set_auto(bool mode)
+{
+    auto_mode = mode;
+}

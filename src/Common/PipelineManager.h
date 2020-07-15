@@ -71,6 +71,7 @@ private:
     // find the elements for configuration
     bool get_element_references();
     bool is_auto();
+    void set_auto(bool mode);
 };
 
 #endif
