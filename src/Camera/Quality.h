@@ -8,6 +8,7 @@ private:
     int width;
     int height;
     int framerate;
+    static vector<Quality> quality_table;
 
 public:
     enum QualityLevel
@@ -21,7 +22,7 @@ public:
                                                        framerate(framerate_)
     {
     }
-// overload == operator
+    // overload == operator
     int getWidth() const
     {
         return width;
@@ -68,31 +69,23 @@ public:
     // Hacky lookup table! Sorry folks!
     static Quality int_to_Quality(int qual)
     {
-        Quality quality(0,0,0);
-        if (qual == 0) {
-            quality = Quality(320,240,15);
-        } else if (qual == 1) {
-            quality = Quality(640,480,15);
-        } else if (qual == 2) {
-            quality = Quality(1280,720,15);
-        } else if (qual == 3) {
-            quality = Quality(320,240,30);
-        } else if (qual == 4) {
-            quality = Quality(640,480,30);
-        } else if (qual == 5) {
-            quality = Quality(1280,720,30);
-        } else if (qual == 6) {
-            quality = Quality(320,240,60);
-        } else if (qual == 7) {
-            quality = Quality(640,480,60);
-        } else if (qual == 8) {
-            quality = Quality(1280,720,60);
-        }
+        return quality_table[qual];
     }
 
-    bool operator==(Quality& rhs) const
+    static int Quality_to_int(Quality q)
     {
-        if (width == rhs.width && height == rhs.height && framerate == rhs.framerate) {
+        for (int i = 0; i < quality_table.size(); i++) {
+            if (quality_table[i] == q) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    bool operator==(Quality &rhs) const
+    {
+        if (width == rhs.width && height == rhs.height && framerate == rhs.framerate)
+        {
             return true;
         }
         return false;
