@@ -76,6 +76,7 @@ private:
     void set_quality(int quality);
     string get_device();
     CameraType get_camera_type();
+    void set_pipeline_element(GstElement* _element);
 
     // Takes the pipeline created by the launch string and iterates through it to
     // find the elements for configuration

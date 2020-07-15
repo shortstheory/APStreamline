@@ -4,14 +4,13 @@
 class MJPGCamera : public Camera
 {
 protected:
-    GstElement *encoder;
-    GstElement *capsfilter;
+    GstElement* encoder;
+    GstElement* capsfilter;
     string encoder_name;
-
+    guint32 bitrate;
 public:
     MJPGCamera() : Camera()
     {
-
     }
     virtual bool set_element_references(GstElement* pipeline) override
     {
@@ -33,6 +32,9 @@ public:
         gst_caps_unref(caps);
         return true;
     }
+    // call from ctr
+    // set min bitrate in ctr
+    // and quality
     virtual bool read_configuration(Setting &camera_config) override
     {
         Camera::read_configuration(camera_config);
@@ -51,5 +53,13 @@ public:
         regex_replace(launch_string, enc, encoder_name);
         regex_replace(launch_string, br, to_string(bitrate));
         return launch_string;
+    }
+    virtual void improve_quality(bool congested) override
+    {
+
+    }
+    virtual void degrade_quality(bool congested) override
+    {
+
     }
 };

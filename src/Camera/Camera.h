@@ -46,7 +46,6 @@ public:
         dynamic_res = camera_config.lookup("properties.dynamic_res");
         dynamic_bitrate = camera_config.lookup("properties.dynamic_bitrate");
         default_framerate = camera_config.lookup("properties.default_framerate");
-        default_res = 1;
 
         for (int i = 0; i < camera_config["encoder_params"].getLength(); i++)
         {
@@ -82,6 +81,8 @@ public:
         return caps;
     }
     virtual string generate_launch_string(Quality q, int bitrate) const = 0;
+    virtual void improve_quality(bool congested) = 0;
+    virtual void degrade_quality(bool congested) = 0;
     bool dynamic_res_capability() const
     {
         return dynamic_res;

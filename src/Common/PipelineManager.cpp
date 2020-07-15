@@ -340,3 +340,9 @@ CameraType PipelineManager::get_camera_type()
 {
     return camera_type;
 }
+
+void PipelineManager::set_pipeline_element(GstElement* _element)
+{
+    pipeline = _element;
+    cam->set_element_references(pipeline);
+}

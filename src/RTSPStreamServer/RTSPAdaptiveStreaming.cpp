@@ -124,7 +124,7 @@ void RTSPAdaptiveStreaming::media_prepared_callback(GstRTSPMedia* media)
         str = gst_element_get_name(element);
 
         if (str.find("bin") != std::string::npos || str.find("pipeline") != std::string::npos) {
-            pipeline_manager.pipeline = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
+            pipeline_manager.set_pipeline_element(gst_bin_get_by_name(GST_BIN(parent), str.c_str()));
         }
         if (str.find("rtpbin") != std::string::npos) {
             rtpbin = gst_bin_get_by_name(GST_BIN(parent), str.c_str());
