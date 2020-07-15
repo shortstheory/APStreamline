@@ -2,7 +2,6 @@
 #include <string>
 #include <unordered_map>
 #include <gst/gst.h>
-#include "Constants.h"
 #include "Quality.h"
 #include <libconfig.h++>
 #include <iostream>
@@ -27,7 +26,10 @@ protected:
     int default_res;
 
 public:
-    virtual bool set_element_references(GstElement *pipeline) = 0;
+    Camera()
+    {
+    }
+    virtual bool set_element_references(GstElement* pipeline) = 0;
     virtual bool set_bitrate(int bitrate)
     {
         return dynamic_bitrate;

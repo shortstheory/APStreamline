@@ -11,7 +11,7 @@
 #include <sstream>
 #include <iomanip>
 #include <ctime>
-
+#include "../Camera/Camera.h"
 #include "QoSEstimator.h"
 #include "DeviceDatatypes.h"
 #include "Constants.h"
@@ -30,11 +30,13 @@ private:
     guint32 DEC_BITRATE;
     guint32 INC_BITRATE;
 
-    GstElement *camera;
-    GstElement *src_capsfilter;
-    GstElement *videoconvert;
-    GstElement *h264_encoder;
-    GstElement *text_overlay;
+    shared_ptr<Camera> cam;
+
+    GstElement* camera;
+    GstElement* src_capsfilter;
+    GstElement* videoconvert;
+    GstElement* h264_encoder;
+    GstElement* text_overlay;
 
     enum NetworkState {STEADY, CONGESTION} network_state;
     guint32 successive_transmissions;

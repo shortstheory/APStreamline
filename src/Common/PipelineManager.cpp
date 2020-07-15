@@ -7,44 +7,47 @@
 #include <unistd.h>
 #include <iostream>
 #include "PipelineManager.h"
+#include "../Camera/CameraFactory.h"
 
 PipelineManager::PipelineManager(string _device, int quality, CameraType type) : network_state(NetworkState::STEADY), successive_transmissions(0),
                                                                                  device(_device), quality(quality), camera_type(type)
 {
-    switch (camera_type) {
-    case CameraType::MJPG_CAM:
-        video_presets[ResolutionPresets::LOW] = MJPG_CAPS_FILTERS[VIDEO_320x240x30];
-        video_presets[ResolutionPresets::MED] = MJPG_CAPS_FILTERS[VIDEO_640x480x30];
-        video_presets[ResolutionPresets::HIGH] = MJPG_CAPS_FILTERS[VIDEO_1280x720x30];
-        break;
-    case CameraType::RPI_CAM:
-    case CameraType::UVC_CAM:
-        video_presets[ResolutionPresets::LOW] = H264_CAPS_FILTERS[VIDEO_320x240x30];
-        video_presets[ResolutionPresets::MED] = H264_CAPS_FILTERS[VIDEO_640x480x30];
-        video_presets[ResolutionPresets::HIGH] = H264_CAPS_FILTERS[VIDEO_1280x720x30];
-        break;
-    case CameraType::JETSON_CAM:
-        video_presets[ResolutionPresets::LOW] = JETSON_CAPS_FILTERS[VIDEO_320x240x30];
-        video_presets[ResolutionPresets::MED] = JETSON_CAPS_FILTERS[VIDEO_640x480x30];
-        video_presets[ResolutionPresets::HIGH] = JETSON_CAPS_FILTERS[VIDEO_1280x720x30];
-        break;
-    }
+    cam = CameraFactory(camera_type).get_camera();
 
-    bitrate_presets[ResolutionPresets::LOW] = LOW_QUAL_BITRATE;
-    bitrate_presets[ResolutionPresets::MED] = MED_QUAL_BITRATE;
-    bitrate_presets[ResolutionPresets::HIGH] = HIGH_QUAL_BITRATE;
+    // switch (camera_type) {
+    // case CameraType::MJPG_CAM:
+    //     video_presets[ResolutionPresets::LOW] = MJPG_CAPS_FILTERS[VIDEO_320x240x30];
+    //     video_presets[ResolutionPresets::MED] = MJPG_CAPS_FILTERS[VIDEO_640x480x30];
+    //     video_presets[ResolutionPresets::HIGH] = MJPG_CAPS_FILTERS[VIDEO_1280x720x30];
+    //     break;
+    // case CameraType::RPI_CAM:
+    // case CameraType::UVC_CAM:
+    //     video_presets[ResolutionPresets::LOW] = H264_CAPS_FILTERS[VIDEO_320x240x30];
+    //     video_presets[ResolutionPresets::MED] = H264_CAPS_FILTERS[VIDEO_640x480x30];
+    //     video_presets[ResolutionPresets::HIGH] = H264_CAPS_FILTERS[VIDEO_1280x720x30];
+    //     break;
+    // case CameraType::JETSON_CAM:
+    //     video_presets[ResolutionPresets::LOW] = JETSON_CAPS_FILTERS[VIDEO_320x240x30];
+    //     video_presets[ResolutionPresets::MED] = JETSON_CAPS_FILTERS[VIDEO_640x480x30];
+    //     video_presets[ResolutionPresets::HIGH] = JETSON_CAPS_FILTERS[VIDEO_1280x720x30];
+    //     break;
+    // }
 
-    pipeline = nullptr;
-    camera = nullptr;
-    src_capsfilter = nullptr;
-    videoconvert = nullptr;
-    h264_encoder = nullptr;
-    rtph264_payloader = nullptr;
-    text_overlay = nullptr;
-    tee = nullptr;
-    multi_udp_sink = nullptr;
+    // bitrate_presets[ResolutionPresets::LOW] = LOW_QUAL_BITRATE;
+    // bitrate_presets[ResolutionPresets::MED] = MED_QUAL_BITRATE;
+    // bitrate_presets[ResolutionPresets::HIGH] = HIGH_QUAL_BITRATE;
 
-    set_state_constants();
+    // pipeline = nullptr;
+    // camera = nullptr;
+    // src_capsfilter = nullptr;
+    // videoconvert = nullptr;
+    // h264_encoder = nullptr;
+    // rtph264_payloader = nullptr;
+    // text_overlay = nullptr;
+    // tee = nullptr;
+    // multi_udp_sink = nullptr;
+
+    // set_state_constants();
 }
 
 int PipelineManager::get_quality_bitrate(int quality)

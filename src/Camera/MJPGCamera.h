@@ -9,7 +9,11 @@ protected:
     string encoder_name;
 
 public:
-    virtual bool set_element_references(GstElement *pipeline) override
+    MJPGCamera() : Camera()
+    {
+
+    }
+    virtual bool set_element_references(GstElement* pipeline) override
     {
         encoder = gst_bin_get_by_name(GST_BIN(pipeline), encoder_name.c_str());
         capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter");
