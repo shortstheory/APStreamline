@@ -36,21 +36,21 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
     port = rtsp_stream_server->get_port();
 
     sprintf(info_buffer, "{"
-                            "\"ip\": \"%s\", "
-                            "\"port\": \"%s\", "
-                            "\"dev_mount\": \"%s\", "
-                            "\"name\": \"%s\", "
-                            "\"mount\": \"%s\", "
-                            "\"camtype\": %d, "
+            "\"ip\": \"%s\", "
+            "\"port\": \"%s\", "
+            "\"dev_mount\": \"%s\", "
+            "\"name\": \"%s\", "
+            "\"mount\": \"%s\", "
+            "\"camtype\": %d, "
 #if defined(__amd64__) || defined(__aarch64__)
-                            "\"frame_property_bitmask\": %lu, "
+            "\"frame_property_bitmask\": %lu, "
 #endif
 #ifdef __arm__
-                            "\"frame_property_bitmask\": %llu, "
+            "\"frame_property_bitmask\": %llu, "
 #endif
-                            "\"current_quality\": %u, "
-                            "\"recording\": %d"
-                            "}",
+            "\"current_quality\": %u, "
+            "\"recording\": %d"
+            "}",
             ip_address.c_str(),
             port.c_str(),
             device_props.first.c_str(),

@@ -46,7 +46,7 @@ private:
     const CameraType camera_type;
     bool auto_mode;
 
-  public:
+public:
     ResolutionPresets current_res;
     guint32 h264_bitrate;
 

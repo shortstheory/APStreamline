@@ -13,7 +13,7 @@ private:
 public:
     CameraFactory(string device, Quality q, CameraType type)
     {
-        if (type == MJPG_CAM) { 
+        if (type == MJPG_CAM) {
             camera = shared_ptr<MJPGCamera>(new MJPGCamera(device,q));
         }
     }

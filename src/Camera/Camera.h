@@ -54,7 +54,7 @@ public:
     Camera(string device, Quality q) : device_path(device), current_quality(q)
     {
     }
-    virtual ~Camera(){}
+    virtual ~Camera() {}
     virtual bool set_element_references(GstElement *pipeline) = 0;
     virtual bool set_bitrate(guint32 _bitrate)
     {
@@ -74,26 +74,23 @@ public:
     }
     void set_bitrates_constants(bool congested)
     {
-        if (congested)
-        {
+        if (congested) {
             min_bitrate = congested_state_min;
             max_bitrate = congested_state_max;
             increment_bitrate = congested_state_increment;
             decrement_bitrate = congested_state_decrement;
-        }
-        else
-        {
+        } else {
             min_bitrate = steady_state_min;
             max_bitrate = steady_state_max;
             increment_bitrate = steady_state_increment;
             decrement_bitrate = steady_state_decrement;
         }
     }
-    virtual bool read_configuration(Setting &config_root)
+    virtual bool read_configuration(Setting& camera_config, Setting& quality_config)
     {
-        Setting &quality_config = config_root["quality"];
-        string camera_name_path = "cameras." + camera_name;
-        Setting &camera_config = config_root[camera_name_path.c_str()];
+        // Setting &quality_config = config_root["quality"];
+        // string camera_name_path = "cameras." + camera_name;
+        // Setting &camera_config = config_root[camera_name_path.c_str()];
 
         steady_state_min = quality_config.lookup("steady_state.min");
         steady_state_max = quality_config.lookup("steady_state.max");
@@ -116,14 +113,12 @@ public:
         dynamic_bitrate = camera_config.lookup("properties.dynamic_bitrate");
         default_framerate = camera_config.lookup("properties.default_framerate");
 
-        for (int i = 0; i < camera_config["encoder_params"].getLength(); i++)
-        {
+        for (int i = 0; i < camera_config["encoder_params"].getLength(); i++) {
             string key;
             Setting::Type type;
             key = camera_config["encoder_params"][i].getName();
             type = camera_config["encoder_params"][i].getType();
-            switch (type)
-            {
+            switch (type) {
             case Setting::Type::TypeBoolean:
                 encoder_params_bool[key] = camera_config["encoder_params"].lookup(key);
                 break;

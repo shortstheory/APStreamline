@@ -10,7 +10,7 @@
 #include "../Camera/CameraFactory.h"
 
 PipelineManager::PipelineManager(string _device, CameraType type) : congested(false), successive_transmissions(0),
-                                                                    camera_type(type), auto_mode(true)
+    camera_type(type), auto_mode(true)
 {
     cam = CameraFactory(_device, Quality::get_quality(Quality::QualityLevel::LOW), type).get_camera();
 }
@@ -20,34 +20,24 @@ void PipelineManager::adapt_stream()
     QoSReport qos_report;
     qos_report = qos_estimator.get_qos_report();
 
-    if (successive_transmissions >= SUCCESSFUL_TRANSMISSION)
-    {
+    if (successive_transmissions >= SUCCESSFUL_TRANSMISSION) {
         congested = false;
     }
 
     // If we get a number of transmissions without any packet loss, we can increase bitrate
-    if (qos_report.fraction_lost == 0)
-    {
+    if (qos_report.fraction_lost == 0) {
         successive_transmissions++;
-        if (multi_udp_sink)
-        {
-            if (qos_report.encoding_bitrate < qos_report.estimated_bitrate * 1.5)
-            {
+        if (multi_udp_sink) {
+            if (qos_report.encoding_bitrate < qos_report.estimated_bitrate * 1.5) {
                 cam->improve_quality(congested);
-            }
-            else
-            {
+            } else {
                 cerr << "Buffer overflow possible!" << endl;
                 cam->degrade_quality(congested);
             }
-        }
-        else
-        {
+        } else {
             cam->improve_quality(congested);
         }
-    }
-    else
-    {
+    } else {
         congested = true;
         successive_transmissions = 0;
         cam->degrade_quality(congested);
@@ -56,12 +46,10 @@ void PipelineManager::adapt_stream()
 
 bool PipelineManager::get_element_references()
 {
-    if (pipeline)
-    {
+    if (pipeline) {
         tee = gst_bin_get_by_name(GST_BIN(pipeline), "tee_element");
         rtph264_payloader = gst_bin_get_by_name(GST_BIN(pipeline), "pay0");
-        if (cam->set_element_references(pipeline) && tee && rtph264_payloader)
-        {
+        if (cam->set_element_references(pipeline) && tee && rtph264_payloader) {
             return true;
         }
     }

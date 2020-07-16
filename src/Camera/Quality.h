@@ -11,8 +11,7 @@ private:
     static vector<Quality> quality_table;
 
 public:
-    enum QualityLevel
-    {
+    enum QualityLevel {
         LOW,
         MEDIUM,
         HIGH
@@ -24,8 +23,8 @@ public:
         framerate = quality_table[quality].framerate;
     }
     Quality(int width_, int height_, int framerate_) : width(width_),
-                                                       height(height_),
-                                                       framerate(framerate_)
+        height(height_),
+        framerate(framerate_)
     {
     }
     // overload == operator
@@ -46,8 +45,7 @@ public:
 
     QualityLevel get_quality_level()
     {
-        switch (height)
-        {
+        switch (height) {
         case 240:
             return LOW;
         case 480:
@@ -61,8 +59,7 @@ public:
 
     static Quality get_quality(QualityLevel quality_level)
     {
-        switch (quality_level)
-        {
+        switch (quality_level) {
         case LOW:
             return Quality(320, 240, 30);
         case MEDIUM:
@@ -92,8 +89,7 @@ public:
 
     bool operator==(Quality &rhs) const
     {
-        if (width == rhs.width && height == rhs.height && framerate == rhs.framerate)
-        {
+        if (width == rhs.width && height == rhs.height && framerate == rhs.framerate) {
             return true;
         }
         return false;
