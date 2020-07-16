@@ -62,6 +62,9 @@ void RTSPStreamServer::get_v4l2_devices_info()
         if (fd != -1) {
             v4l2_capability caps;
             ioctl(fd, VIDIOC_QUERYCAP, &caps);
+            if (!(caps.device_caps & V4L2_CAP_VIDEO_CAPTURE)) {
+                continue;
+            }
 
             info.camera_name = string(caps.card, caps.card + sizeof caps.card / sizeof caps.card[0]);
             info.mount_point = MOUNT_POINT_PREFIX + to_string(i);
