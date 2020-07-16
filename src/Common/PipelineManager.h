@@ -62,7 +62,7 @@ private:
     void adapt_stream();
     // int get_quality();
     // void set_quality(int quality);
-    string get_device();
+    string get_device_path();
     // CameraType get_camera_type();
     void set_pipeline_element(GstElement* _element);
     shared_ptr<Camera> get_camera();

@@ -68,7 +68,7 @@ public:
     {
         return current_quality;
     }
-    string get_device()
+    string get_device_path()
     {
         return device_path;
     }

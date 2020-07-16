@@ -35,7 +35,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
 
         string launch_string;
         string device;
-        device = pipeline_manager.get_device();
+        device = pipeline_manager.get_device_path();
 
         string resolution_caps;
 

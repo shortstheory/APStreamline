@@ -68,10 +68,10 @@ bool PipelineManager::get_element_references()
     return false;
 }
 
-string PipelineManager::get_device()
+string PipelineManager::get_device_path()
 {
     // return device;
-    return cam->get_device();
+    return cam->get_device_path();
 }
 
 shared_ptr<Camera> PipelineManager::get_camera()
