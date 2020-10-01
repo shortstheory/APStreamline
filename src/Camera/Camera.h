@@ -20,6 +20,8 @@ protected:
     string launch_string;
     string camera_name;
     string capsfilter;
+    uint32_t frame_property_bitmask;
+
     bool fallback;
     bool dynamic_res;
     bool dynamic_bitrate;
@@ -126,7 +128,7 @@ public:
                 encoder_params_int[key] = camera_config["encoder_params"].lookup(key);
                 break;
             default:
-                cerr << "Other types not implement yet" << endl;
+                cerr << "Other types not implemented yet" << endl;
                 return false;
             }
         }
