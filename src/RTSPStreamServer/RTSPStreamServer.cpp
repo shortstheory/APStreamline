@@ -62,6 +62,8 @@ void RTSPStreamServer::get_v4l2_devices_info()
         if (fd != -1) {
             v4l2_capability caps;
             ioctl(fd, VIDIOC_QUERYCAP, &caps);
+            // V4L2 annoyingly lists each camera twice, so we need to filter the ones
+            // which don't support the VIDEO_CAPTURE capability
             if (!(caps.device_caps & V4L2_CAP_VIDEO_CAPTURE)) {
                 continue;
             }

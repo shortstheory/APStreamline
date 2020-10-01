@@ -9,6 +9,7 @@
 #include <ifaddrs.h>
 #include <arpa/inet.h>
 #include <signal.h>
+#include <filesystem>
 
 #include "RTSPStreamServer.h"
 #include "IPCMessageHandler.h"
@@ -80,7 +81,7 @@ string get_ip_address(string interface = "lo")
     cerr << "No IP found for given interface" << endl;
     return string("127.0.0.1");
 }
-
+// FIXME: why is this global?
 GMainLoop* loop;
 
 // SIGTERM handler so we can clean up before destroying the stream
@@ -98,7 +99,7 @@ int main(int argc, char *argv[])
     memset(&action, 0, sizeof(struct sigaction));
     action.sa_handler = terminate_process;
     sigaction(SIGINT, &action, NULL);
-
+    cout << std::filesystem::current_path() << endl;
     gst_init(&argc, &argv);
     loop = g_main_loop_new(NULL, FALSE);
 
