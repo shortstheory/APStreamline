@@ -51,7 +51,7 @@ Quality::QualityLevel Quality::get_quality_level()
     };
 }
 
-Quality::Quality get_quality(Quality::QualityLevel quality_level)
+Quality Quality::get_quality(Quality::QualityLevel quality_level)
 {
     switch (quality_level) {
     case Quality::QualityLevel::LOW:
