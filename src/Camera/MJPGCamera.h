@@ -69,7 +69,7 @@ public:
     {
         Camera::read_configuration(camera_config, quality_config);
         // change this here
-        encoder_name = static_cast<const char *>(camera_config.lookup("encoder_name"));
+        encoder_name = static_cast<const char *>(camera_config.lookup("camera.properties.encoder_name"));
         return true;
     }
     virtual string generate_launch_string(Quality q) const override
@@ -92,11 +92,12 @@ public:
         regex cf("%capsfilter");
         regex enc("%encoder");
         regex br("%bitrate");
-        regex_replace(launch_string, d, device_path);
-        regex_replace(launch_string, cf, capsfilter_string);
-        regex_replace(launch_string, enc, encoder_name);
-        regex_replace(launch_string, br, to_string(launch_bitrate));
-        return launch_string;
+        string result;
+        result = regex_replace(launch_string, d, device_path);
+        result = regex_replace(result, cf, capsfilter_string);
+        result = regex_replace(result, enc, encoder_name);
+        result = regex_replace(result, br, to_string(launch_bitrate));
+        return result;
     }
     virtual void improve_quality(bool congested) override
     {

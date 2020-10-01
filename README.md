@@ -47,7 +47,7 @@ Do note that the Raspberry Pi 3 and 3B+ have **very** low power Wi-Fi antennae w
 Install the `gstreamer` dependencies:
 
 ```
-sudo apt install libgstreamer-plugins-base1.0* libgstreamer1.0-dev libgstrtspserver-1.0-dev gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly python3-pip python-pip
+sudo apt install libgstreamer-plugins-base1.0* libgstreamer1.0-dev libgstrtspserver-1.0-dev gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly python3-pip python-pip gstreamer1.0-libav
 ```
 
 Install `meson` from `pip` and `ninja` for building the code:

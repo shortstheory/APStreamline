@@ -145,9 +145,9 @@ public:
         regex f("%framerate");
         string caps;
         caps = capsfilter;
-        regex_replace(caps, w, to_string(q.getWidth()));
-        regex_replace(caps, h, to_string(q.getHeight()));
-        regex_replace(caps, f, to_string(q.getFramerate()));
+        caps = regex_replace(caps, w, to_string(q.getWidth()));
+        caps = regex_replace(caps, h, to_string(q.getHeight()));
+        caps = regex_replace(caps, f, to_string(q.getFramerate()));
         return caps;
     }
     virtual string generate_launch_string(Quality q) const = 0;
