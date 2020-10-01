@@ -21,8 +21,9 @@ RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_
     gst_rtsp_server_set_service(server, port.c_str());
 
     get_v4l2_devices_paths();
-    cerr << "***APStreamline***\nAccess the following video streams using VLC or gst-launch following \
-    the instructions here: https://github.com/shortstheory/adaptive-streaming#usage\n==============================\n";
+    cerr << "***APStreamline***\nAccess the following video streams using VLC or gst-launch following"
+    "the instructions here: https://github.com/shortstheory/adaptive-streaming#usage"
+    "\n==============================\n";
     setup_streams();
 }
 
@@ -76,8 +77,10 @@ CameraType RTSPStreamServer::get_camera_type(const string &device_path)
             return CameraType::JETSON_CAM;
         } else {
             v4l2_fmtdesc fmt;
+            v4l2_buf_type type;
+            type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
             memset(&fmt, 0, sizeof(fmt));
-
+            fmt.type = type;
             fmt.index = 0;
             while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
                 if (!strcmp((char*)fmt.description, "Motion-JPEG")) {
