@@ -21,8 +21,9 @@ public:
         // Read the file. If there is an error, report it and exit.
         try {
             cout << "Reading config" << endl;
-            camera_config.readFile("Config/MJPGCamera.cfg");
-            quality_config.readFile("Config/settings.cfg");
+            camera_config.readFile("config/MJPGCamera.cfg");
+            quality_config.readFile("config/settings.cfg");
+            read_configuration(camera_config.getRoot(), quality_config.getRoot());
         } catch (const FileIOException &fioex) {
             cerr << "I/O error while reading file." << std::endl;
         } catch (const ParseException &pex) {
