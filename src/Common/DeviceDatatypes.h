@@ -10,11 +10,11 @@ using namespace std;
 
 enum class CameraType {MJPG_CAM, UVC_CAM, RPI_CAM, JETSON_CAM, NOT_SUPPORTED};
 enum ResolutionPresets {LOW, MED, HIGH};
-enum FramePresets {FRAME_320x240, FRAME_640x480, FRAME_1280x720, FRAME_COUNT};
-enum VideoPresets {VIDEO_320x240x15, VIDEO_640x480x15, VIDEO_1280x720x15,
-                   VIDEO_320x240x30, VIDEO_640x480x30, VIDEO_1280x720x30,
-                   VIDEO_320x240x60, VIDEO_640x480x60, VIDEO_1280x720x60
-                  };
+// enum FramePresets {FRAME_320x240, FRAME_640x480, FRAME_1280x720, FRAME_COUNT};
+// enum VideoPresets {VIDEO_320x240x15, VIDEO_640x480x15, VIDEO_1280x720x15,
+//                    VIDEO_320x240x30, VIDEO_640x480x30, VIDEO_1280x720x30,
+//                    VIDEO_320x240x60, VIDEO_640x480x60, VIDEO_1280x720x60
+//                   };
 
 enum RTSPMessageType {GET_DEVICE_PROPS, SET_DEVICE_PROPS, ERROR, COUNT};
 const static vector<string> RTSPMessageHeader = {
