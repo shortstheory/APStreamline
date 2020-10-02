@@ -20,7 +20,7 @@ protected:
     string launch_string;
     string camera_name;
     string capsfilter;
-    uint32_t frame_property_bitmask;
+    uint32_t supported_qualities;
 
     bool fallback;
     bool dynamic_res;

@@ -32,7 +32,7 @@ void PipelineManager::adapt_stream()
             if (qos_report.encoding_bitrate < qos_report.estimated_bitrate * 1.5) {
                 cam->improve_quality(congested);
             } else {
-                cerr << "Buffer overflow possible!" << endl;
+                cerr << "Potential buffer overflow!" << endl;
                 cam->degrade_quality(congested);
             }
         } else {
