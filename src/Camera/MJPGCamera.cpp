@@ -51,7 +51,7 @@ bool MJPGCamera::set_quality(Quality q)
     string capsfilter_string;
     // TODO: add checks for if Q is valid or not
     current_quality = q;
-    capsfilter_string = generate_capsfilter(current_quality);
+    capsfilter_string = generate_capsfilter();
     GstCaps *caps;
     caps = gst_caps_from_string(capsfilter_string.c_str());
     g_object_set(G_OBJECT(capsfilter), "caps", caps, NULL);
@@ -67,22 +67,22 @@ bool MJPGCamera::read_configuration(Setting &camera_config, Setting &quality_con
     return true;
 }
 
-string MJPGCamera::generate_launch_string(Quality q) const
+string MJPGCamera::generate_launch_string() const
 {
     string capsfilter_string;
     guint32 launch_bitrate;
-    switch (q.get_quality_level()) {
-    case Quality::QualityLevel::LOW:
+    switch (current_quality.getResolution()) {
+    case Quality::Level::LOW:
         launch_bitrate = low_bitrate;
         break;
-    case Quality::QualityLevel::MEDIUM:
+    case Quality::Level::MEDIUM:
         launch_bitrate = medium_bitrate;
         break;
-    case Quality::QualityLevel::HIGH:
+    case Quality::Level::HIGH:
         launch_bitrate = high_bitrate;
         break;
     };
-    capsfilter_string = generate_capsfilter(q);
+    capsfilter_string = generate_capsfilter();
     regex d("%device");
     regex cf("%capsfilter");
     regex enc("%encoder");
@@ -99,10 +99,12 @@ void MJPGCamera::improve_quality(bool congested)
 {
     set_bitrates_constants(congested);
     set_bitrate(bitrate + increment_bitrate);
-    if (current_quality.get_quality_level() == Quality::QualityLevel::LOW && bitrate > medium_bitrate) {
-        set_quality(Quality::get_quality(Quality::QualityLevel::MEDIUM));
-    } else if (current_quality.get_quality_level() == Quality::QualityLevel::MEDIUM && bitrate > high_bitrate) {
-        set_quality(Quality::get_quality(Quality::QualityLevel::HIGH));
+    if (current_quality.getResolution() == Quality::Level::LOW && bitrate > medium_bitrate) {
+        Quality mediumQuality(Quality::Level::MEDIUM, Quality::Level::MEDIUM);
+        set_quality(mediumQuality);
+    } else if (current_quality.getResolution() == Quality::Level::MEDIUM && bitrate > high_bitrate) {
+        Quality highQuality(Quality::Level::HIGH, Quality::Level::MEDIUM);
+        set_quality(highQuality);
     }
 }
 
@@ -110,9 +112,11 @@ void MJPGCamera::degrade_quality(bool congested)
 {
     set_bitrates_constants(congested);
     set_bitrate(bitrate - decrement_bitrate);
-    if (current_quality.get_quality_level() == Quality::QualityLevel::MEDIUM && bitrate < medium_bitrate) {
-        set_quality(Quality::get_quality(Quality::QualityLevel::LOW));
-    } else if (current_quality.get_quality_level() == Quality::QualityLevel::HIGH && bitrate < high_bitrate) {
-        set_quality(Quality::get_quality(Quality::QualityLevel::MEDIUM));
+    if (current_quality.getResolution() == Quality::Level::MEDIUM && bitrate < medium_bitrate) {
+        Quality lowQuality(Quality::Level::LOW, Quality::Level::MEDIUM);
+        set_quality(lowQuality);
+    } else if (current_quality.getResolution() == Quality::Level::HIGH && bitrate < high_bitrate) {
+        Quality mediumQuality(Quality::Level::MEDIUM, Quality::Level::MEDIUM);
+        set_quality(mediumQuality);
     }
 }

@@ -27,6 +27,8 @@ protected:
     bool dynamic_bitrate;
     unordered_map<string, bool> encoder_params_bool;
     unordered_map<string, int> encoder_params_int;
+    unordered_map<Quality::Level, pair<int,int>> resolutions;
+    unordered_map<Quality::Level, int> framerates;
 
     int default_framerate;
     int default_res;
@@ -62,8 +64,8 @@ public:
     Quality get_quality();
     string get_device_path();
     void set_bitrates_constants(bool congested);
-    virtual string generate_capsfilter(Quality q) const;
-    virtual string generate_launch_string(Quality q) const = 0;
+    virtual string generate_capsfilter() const;
+    virtual string generate_launch_string() const = 0;
     virtual void improve_quality(bool congested) = 0;
     virtual void degrade_quality(bool congested) = 0;
     bool dynamic_res_capability() const;

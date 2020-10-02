@@ -39,7 +39,7 @@ void RTSPAdaptiveStreaming::init_media_factory()
 
         string resolution_caps;
 
-        launch_string = pipeline_manager.get_camera()->generate_launch_string(Quality::get_quality(Quality::QualityLevel::LOW));
+        launch_string = pipeline_manager.get_camera()->generate_launch_string();
         gst_rtsp_media_factory_set_launch(media_factory, launch_string.c_str());
         gst_rtsp_mount_points_add_factory(mounts, uri.c_str(), media_factory);
         g_signal_connect(media_factory, "media-constructed", G_CALLBACK(static_media_constructed_callback), this);
@@ -254,7 +254,7 @@ int RTSPAdaptiveStreaming::get_quality()
         return AUTO_PRESET;
     } else {
         Quality q = pipeline_manager.get_camera()->get_quality();
-        return Quality::Quality_to_int(q);
+        return q.to_int();
     }
 }
 
@@ -265,7 +265,7 @@ void RTSPAdaptiveStreaming::set_quality(int quality)
         pipeline_manager.set_auto(true);
     } else {
         pipeline_manager.set_auto(false);
-        Quality q(quality);
+        Quality q = Quality::int_to_Quality(quality);
         pipeline_manager.get_camera()->set_quality(q);
     }
 }

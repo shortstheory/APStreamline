@@ -63,9 +63,25 @@ bool Camera::read_configuration(Setting& camera_config, Setting& quality_config)
     dynamic_bitrate = camera_config.lookup("camera.properties.dynamic_bitrate");
     default_framerate = camera_config.lookup("camera.properties.default_framerate");
 
-    Setting& encoder_params = camera_config.lookup("camera.encoder_params");
-    int val = encoder_params.getLength();
+    const Setting& low_res = camera_config.lookup("camera.resolutions.low");
+    resolutions[Quality::Level::LOW].first = low_res[0];
+    resolutions[Quality::Level::LOW].second = low_res[1];
 
+    const Setting& med_res = camera_config.lookup("camera.resolutions.medium");
+    resolutions[Quality::Level::MEDIUM].first = med_res[0];
+    resolutions[Quality::Level::MEDIUM].second = med_res[1];
+
+    const Setting& high_res = camera_config.lookup("camera.resolutions.high");
+    resolutions[Quality::Level::HIGH].first = high_res[0];
+    resolutions[Quality::Level::HIGH].second = high_res[1];
+
+    const Setting& framerate_config = camera_config.lookup("camera.framerates");
+    framerates[Quality::Level::LOW] = framerate_config[0];
+    framerates[Quality::Level::MEDIUM] = framerate_config[1];
+    framerates[Quality::Level::HIGH] = framerate_config[2];
+
+    const Setting& encoder_params = camera_config.lookup("camera.encoder_params");
+    int val = encoder_params.getLength();
 
     for (int i = 0; i < encoder_params.getLength(); i++) {
         string key;
@@ -87,16 +103,22 @@ bool Camera::read_configuration(Setting& camera_config, Setting& quality_config)
     return true;
 }
 
-string Camera::generate_capsfilter(Quality q) const
+string Camera::generate_capsfilter() const
 {
     regex w("%width");
     regex h("%height");
     regex f("%framerate");
     string caps;
     caps = capsfilter;
-    caps = regex_replace(caps, w, to_string(q.getWidth()));
-    caps = regex_replace(caps, h, to_string(q.getHeight()));
-    caps = regex_replace(caps, f, to_string(q.getFramerate()));
+
+    pair<int, int> res;
+    res = resolutions.at(current_quality.getResolution());
+    int framerate;
+    framerate = framerates.at(current_quality.getFramerate());
+
+    caps = regex_replace(caps, w, to_string(res.first));
+    caps = regex_replace(caps, h, to_string(res.second));
+    caps = regex_replace(caps, f, to_string(framerate));
     return caps;
 }
 

@@ -48,7 +48,7 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
 #ifdef __arm__
             "\"frame_property_bitmask\": %llu, "
 #endif
-            "\"current_quality\": %u, "
+            "\"resolution\": %u, "
             "\"recording\": %d"
             "}",
             ip_address.c_str(),

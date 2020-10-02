@@ -12,7 +12,8 @@
 PipelineManager::PipelineManager(string _device, CameraType type) : congested(false), successive_transmissions(0),
     camera_type(type), auto_mode(true)
 {
-    cam = CameraFactory(_device, Quality::get_quality(Quality::QualityLevel::LOW), type).get_camera();
+    Quality startingQuality(Quality::Level::LOW, Quality::Level::MEDIUM);
+    cam = CameraFactory(_device, startingQuality, type).get_camera();
 }
 
 void PipelineManager::adapt_stream()

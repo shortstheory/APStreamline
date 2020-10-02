@@ -15,7 +15,7 @@ public:
     virtual bool set_element_references(GstElement *pipeline) override;
     virtual bool set_bitrate(guint32 _bitrate) override;
     virtual bool set_quality(Quality q) override;
-    virtual string generate_launch_string(Quality q) const override;
+    virtual string generate_launch_string() const override;
     virtual void improve_quality(bool congested) override;
     virtual void degrade_quality(bool congested) override;
 };

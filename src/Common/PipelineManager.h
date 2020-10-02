@@ -26,28 +26,12 @@ class PipelineManager
 {
 private:
     shared_ptr<Camera> cam;
-
-    // GstElement* camera;
-    // GstElement* src_capsfilter;
-    // GstElement* videoconvert;
-    // GstElement* h264_encoder;
-    // GstElement* text_overlay;
-
-    // enum NetworkState {STEADY, CONGESTION} network_state;
     bool congested;
     guint32 successive_transmissions;
-
-    // string video_caps_string;
-
-    // string video_presets[3];
-
-    // string device;
-    // int quality;
     const CameraType camera_type;
     bool auto_mode;
 
 public:
-    ResolutionPresets current_res;
     guint32 h264_bitrate;
 
     GstElement* pipeline;
@@ -60,10 +44,7 @@ public:
     PipelineManager(string _device = "/dev/video0", CameraType type = CameraType::MJPG_CAM);
 
     void adapt_stream();
-    // int get_quality();
-    // void set_quality(int quality);
     string get_device_path();
-    // CameraType get_camera_type();
     void set_pipeline_element(GstElement* _element);
     shared_ptr<Camera> get_camera();
 
