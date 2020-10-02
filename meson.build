@@ -1,5 +1,5 @@
 project('adaptive-streaming', 'c', 'cpp', default_options: [
-    'cpp_std=c++17'
+    'cpp_std=c++14'
   ])
 common_c_args = [
   '-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_44',
