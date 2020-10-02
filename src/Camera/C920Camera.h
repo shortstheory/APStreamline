@@ -7,9 +7,8 @@
 class C920Camera : public Camera
 {
 protected:
-    GstElement *encoder;
+    GstElement *device;
     GstElement *capsfilter;
-    string encoder_name;
     guint32 bitrate;
     virtual bool read_configuration(Setting &camera_config, Setting &quality_config) override;
 

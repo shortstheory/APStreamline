@@ -2,10 +2,8 @@
 #include <gst/gst.h>
 #include <cstdlib>
 
-MJPGCamera::MJPGCamera(string device, Quality q) : Camera(device, q)
+MJPGCamera::MJPGCamera(string device, Quality q) : Camera(device, q), encoder(nullptr), capsfilter(nullptr)
 {
-    encoder = nullptr;
-    capsfilter = nullptr;
     Config camera_config;
     Config quality_config;
 
@@ -61,10 +59,8 @@ bool MJPGCamera::set_quality(Quality q)
 
 bool MJPGCamera::read_configuration(Setting &camera_config, Setting &quality_config)
 {
-    Camera::read_configuration(camera_config, quality_config);
-    // change this here
     encoder_name = static_cast<const char *>(camera_config.lookup("camera.properties.encoder_name"));
-    return true;
+    return Camera::read_configuration(camera_config, quality_config);
 }
 
 string MJPGCamera::generate_launch_string() const

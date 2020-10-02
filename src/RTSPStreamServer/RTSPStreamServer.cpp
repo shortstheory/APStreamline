@@ -69,12 +69,16 @@ CameraType RTSPStreamServer::get_camera_type(const string &device_path)
             return CameraType::NOT_SUPPORTED;
         }
 
-        // info.camera_name = string(caps.card, caps.card + sizeof(caps.card)/sizeof(caps.card[0]));
-        // info.mount_point = MOUNT_POINT_PREFIX + to_string(i);
+        string camera_name;
+        string driver_name;
+        camera_name = string(caps.card, caps.card + sizeof(caps.card)/sizeof(caps.card[0]));
+        driver_name = string(caps.driver, caps.driver+sizeof(caps.driver)/sizeof(caps.card[0]));
 
         // FIXME: add more camera IDs
-        if (string((char*)caps.driver) == JETSON_CAM_DRIVER) {
+        if (driver_name == JETSON_CAM_DRIVER) {
             return CameraType::JETSON_CAM;
+        } else if (camera_name.find("HD Pro Webcam C920") != string::npos) {
+            return CameraType::C920_CAM;
         } else {
             v4l2_fmtdesc fmt;
             v4l2_buf_type type;

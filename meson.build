@@ -17,5 +17,5 @@ libconfig_dep = dependency('libconfig++')
 common_deps = ['src/Common/PipelineManager.cpp', 'src/Common/QoSEstimator.cpp']
 camera_deps = ['src/Camera/Camera.h','src/Camera/CameraFactory.h','src/Camera/Quality.cpp']
 rtsp_src = ['src/RTSPStreamServer/stream_server.cpp', 'src/RTSPStreamServer/IPCMessageHandler.cpp', 'src/RTSPStreamServer/RTSPAdaptiveStreaming.cpp', 'src/RTSPStreamServer/RTSPStreamServer.cpp']
-work_src = ['src/RTSPStreamServer/stream_server.cpp', 'src/Camera/MJPGCamera.cpp', 'src/Camera/Camera.cpp', 'src/RTSPStreamServer/RTSPAdaptiveStreaming.cpp', 'src/RTSPStreamServer/RTSPStreamServer.cpp']
+work_src = ['src/RTSPStreamServer/stream_server.cpp', 'src/Camera/C920Camera.cpp', 'src/Camera/MJPGCamera.cpp', 'src/Camera/Camera.cpp', 'src/RTSPStreamServer/RTSPAdaptiveStreaming.cpp', 'src/RTSPStreamServer/RTSPStreamServer.cpp']
 executable('stream_server', sources: [work_src, common_deps, camera_deps], dependencies: [gst_dep, gst_rtp_dep, gst_rtsp_dep, gst_rtsp_server_dep, thread_dep, libconfig_dep], cpp_args : common_c_args, link_args: '-lstdc++fs', install : true)
