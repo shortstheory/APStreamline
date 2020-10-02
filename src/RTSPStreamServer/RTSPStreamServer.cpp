@@ -21,7 +21,7 @@ RTSPStreamServer::RTSPStreamServer(string _ip_addr, string _port) : ip_addr(_ip_
     gst_rtsp_server_set_service(server, port.c_str());
 
     get_v4l2_devices_paths();
-    cerr << "***APStreamline***\nAccess the following video streams using VLC or gst-launch following"
+    cerr << "***APStreamline***\nAccess the following video streams using VLC or gst-launch following "
     "the instructions here: https://github.com/shortstheory/adaptive-streaming#usage"
     "\n==============================\n";
     setup_streams();
