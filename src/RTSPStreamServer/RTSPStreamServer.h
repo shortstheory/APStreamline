@@ -31,7 +31,7 @@ public:
     RTSPStreamServer(string _ip_addr, string _port);
     ~RTSPStreamServer();
     GstRTSPServer* get_server();
-    CameraType get_camera_type(const string &device);
+    pair<CameraType, string> get_camera_type(const string &device);
     void set_service_id(guint id);
     string get_ip_address();
     string get_port();

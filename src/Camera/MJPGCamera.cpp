@@ -90,29 +90,3 @@ string MJPGCamera::generate_launch_string() const
     result = regex_replace(result, br, to_string(launch_bitrate));
     return result;
 }
-
-void MJPGCamera::improve_quality(bool congested)
-{
-    set_bitrates_constants(congested);
-    set_bitrate(bitrate + increment_bitrate);
-    if (current_quality.getResolution() == Quality::Level::LOW && bitrate > medium_bitrate) {
-        Quality mediumQuality(Quality::Level::MEDIUM, Quality::Level::MEDIUM);
-        set_quality(mediumQuality);
-    } else if (current_quality.getResolution() == Quality::Level::MEDIUM && bitrate > high_bitrate) {
-        Quality highQuality(Quality::Level::HIGH, Quality::Level::MEDIUM);
-        set_quality(highQuality);
-    }
-}
-
-void MJPGCamera::degrade_quality(bool congested)
-{
-    set_bitrates_constants(congested);
-    set_bitrate(bitrate - decrement_bitrate);
-    if (current_quality.getResolution() == Quality::Level::MEDIUM && bitrate < medium_bitrate) {
-        Quality lowQuality(Quality::Level::LOW, Quality::Level::MEDIUM);
-        set_quality(lowQuality);
-    } else if (current_quality.getResolution() == Quality::Level::HIGH && bitrate < high_bitrate) {
-        Quality mediumQuality(Quality::Level::MEDIUM, Quality::Level::MEDIUM);
-        set_quality(mediumQuality);
-    }
-}

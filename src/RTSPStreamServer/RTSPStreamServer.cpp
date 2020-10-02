@@ -57,7 +57,7 @@ bool RTSPStreamServer::check_h264_ioctls(int fd)
     return true;
 }
 
-CameraType RTSPStreamServer::get_camera_type(const string &device_path)
+pair<CameraType, string> RTSPStreamServer::get_camera_type(const string &device_path)
 {
     int fd = open(device_path.c_str(), O_RDONLY);
     if (fd != -1) {
@@ -66,7 +66,7 @@ CameraType RTSPStreamServer::get_camera_type(const string &device_path)
         // V4L2 annoyingly lists each camera twice, so we need to filter the ones
         // which don't support the VIDEO_CAPTURE capability
         if (!(caps.device_caps & V4L2_CAP_VIDEO_CAPTURE)) {
-            return CameraType::NOT_SUPPORTED;
+            return make_pair(CameraType::NOT_SUPPORTED, "");
         }
 
         string camera_name;
@@ -76,9 +76,11 @@ CameraType RTSPStreamServer::get_camera_type(const string &device_path)
 
         // FIXME: add more camera IDs
         if (driver_name == JETSON_CAM_DRIVER) {
-            return CameraType::JETSON_CAM;
+            return make_pair(CameraType::JETSON_CAM, camera_name);
         } else if (camera_name.find("HD Pro Webcam C920") != string::npos) {
-            return CameraType::C920_CAM;
+            return make_pair(CameraType::C920_CAM, camera_name);
+        } else if (camera_name.find("ZED") != string::npos) {
+            return make_pair(CameraType::ZED_CAM, camera_name);
         } else {
             v4l2_fmtdesc fmt;
             v4l2_buf_type type;
@@ -88,13 +90,13 @@ CameraType RTSPStreamServer::get_camera_type(const string &device_path)
             fmt.index = 0;
             while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
                 if (!strcmp((char*)fmt.description, "Motion-JPEG")) {
-                    return CameraType::MJPG_CAM;
+                    return make_pair(CameraType::MJPG_CAM, camera_name);
                 }
                 fmt.index++;
             }
         }
     }
-    return CameraType::NOT_SUPPORTED;
+    return make_pair(CameraType::NOT_SUPPORTED, "");
 }
 
 void RTSPStreamServer::setup_streams()
@@ -102,16 +104,20 @@ void RTSPStreamServer::setup_streams()
     int i = 0;
     for (string device : get_v4l2_devices_paths()) {
         // why is this a pointer?
+        pair<CameraType, string> camera_info = get_camera_type(device);
         CameraType type;
-        type = get_camera_type(device);
+        type = camera_info.first;
+
         if (type == CameraType::NOT_SUPPORTED) {
             continue;
         }
+
         i++;
         string mount_point;
         mount_point = MOUNT_POINT_PREFIX + to_string(i);
+
         string camera_name;
-        camera_name = "PLACEHOLDER" + to_string(i);
+        camera_name = camera_info.second;
 
         adaptive_streams_map.insert(pair<string, shared_ptr<RTSPAdaptiveStreaming>>(device,
                                     new RTSPAdaptiveStreaming(device, type, mount_point, server)));

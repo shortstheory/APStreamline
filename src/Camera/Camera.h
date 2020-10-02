@@ -39,6 +39,7 @@ protected:
     guint32 congested_state_increment;
     guint32 congested_state_decrement;
 
+    guint32 bitrate;
     guint32 low_bitrate;
     guint32 medium_bitrate;
     guint32 high_bitrate;
@@ -62,8 +63,8 @@ public:
     void set_bitrates_constants(bool congested);
     virtual string generate_capsfilter() const;
     virtual string generate_launch_string() const = 0;
-    virtual void improve_quality(bool congested) = 0;
-    virtual void degrade_quality(bool congested) = 0;
+    virtual void improve_quality(bool congested);
+    virtual void degrade_quality(bool congested);
     bool dynamic_res_capability() const;
     bool dynamic_bitrate_capability() const;
 };
