@@ -103,6 +103,7 @@ void RTSPStreamServer::setup_streams()
         if (type == CameraType::NOT_SUPPORTED) {
             continue;
         }
+        i++;
         string mount_point;
         mount_point = MOUNT_POINT_PREFIX + to_string(i);
         string camera_name;

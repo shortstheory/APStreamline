@@ -22,7 +22,6 @@ protected:
     string capsfilter;
     guint32 supported_qualities;
 
-    bool fallback;
     bool dynamic_res;
     bool dynamic_bitrate;
     unordered_map<string, bool> encoder_params_bool;

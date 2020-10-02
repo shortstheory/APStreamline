@@ -58,7 +58,6 @@ bool Camera::read_configuration(Setting& camera_config, Setting& quality_config)
 
     launch_string = static_cast<const char *>(camera_config.lookup("camera.properties.launch_string"));
     capsfilter = static_cast<const char *>(camera_config.lookup("camera.properties.capsfilter"));
-    fallback = camera_config.lookup("camera.properties.fallback");
     dynamic_res = camera_config.lookup("camera.properties.dynamic_res");
     dynamic_bitrate = camera_config.lookup("camera.properties.dynamic_bitrate");
     supported_qualities = camera_config.lookup("camera.properties.supported_qualities");
