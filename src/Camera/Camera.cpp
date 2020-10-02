@@ -61,7 +61,6 @@ bool Camera::read_configuration(Setting& camera_config, Setting& quality_config)
     fallback = camera_config.lookup("camera.properties.fallback");
     dynamic_res = camera_config.lookup("camera.properties.dynamic_res");
     dynamic_bitrate = camera_config.lookup("camera.properties.dynamic_bitrate");
-    default_framerate = camera_config.lookup("camera.properties.default_framerate");
     supported_qualities = camera_config.lookup("camera.properties.supported_qualities");
 
     const Setting& low_res = camera_config.lookup("camera.resolutions.low");

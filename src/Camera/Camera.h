@@ -20,7 +20,7 @@ protected:
     string launch_string;
     string camera_name;
     string capsfilter;
-    uint32_t supported_qualities;
+    guint32 supported_qualities;
 
     bool fallback;
     bool dynamic_res;
@@ -29,9 +29,6 @@ protected:
     unordered_map<string, int> encoder_params_int;
     unordered_map<Quality::Level, pair<int,int>> resolutions;
     unordered_map<Quality::Level, int> framerates;
-
-    int default_framerate;
-    int default_res;
 
     guint32 steady_state_min;
     guint32 steady_state_max;
