@@ -2,7 +2,7 @@
 #include <gst/gst.h>
 #include <cstdlib>
 
-AR0521Camera::AR0521Camera(string device, Quality q) : Camera(device, q), device(nullptr), capsfilter(nullptr)
+AR0521Camera::AR0521Camera(string device, Quality q) : Camera(device, q), encoder(nullptr), capsfilter_element(nullptr)
 {
     Config camera_config;
     Config quality_config;
@@ -23,9 +23,9 @@ AR0521Camera::AR0521Camera(string device, Quality q) : Camera(device, q), device
 
 bool AR0521Camera::set_element_references(GstElement *pipeline)
 {
-    device = gst_bin_get_by_name(GST_BIN(pipeline), "src");
-    capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter");
-    if (device && capsfilter) {
+    encoder = gst_bin_get_by_name(GST_BIN(pipeline), encoder_name.c_str());
+    capsfilter_element = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter");
+    if (encoder && capsfilter_element) {
         return true;
     }
     return false;
@@ -41,28 +41,26 @@ bool AR0521Camera::set_bitrate(guint32 _bitrate)
         bitrate = _bitrate;
     }
     // some drivers using bps instead of kbps
-    g_object_set(G_OBJECT(device), "average-bitrate", 1000*bitrate, NULL);
+    g_object_set(G_OBJECT(encoder), "bitrate", 1000*bitrate, NULL);
     return true;
 }
 
 bool AR0521Camera::set_quality(Quality q)
 {
     // We can't change the resolution in H264 mode, though framerate might work
-    if (q.getResolution() == current_quality.getResolution()) {
-        string capsfilter_string;
-        current_quality = q;
-        capsfilter_string = generate_capsfilter();
-        GstCaps *caps;
-        caps = gst_caps_from_string(capsfilter_string.c_str());
-        g_object_set(G_OBJECT(capsfilter), "caps", caps, NULL);
-        gst_caps_unref(caps);
-        return true;
-    }
-    return false;
+    string capsfilter_string;
+    current_quality = q;
+    capsfilter_string = generate_capsfilter();
+    GstCaps *caps;
+    caps = gst_caps_from_string(capsfilter_string.c_str());
+    g_object_set(G_OBJECT(capsfilter_element), "caps", caps, NULL);
+    gst_caps_unref(caps);
+    return true;
 }
 
 bool AR0521Camera::read_configuration(Setting &camera_config, Setting &quality_config)
 {
+    encoder_name = static_cast<const char *>(camera_config.lookup("camera.properties.encoder_name"));
     return Camera::read_configuration(camera_config, quality_config);
 }
 
@@ -92,3 +90,20 @@ string AR0521Camera::generate_launch_string() const
     result = regex_replace(result, br, to_string(launch_bitrate));
     return result;
 }
+
+string AR0521Camera::generate_capsfilter() const
+{
+    regex w("%width");
+    regex h("%height");
+
+    string caps;
+    caps = capsfilter;
+
+    pair<int, int> res;
+    res = resolutions.at(current_quality.getResolution());
+    // changing framerate not supported on AR0521
+    caps = regex_replace(caps, w, to_string(res.first));
+    caps = regex_replace(caps, h, to_string(res.second));
+    return caps;
+}
+

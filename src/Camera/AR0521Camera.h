@@ -7,9 +7,10 @@
 class AR0521Camera : public Camera
 {
 protected:
-    GstElement *device;
-    GstElement *capsfilter;
+    GstElement *encoder;
+    GstElement *capsfilter_element;
     guint32 bitrate;
+    string encoder_name;
     virtual bool read_configuration(Setting &camera_config, Setting &quality_config) override;
 
 public:
@@ -18,6 +19,7 @@ public:
     virtual bool set_bitrate(guint32 _bitrate) override;
     virtual bool set_quality(Quality q) override;
     virtual string generate_launch_string() const override;
+    virtual string generate_capsfilter() const override;
 };
 
 #endif
