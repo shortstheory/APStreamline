@@ -75,13 +75,14 @@ pair<CameraType, string> RTSPStreamServer::get_camera_type(const string &device_
         driver_name = string(caps.driver, caps.driver+sizeof(caps.driver)/sizeof(caps.card[0]));
 
         // FIXME: add more camera IDs
-        if (driver_name == JETSON_CAM_DRIVER) {
-            return make_pair(CameraType::JETSON_CAM, camera_name);
+        if (camera_name.find("ar0521") != string::npos) {
+            return make_pair(CameraType::AR0521_CAM, camera_name);
         } else if (camera_name.find("HD Pro Webcam C920") != string::npos) {
             return make_pair(CameraType::C920_CAM, camera_name);
         } else if (camera_name.find("ZED") != string::npos) {
             return make_pair(CameraType::ZED_CAM, camera_name);
         } else {
+            // MJPG is our fallback option
             v4l2_fmtdesc fmt;
             v4l2_buf_type type;
             type = V4L2_BUF_TYPE_VIDEO_CAPTURE;

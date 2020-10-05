@@ -8,7 +8,7 @@
 
 using namespace std;
 
-enum class CameraType {MJPG_CAM, C920_CAM, ZED_CAM, RPI_CAM, JETSON_CAM, NOT_SUPPORTED};
+enum class CameraType {MJPG_CAM, C920_CAM, ZED_CAM, RPI_CAM, TEGRA_DRIVER_CAM, AR0521_CAM, NOT_SUPPORTED};
 enum ResolutionPresets {LOW, MED, HIGH};
 // enum FramePresets {FRAME_320x240, FRAME_640x480, FRAME_1280x720, FRAME_COUNT};
 // enum VideoPresets {VIDEO_320x240x15, VIDEO_640x480x15, VIDEO_1280x720x15,
