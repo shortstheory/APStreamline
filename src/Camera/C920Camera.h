@@ -9,7 +9,6 @@ class C920Camera : public Camera
 protected:
     GstElement *device;
     GstElement *capsfilter;
-    guint32 bitrate;
     virtual bool read_configuration(Setting &camera_config, Setting &quality_config) override;
 
 public:

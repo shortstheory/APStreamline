@@ -10,7 +10,6 @@ protected:
     GstElement *encoder;
     GstElement *capsfilter;
     string encoder_name;
-    guint32 bitrate;
     virtual bool read_configuration(Setting &camera_config, Setting &quality_config) override;
 
 public:

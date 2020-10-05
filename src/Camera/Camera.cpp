@@ -78,27 +78,6 @@ bool Camera::read_configuration(Setting& camera_config, Setting& quality_config)
     framerates[Quality::Level::LOW] = framerate_config[0];
     framerates[Quality::Level::MEDIUM] = framerate_config[1];
     framerates[Quality::Level::HIGH] = framerate_config[2];
-
-    const Setting& encoder_params = camera_config.lookup("camera.encoder_params");
-    int val = encoder_params.getLength();
-
-    for (int i = 0; i < encoder_params.getLength(); i++) {
-        string key;
-        Setting::Type type;
-        key = encoder_params[i].getName();
-        type = encoder_params[i].getType();
-        switch (type) {
-        case Setting::Type::TypeBoolean:
-            encoder_params_bool[key] = encoder_params.lookup(key);
-            break;
-        case Setting::Type::TypeInt:
-            encoder_params_int[key] = encoder_params.lookup(key);
-            break;
-        default:
-            cerr << "Other types not implemented yet" << endl;
-            return false;
-        }
-    }
     return true;
 }
 
