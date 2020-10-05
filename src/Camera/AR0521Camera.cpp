@@ -47,15 +47,8 @@ bool AR0521Camera::set_bitrate(guint32 _bitrate)
 
 bool AR0521Camera::set_quality(Quality q)
 {
-    // We can't change the resolution in H264 mode, though framerate might work
-    string capsfilter_string;
-    current_quality = q;
-    capsfilter_string = generate_capsfilter();
-    GstCaps *caps;
-    caps = gst_caps_from_string(capsfilter_string.c_str());
-    g_object_set(G_OBJECT(capsfilter_element), "caps", caps, NULL);
-    gst_caps_unref(caps);
-    return true;
+    // Changing quality isn't supported, but one can play with the bitrate
+    return false;
 }
 
 bool AR0521Camera::read_configuration(Setting &camera_config, Setting &quality_config)
