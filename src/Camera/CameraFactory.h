@@ -1,7 +1,7 @@
 #ifndef CAMERA_FACTORY_H
 #define CAMERA_FACTORY_H
 
-#include "../Common/DeviceDatatypes.h"
+#include "../Camera/CameraType.h"
 #include "../Camera/Camera.h"
 #include "../Camera/MJPGCamera.h"
 #include "../Camera/C920Camera.h"

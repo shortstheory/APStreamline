@@ -9,7 +9,6 @@
 #include <sys/time.h>
 
 #include "NTPTime.h"
-#include "DeviceDatatypes.h"
 #include "QoSReport.h"
 // Computes Quality-of-Service of the network per RTT of RTCP packets by maintaining
 // timers and state information about bytes transferred. The information recorded

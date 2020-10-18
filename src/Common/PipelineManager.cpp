@@ -9,8 +9,7 @@
 #include "PipelineManager.h"
 #include "../Camera/CameraFactory.h"
 
-PipelineManager::PipelineManager(string _device, CameraType type) : congested(false), successive_transmissions(0),
-    camera_type(type), auto_mode(true)
+PipelineManager::PipelineManager(string _device, CameraType type) : congested(false), successive_transmissions(0), auto_mode(true)
 {
     Quality startingQuality(Quality::Level::LOW, Quality::Level::MEDIUM);
     cam = CameraFactory(_device, startingQuality, type).get_camera();

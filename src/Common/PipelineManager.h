@@ -12,8 +12,8 @@
 #include <iomanip>
 #include <ctime>
 #include "../Camera/Camera.h"
+#include "../Camera/CameraType.h"
 #include "QoSEstimator.h"
-#include "DeviceDatatypes.h"
 #include "Constants.h"
 
 using namespace std;
@@ -28,7 +28,6 @@ private:
     shared_ptr<Camera> cam;
     bool congested;
     guint32 successive_transmissions;
-    const CameraType camera_type;
     bool auto_mode;
 
 public:
