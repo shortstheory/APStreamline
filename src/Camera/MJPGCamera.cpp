@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <linux/videodev2.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 MJPGCamera::MJPGCamera(string device, Quality q) : Camera(device, q), encoder(nullptr), capsfilter(nullptr)
 {
@@ -24,6 +25,7 @@ MJPGCamera::MJPGCamera(string device, Quality q) : Camera(device, q), encoder(nu
         cerr << "Parse error at " << pex.getFile() << ":" << pex.getLine()
                 << " - " << pex.getError() << std::endl;
     }
+    get_supported_qualities();
 }
 
 bool MJPGCamera::set_element_references(GstElement *pipeline)
@@ -64,10 +66,61 @@ bool MJPGCamera::get_supported_qualities()
     memset(&fmt, 0, sizeof(fmt));
     memset(&frmsize, 0, sizeof(frmsize));
     memset(&frmival, 0, sizeof(frmival));
-    return true;
-    // frmsize.pixel_format = fmt.pixelformat;
-    // if (ioctl(fd, VIDIOC_ENUM_FMT, &fmt)
+    fmt.type = type;
+    fmt.index = 0;
+    while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
+        string description((char*)fmt.description);
+        if (description.find("Motion-JPEG") != string::npos
+        || description.find("MJPG") != string::npos
+        || description.find("M.JPG") != string::npos) {
+            break;
+        }
+        fmt.index++;
+    }
+    frmsize.pixel_format = fmt.pixelformat;
 
+
+    supported_qualities = 0;
+
+    for (frmsize.index = 0; ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0; frmsize.index++) {
+        // go through all the possible resolution, but we're only looking for 240p, 480p, 720p
+        if (frmsize.type == V4L2_FRMSIZE_TYPE_DISCRETE) {
+            Quality::Level resolutionLevel;
+            if (frmsize.discrete.width == 320 && frmsize.discrete.height == 240) {
+                resolutionLevel = Quality::Level::LOW;
+            } else if (frmsize.discrete.width == 640 && frmsize.discrete.height == 480) {
+                resolutionLevel = Quality::Level::MEDIUM;
+            } else if (frmsize.discrete.width == 1280 && frmsize.discrete.height == 720) {
+                resolutionLevel = Quality::Level::HIGH;
+            } else {
+                continue;
+            }
+
+            frmival.pixel_format = fmt.pixelformat;
+            frmival.width = frmsize.discrete.width;
+            frmival.height = frmsize.discrete.height;
+
+            for (frmival.index = 0; ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) >= 0; frmival.index++) {
+                int framerate = frmival.discrete.denominator;
+                // For simplicity in maintenance, we only support 240p, 480p
+                // and 720p. If a camera supports a resolution we use a bitmask
+                // for saving its capabilities as it greatly simplifies our IPC
+                Quality::Level framerateLevel;
+                if (framerate == 15) {
+                    framerateLevel = Quality::Level::LOW;
+                } else if (framerate == 30) {
+                    framerateLevel = Quality::Level::MEDIUM;
+                } else if (framerate == 60) {
+                    framerateLevel = Quality::Level::HIGH;
+                }
+                Quality q(resolutionLevel, framerateLevel);
+                // populate the bitmask
+                supported_qualities |= (1 << q.to_int());
+            }
+        }
+    }
+    close(fd);
+    return true;
 }
 
 bool MJPGCamera::set_quality(Quality q)
