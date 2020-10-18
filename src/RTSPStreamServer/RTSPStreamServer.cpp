@@ -92,8 +92,12 @@ pair<CameraType, string> RTSPStreamServer::get_camera_type(const string &device_
             fmt.type = type;
             fmt.index = 0;
             while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
-                if (!strcmp((char*)fmt.description, "Motion-JPEG")) {
+                string description((char*)fmt.description);
+                if (description.find("Motion-JPEG") != string::npos
+                || description.find("MJPG") != string::npos
+                || description.find("M.JPG") != string::npos) {
                     cameraPair = make_pair(CameraType::MJPG_CAM, camera_name);
+                    break;
                 }
                 fmt.index++;
             }
