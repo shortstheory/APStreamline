@@ -7,6 +7,7 @@
 #include "../Camera/C920Camera.h"
 #include "../Camera/ZEDCamera.h"
 #include "../Camera/AR0521Camera.h"
+#include "../Camera/RPiCamera.h"
 #include <memory>
 
 using namespace std;
@@ -26,6 +27,8 @@ public:
             camera = shared_ptr<ZEDCamera>(new ZEDCamera(device,q));
         } else if (type == CameraType::AR0521_CAM) {
             camera = shared_ptr<AR0521Camera>(new AR0521Camera(device,q));
+        } else if (type == CameraType::RPI_CAM) {
+            camera = shared_ptr<RPiCamera>(new RPiCamera(device, q));
         }
     }
 
