@@ -54,11 +54,9 @@ bool RPiCamera::set_bitrate(guint32 _bitrate)
         bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
         bitrate_ctrl.value = bitrate*1000;
         if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1) {
-            close(v4l2_cam_fd);
             return false;
         }
     }
-    close(v4l2_cam_fd);
     return true;
 }
 
