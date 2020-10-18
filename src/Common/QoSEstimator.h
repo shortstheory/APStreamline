@@ -10,7 +10,7 @@
 
 #include "NTPTime.h"
 #include "DeviceDatatypes.h"
-
+#include "QoSReport.h"
 // Computes Quality-of-Service of the network per RTT of RTCP packets by maintaining
 // timers and state information about bytes transferred. The information recorded
 // per RTT is saved in a QoSReport struct which can be accessed by other classes
@@ -36,9 +36,7 @@ private:
 
     guint64 get_current_ntp_time();
     guint32 get_compressed_ntp_time(const guint64 &full_ntp_timestamp);
-
     QoSReport qos_report;
-
     void process_rr_packet(GstRTCPPacket* packet);
     void process_sr_packet(GstRTCPPacket* packet);
     gfloat update_rtt(const guint32 &lsr, const guint32 &dlsr);

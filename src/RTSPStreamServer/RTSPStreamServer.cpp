@@ -34,9 +34,9 @@ RTSPStreamServer::~RTSPStreamServer()
 vector<string> RTSPStreamServer::get_v4l2_devices_paths()
 {
     vector<string> device_list;
-    for (const auto & entry : fs::directory_iterator(V4L2_DEVICE_PATH)) {
+    for (const auto & entry : fs::directory_iterator("/dev")) {
         string s = entry.path();
-        if (s.find(V4L2_DEVICE_PREFIX) != std::string::npos) {
+        if (s.find("video") != std::string::npos) {
             // Add device path to list
             device_list.push_back(s);
         }
@@ -115,7 +115,7 @@ void RTSPStreamServer::setup_streams()
 
         i++;
         string mount_point;
-        mount_point = MOUNT_POINT_PREFIX + to_string(i);
+        mount_point = "/cam" + to_string(i);
 
         string camera_name;
         camera_name = camera_info.second;
