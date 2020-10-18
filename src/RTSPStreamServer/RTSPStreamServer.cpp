@@ -76,8 +76,9 @@ pair<CameraType, string> RTSPStreamServer::get_camera_type(const string &device_
 
         // FIXME: add more camera IDs and close fd
         pair<CameraType, string> cameraPair;
-
-        if (camera_name.find("ar0521") != string::npos) {
+        if (camera_name.find("mmal service 16.1") != string::npos) {
+            cameraPair = make_pair(CameraType::RPI_CAM, camera_name);
+        } else if (camera_name.find("ar0521") != string::npos) {
             cameraPair = make_pair(CameraType::AR0521_CAM, camera_name);
         } else if (camera_name.find("HD Pro Webcam C920") != string::npos) {
             cameraPair = make_pair(CameraType::C920_CAM, camera_name);
