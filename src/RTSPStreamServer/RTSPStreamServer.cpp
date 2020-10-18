@@ -74,13 +74,15 @@ pair<CameraType, string> RTSPStreamServer::get_camera_type(const string &device_
         camera_name = string(caps.card, caps.card + sizeof(caps.card)/sizeof(caps.card[0]));
         driver_name = string(caps.driver, caps.driver+sizeof(caps.driver)/sizeof(caps.card[0]));
 
-        // FIXME: add more camera IDs
+        // FIXME: add more camera IDs and close fd
+        pair<CameraType, string> cameraPair;
+
         if (camera_name.find("ar0521") != string::npos) {
-            return make_pair(CameraType::AR0521_CAM, camera_name);
+            cameraPair = make_pair(CameraType::AR0521_CAM, camera_name);
         } else if (camera_name.find("HD Pro Webcam C920") != string::npos) {
-            return make_pair(CameraType::C920_CAM, camera_name);
+            cameraPair = make_pair(CameraType::C920_CAM, camera_name);
         } else if (camera_name.find("ZED") != string::npos) {
-            return make_pair(CameraType::ZED_CAM, camera_name);
+            cameraPair = make_pair(CameraType::ZED_CAM, camera_name);
         } else {
             // MJPG is our fallback option
             v4l2_fmtdesc fmt;
@@ -91,11 +93,13 @@ pair<CameraType, string> RTSPStreamServer::get_camera_type(const string &device_
             fmt.index = 0;
             while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
                 if (!strcmp((char*)fmt.description, "Motion-JPEG")) {
-                    return make_pair(CameraType::MJPG_CAM, camera_name);
+                    cameraPair = make_pair(CameraType::MJPG_CAM, camera_name);
                 }
                 fmt.index++;
             }
         }
+        close(fd);
+        return cameraPair;
     }
     return make_pair(CameraType::NOT_SUPPORTED, "");
 }

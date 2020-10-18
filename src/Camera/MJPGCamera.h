@@ -11,6 +11,7 @@ protected:
     GstElement *capsfilter;
     string encoder_name;
     virtual bool read_configuration(Setting &camera_config, Setting &quality_config) override;
+    bool get_supported_qualities();
 
 public:
     MJPGCamera(string device, Quality q);

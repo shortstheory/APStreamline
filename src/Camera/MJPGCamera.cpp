@@ -1,6 +1,11 @@
 #include "MJPGCamera.h"
 #include <gst/gst.h>
 #include <cstdlib>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <linux/videodev2.h>
+#include <fcntl.h>
 
 MJPGCamera::MJPGCamera(string device, Quality q) : Camera(device, q), encoder(nullptr), capsfilter(nullptr)
 {
@@ -42,6 +47,27 @@ bool MJPGCamera::set_bitrate(guint32 _bitrate)
     }
     g_object_set(G_OBJECT(encoder), "bitrate", bitrate, NULL);
     return true;
+}
+
+bool MJPGCamera::get_supported_qualities()
+{
+    int fd;
+    fd = open(device_path.c_str(), O_RDONLY);
+    if (fd == -1) {
+        return false;
+    }
+    v4l2_buf_type type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    v4l2_fmtdesc fmt;
+    v4l2_frmsizeenum frmsize;
+    v4l2_frmivalenum frmival;
+
+    memset(&fmt, 0, sizeof(fmt));
+    memset(&frmsize, 0, sizeof(frmsize));
+    memset(&frmival, 0, sizeof(frmival));
+    return true;
+    // frmsize.pixel_format = fmt.pixelformat;
+    // if (ioctl(fd, VIDIOC_ENUM_FMT, &fmt)
+
 }
 
 bool MJPGCamera::set_quality(Quality q)
