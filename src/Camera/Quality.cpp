@@ -7,9 +7,36 @@ Quality::Quality(Level _resolution, Level _framerate) : resolution(_resolution),
 // overload == operator
 // Hacky lookup table! Sorry folks!
 // FIXME: Fill in this method
-Quality Quality::int_to_Quality(int qual)
+Quality Quality::int_to_Quality(int quality)
 {
-    return Quality(Level::MEDIUM, Level::MEDIUM);
+    int framerate;
+    int resolution;
+    framerate = quality / 3;
+    resolution = quality % 3;
+
+    Quality::Level resolution_level;
+    Quality::Level framerate_level;
+
+    if (framerate == 0) {
+        framerate_level = Quality::Level::LOW;
+    } else if (framerate == 1) {
+        framerate_level = Quality::Level::MEDIUM;
+    } else if (framerate == 2) {
+        framerate_level = Quality::Level::HIGH;
+    } else {
+        framerate_level = Quality::Level::MEDIUM;
+    }
+
+    if (resolution == 0) {
+        resolution_level = Quality::Level::LOW;
+    } else if (resolution == 1) {
+        resolution_level = Quality::Level::MEDIUM;
+    } else if (resolution == 2) {
+        resolution_level = Quality::Level::HIGH;
+    } else {
+        resolution_level = Quality::Level::MEDIUM;
+    }
+    return Quality(resolution_level, framerate_level);
 }
 
 int Quality::to_int() const
