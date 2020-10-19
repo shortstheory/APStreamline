@@ -18,6 +18,7 @@ using namespace std;
 class RTSPAdaptiveStreaming
 {
 private:
+    static const int AUTO_PRESET = 1024;
     const string uri;
     GstRTSPServer* rtsp_server;
     GstRTSPMediaFactory* media_factory;

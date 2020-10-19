@@ -4,6 +4,5 @@
 #include "NTPTime.h"
 #include "QoSEstimator.h"
 #include "PipelineManager.h"
-#include "Constants.h"
 
 #endif

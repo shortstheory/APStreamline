@@ -20,7 +20,7 @@ void PipelineManager::adapt_stream()
     QoSReport qos_report;
     qos_report = qos_estimator.get_qos_report();
 
-    if (successive_transmissions >= SUCCESSFUL_TRANSMISSION) {
+    if (successive_transmissions >= successful_transmissions) {
         congested = false;
     }
 

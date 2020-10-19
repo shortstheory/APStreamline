@@ -11,10 +11,10 @@
 #include <sstream>
 #include <iomanip>
 #include <ctime>
+
 #include "../Camera/Camera.h"
 #include "../Camera/CameraType.h"
 #include "QoSEstimator.h"
-#include "Constants.h"
 
 using namespace std;
 
@@ -29,9 +29,10 @@ private:
     bool congested;
     guint32 successive_transmissions;
     bool auto_mode;
+    const unsigned int successful_transmissions = 5;
 
 public:
-    guint32 h264_bitrate;
+    unsigned int h264_bitrate;
 
     GstElement* pipeline;
     GstElement* multi_udp_sink;

@@ -25,6 +25,7 @@ void ipc_loop(RTSPStreamServer& stream_server)
         cerr << "Local socket creation failed, IPC will be disabled" << endl;
         return;
     }
+    const string SOCKET_PATH = "/tmp/rtsp_server.sock";
 
     memset(&addr, 0, sizeof(addr));
     addr.sun_family = AF_UNIX;
