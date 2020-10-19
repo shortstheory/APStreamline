@@ -41,8 +41,8 @@ string IPCMessageHandler::serialise_device_props(pair<string, shared_ptr<RTSPAda
             ip_address.c_str(),
             port.c_str(),
             camera->get_device_path().c_str(),
-            stream->get_uri().c_str(),
             stream->get_camera_name().c_str(),
+            stream->get_uri().c_str(),
             0, // unsupported right now
             camera->get_supported_qualities(),
             camera->get_quality().to_int(),
