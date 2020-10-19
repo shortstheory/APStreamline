@@ -129,6 +129,7 @@ bool MJPGCamera::set_quality(Quality q)
     // TODO: add checks for if Q is valid or not
     current_quality = q;
     capsfilter_string = generate_capsfilter();
+    cerr << capsfilter_string << endl;
     GstCaps *caps;
     caps = gst_caps_from_string(capsfilter_string.c_str());
     g_object_set(G_OBJECT(capsfilter), "caps", caps, NULL);

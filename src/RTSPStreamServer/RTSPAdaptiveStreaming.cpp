@@ -9,8 +9,7 @@ RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
         CameraType type,
         string _uri,
         string name,
-        GstRTSPServer* server,
-        int quality):
+        GstRTSPServer* server):
     uri(_uri),
     camera_name(name),
     rtsp_server((GstRTSPServer*)gst_object_ref(server)),

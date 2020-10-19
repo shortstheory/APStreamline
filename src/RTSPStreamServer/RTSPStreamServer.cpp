@@ -130,7 +130,7 @@ void RTSPStreamServer::setup_streams()
         camera_name = camera_info.second;
 
         adaptive_streams_map.insert(pair<string, shared_ptr<RTSPAdaptiveStreaming>>(device,
-                                    new RTSPAdaptiveStreaming(device, type, camera_name, mount_point, server)));
+                                    new RTSPAdaptiveStreaming(device, type, mount_point, camera_name, server)));
         string camera_description;
         camera_description = device + " (" + camera_name + "): rtsp://" + ip_addr + ":"+ port + mount_point;
         cerr << camera_description << endl;

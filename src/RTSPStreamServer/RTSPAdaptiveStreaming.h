@@ -64,11 +64,11 @@ private:
             gpointer data);
 
 public:
-    RTSPAdaptiveStreaming(string _device = "/dev/video0",
-                          CameraType type = CameraType::MJPG_CAM,
-                          string _uri = "/test", string name="",
-                          GstRTSPServer* server = nullptr,
-                          int quality = AUTO_PRESET);
+    RTSPAdaptiveStreaming(string _device,
+                          CameraType type,
+                          string _uri,
+                          string name,
+                          GstRTSPServer* server);
     ~RTSPAdaptiveStreaming();
     void init_media_factory();
     bool get_media_prepared();
