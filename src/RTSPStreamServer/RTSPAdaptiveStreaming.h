@@ -20,6 +20,7 @@ class RTSPAdaptiveStreaming
 private:
     static const int AUTO_PRESET = 1024;
     const string uri;
+    const string camera_name;
     GstRTSPServer* rtsp_server;
     GstRTSPMediaFactory* media_factory;
 
@@ -65,7 +66,8 @@ private:
 public:
     RTSPAdaptiveStreaming(string _device = "/dev/video0",
                           CameraType type = CameraType::MJPG_CAM,
-                          string _uri = "/test", GstRTSPServer* server = nullptr,
+                          string _uri = "/test", string name="",
+                          GstRTSPServer* server = nullptr,
                           int quality = AUTO_PRESET);
     ~RTSPAdaptiveStreaming();
     void init_media_factory();
@@ -74,6 +76,7 @@ public:
     void set_quality(int quality);
     shared_ptr<Camera> get_camera();
     string get_uri();
+    string get_camera_name();
 };
 
 #endif

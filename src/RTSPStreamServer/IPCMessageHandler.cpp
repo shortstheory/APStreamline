@@ -19,7 +19,6 @@ string IPCMessageHandler::serialise_device_props(pair<string, shared_ptr<RTSPAda
     string ip_address;
     string port;
     string device;
-    string camera_name;
     shared_ptr<Camera> camera;
     shared_ptr<RTSPAdaptiveStreaming> stream;
     stream = device_props.second;
@@ -42,8 +41,8 @@ string IPCMessageHandler::serialise_device_props(pair<string, shared_ptr<RTSPAda
             ip_address.c_str(),
             port.c_str(),
             camera->get_device_path().c_str(),
-            camera->get_name().c_str(),
             stream->get_uri().c_str(),
+            stream->get_camera_name().c_str(),
             0, // unsupported right now
             camera->get_supported_qualities(),
             camera->get_quality().to_int(),
@@ -74,7 +73,7 @@ void IPCMessageHandler::send_device_props()
             json_message = json_message + ", " + serialise_device_props(*it);
         }
     }
-
+    cerr << json_message;
     json_message = json_message + "]";
     send_string(json_message);
 }

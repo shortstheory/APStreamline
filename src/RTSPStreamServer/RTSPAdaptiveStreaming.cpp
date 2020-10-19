@@ -8,9 +8,11 @@
 RTSPAdaptiveStreaming::RTSPAdaptiveStreaming(string _device,
         CameraType type,
         string _uri,
+        string name,
         GstRTSPServer* server,
         int quality):
     uri(_uri),
+    camera_name(name),
     rtsp_server((GstRTSPServer*)gst_object_ref(server)),
     media_prepared(false),
     pipeline_manager(_device, type)
@@ -278,4 +280,9 @@ shared_ptr<Camera> RTSPAdaptiveStreaming::get_camera()
 string RTSPAdaptiveStreaming::get_uri()
 {
     return uri;
+}
+
+string RTSPAdaptiveStreaming::get_camera_name()
+{
+    return camera_name;
 }
