@@ -1,15 +1,5 @@
 #include "IPCMessageHandler.h"
-
-RTSPMessageType IPCMessageHandler::get_message_type(char* buf)
-{
-    string buffer(buf);
-    for (size_t i = 0; i < RTSPMessageHeader.size(); i++) {
-        if (!buffer.compare(0, RTSPMessageHeader[i].size(), RTSPMessageHeader[i])) {
-            return static_cast<RTSPMessageType>(i);
-        }
-    }
-    return ERROR;
-}
+#include <sstream>
 
 string IPCMessageHandler::get_message_payload(char* buf)
 {
@@ -17,23 +7,26 @@ string IPCMessageHandler::get_message_payload(char* buf)
     return buffer.substr(4);
 }
 
-string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_props)
+string IPCMessageHandler::serialise_device_props(pair<string, shared_ptr<RTSPAdaptiveStreaming>> device_props)
 {
     string list;
-    list = RTSPMessageHeader[RTSPMessageType::GET_DEVICE_PROPS] + "$";
+    list = "GDP$";
     string dev_info;
     // weird hack to work around \0?
-    char info_buffer[IPC_BUFFER_SIZE];
+    char info_buffer[1000];
     info_buffer[0] = '\0';
 
-    shared_ptr<RTSPAdaptiveStreaming> stream;
-    stream = rtsp_stream_server->get_stream_map().at(device_props.first);
-
     string ip_address;
-    ip_address = rtsp_stream_server->get_ip_address();
-
     string port;
+    string device;
+    string camera_name;
+    shared_ptr<Camera> camera;
+    shared_ptr<RTSPAdaptiveStreaming> stream;
+    stream = device_props.second;
+    camera = stream->get_camera();
+    ip_address = rtsp_stream_server->get_ip_address();
     port = rtsp_stream_server->get_port();
+    device = device_props.first;
 
     sprintf(info_buffer, "{"
             "\"ip\": \"%s\", "
@@ -42,24 +35,19 @@ string IPCMessageHandler::serialise_device_props(pair<string, v4l2_info> device_
             "\"name\": \"%s\", "
             "\"mount\": \"%s\", "
             "\"camtype\": %d, "
-#if defined(__amd64__) || defined(__aarch64__)
-            "\"frame_property_bitmask\": %lu, "
-#endif
-#ifdef __arm__
-            "\"frame_property_bitmask\": %llu, "
-#endif
+            "\"frame_property_bitmask\": %d, "
             "\"resolution\": %u, "
             "\"recording\": %d"
             "}",
             ip_address.c_str(),
             port.c_str(),
-            device_props.first.c_str(),
-            device_props.second.camera_name.c_str(),
-            device_props.second.mount_point.c_str(),
-            device_props.second.camera_type,
-            device_props.second.frame_property_bitmask,
-            stream->get_quality(),
-            false);
+            camera->get_device_path().c_str(),
+            camera->get_name().c_str(),
+            stream->get_uri().c_str(),
+            0, // unsupported right now
+            camera->get_supported_qualities(),
+            camera->get_quality().to_int(),
+            false); // also unsupported
     return string(info_buffer);
 }
 
@@ -75,7 +63,7 @@ bool IPCMessageHandler::send_string(string data)
 
 void IPCMessageHandler::send_device_props()
 {
-    auto device_map = rtsp_stream_server->get_device_map();
+    auto device_map = rtsp_stream_server->get_stream_map();
     string json_message;
     json_message = "GDP$[";
 
@@ -124,17 +112,12 @@ void IPCMessageHandler::set_device_quality(char* buffer)
 
 void IPCMessageHandler::process_msg(char* buf)
 {
-    RTSPMessageType msgtype;
-    msgtype = get_message_type(buf);
-    switch (msgtype) {
-    case GET_DEVICE_PROPS:
+    string buffer(buf);
+    if (buffer.find("GDP") != string::npos) {
         send_device_props();
-        break;
-    case SET_DEVICE_PROPS:
+    } else if (buffer.find("SDP") != string::npos) {
         set_device_quality(buf);
-        break;
-    default:
+    } else {
         cerr << "Unrecognised IPC header" << endl;
-        break;
     }
 }

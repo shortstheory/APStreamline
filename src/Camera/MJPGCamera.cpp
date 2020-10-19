@@ -69,7 +69,7 @@ bool MJPGCamera::get_supported_qualities()
     fmt.type = type;
     fmt.index = 0;
     while (ioctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0) {
-        string description((char*)fmt.description);
+        string description(reinterpret_cast<char*>(fmt.description));
         if (description.find("Motion-JPEG") != string::npos
         || description.find("MJPG") != string::npos
         || description.find("M.JPG") != string::npos) {

@@ -20,7 +20,7 @@ protected:
     string launch_string;
     string camera_name;
     string capsfilter;
-    guint32 supported_qualities;
+    int supported_qualities;
 
     bool dynamic_res;
     bool dynamic_bitrate;
@@ -60,6 +60,8 @@ public:
     virtual bool set_quality(Quality q);
     Quality get_quality();
     string get_device_path();
+    string get_name();
+    int get_supported_qualities();
     void set_bitrates_constants(bool congested);
     virtual string generate_capsfilter() const;
     virtual string generate_launch_string() const = 0;

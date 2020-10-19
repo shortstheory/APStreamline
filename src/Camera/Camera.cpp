@@ -10,6 +10,16 @@ bool Camera::set_bitrate(guint32 _bitrate)
     return dynamic_bitrate;
 }
 
+string Camera::get_name()
+{
+    return camera_name;
+}
+
+int Camera::get_supported_qualities()
+{
+    return supported_qualities;
+}
+
 bool Camera::set_quality(Quality q)
 {
     return dynamic_res;

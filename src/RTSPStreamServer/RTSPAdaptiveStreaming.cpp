@@ -269,3 +269,13 @@ void RTSPAdaptiveStreaming::set_quality(int quality)
         pipeline_manager.get_camera()->set_quality(q);
     }
 }
+
+shared_ptr<Camera> RTSPAdaptiveStreaming::get_camera()
+{
+    return pipeline_manager.get_camera();
+}
+
+string RTSPAdaptiveStreaming::get_uri()
+{
+    return uri;
+}

@@ -27,11 +27,10 @@ private:
     // Requires a reference to the RTSP Stream Server for accessing the available streams
     RTSPStreamServer* rtsp_stream_server;
 
-    RTSPMessageType get_message_type(char* buf);
     string get_message_payload(char* buf);
 
     // Serialises the properties of a camera in JSON format for the APWeb server
-    string serialise_device_props(pair<string, v4l2_info> device_props);
+    string serialise_device_props(pair<string, shared_ptr<RTSPAdaptiveStreaming>> device_props);
     bool send_string(string data);
     void set_device_quality(char* buffer);
     void send_device_props();

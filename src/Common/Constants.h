@@ -6,8 +6,6 @@
 
 using namespace std;
 
-static const guint32 IPC_BUFFER_SIZE = 10000;
-
 static const guint32 SUCCESSFUL_TRANSMISSION = 5;
 
 static const int AUTO_PRESET = 1024;

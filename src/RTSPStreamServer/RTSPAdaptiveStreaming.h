@@ -72,6 +72,8 @@ public:
     bool get_media_prepared();
     int get_quality();
     void set_quality(int quality);
+    shared_ptr<Camera> get_camera();
+    string get_uri();
 };
 
 #endif

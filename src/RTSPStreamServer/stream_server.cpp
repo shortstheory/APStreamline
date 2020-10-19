@@ -12,13 +12,13 @@
 #include <experimental/filesystem>
 
 #include "RTSPStreamServer.h"
-// #include "IPCMessageHandler.h"
+#include "IPCMessageHandler.h"
 
 // Separate thread for managing the IPC with the APWeb server
 void ipc_loop(RTSPStreamServer& stream_server)
 {
     struct sockaddr_un addr;
-    char buf[IPC_BUFFER_SIZE];
+    char buf[1000];
     int socket_fd, client_fd, bytes_read;
 
     if ((socket_fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
@@ -42,11 +42,11 @@ void ipc_loop(RTSPStreamServer& stream_server)
     }
 
     while ((client_fd = accept(socket_fd, NULL, NULL))) {
-        // IPCMessageHandler message_handler(client_fd, &stream_server);
-        // while ((bytes_read=read(client_fd, buf, sizeof(buf))) > 0) {
-        //     buf[bytes_read] = '\0';
-        //     message_handler.process_msg(buf);
-        // }
+        IPCMessageHandler message_handler(client_fd, &stream_server);
+        while ((bytes_read=read(client_fd, buf, sizeof(buf))) > 0) {
+            buf[bytes_read] = '\0';
+            message_handler.process_msg(buf);
+        }
     }
 }
 
