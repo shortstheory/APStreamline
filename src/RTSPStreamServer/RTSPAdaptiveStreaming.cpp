@@ -106,14 +106,14 @@ void RTSPAdaptiveStreaming::static_media_constructed_callback(GstRTSPMediaFactor
 
 void RTSPAdaptiveStreaming::static_media_prepared_callback(GstRTSPMedia* media, gpointer data)
 {
-    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    RTSPAdaptiveStreaming* ptr = static_cast<RTSPAdaptiveStreaming*>(data);
     ptr->media_prepared_callback(media);
 }
 
 void RTSPAdaptiveStreaming::static_media_unprepared_callback(GstRTSPMedia* media, gpointer data)
 {
     // use this as a way to clean up variables and refs I guess?!
-    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    RTSPAdaptiveStreaming* ptr = static_cast<RTSPAdaptiveStreaming*>(data);
     ptr->media_unprepared_callback(media);
 }
 
@@ -122,7 +122,7 @@ void RTSPAdaptiveStreaming::static_deep_callback(GstBin* bin,
         GstElement* element,
         gpointer data)
 {
-    RTSPAdaptiveStreaming* ptr = (RTSPAdaptiveStreaming*)data;
+    RTSPAdaptiveStreaming* ptr = static_cast<RTSPAdaptiveStreaming*>(data);
     ptr->deep_callback(bin, sub_bin, element);
 }
 

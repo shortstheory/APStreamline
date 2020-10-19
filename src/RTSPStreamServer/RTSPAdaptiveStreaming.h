@@ -11,7 +11,6 @@
 #include <linux/videodev2.h>
 #include <linux/v4l2-controls.h>
 #include <sys/ioctl.h>
-
 #include "../Common/Common.h"
 
 using namespace std;
