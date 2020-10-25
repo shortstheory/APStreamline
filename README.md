@@ -47,14 +47,13 @@ Do note that the Raspberry Pi 3 and 3B+ have **very** low power Wi-Fi antennae w
 Install the `gstreamer` dependencies:
 
 ```
-sudo apt install libgstreamer-plugins-base1.0* libgstreamer1.0-dev libgstrtspserver-1.0-dev gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly python3-pip python-pip gstreamer1.0-libav
+sudo apt-get install libgstreamer-plugins-base1.0* libgstreamer1.0-dev libgstrtspserver-1.0-dev gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly python3-pip python-pip gstreamer1.0-libav
 ```
 
 Install `meson` from `pip` and `ninja` for building the code:
 
 ```
-sudo pip3 install meson
-sudo pip install pymavlink
+pip install meson
 sudo apt install ninja-build
 ```
 
@@ -63,8 +62,7 @@ Navigate to the cloned folder folder and run:
 ```
 meson build
 cd build
-meson configure -Dprefix=$HOME/start_apstreamline/
-ninja install # installs to ~/start_apstreamline for APWeb to spawn the process
+ninja
 ```
 
 On the Raspberry Pi, use `sudo modprobe bcm2835-v4l2` to load the V4L2 driver for the Raspberry Pi camera. Add `bcm2835-v4l2` to `/etc/modules` for automatically loading this module on boot.
@@ -99,6 +97,14 @@ sudo ./web_server -p 80
 
 Video livestreams can be launched using RTSP. It is recommended to use RTSP for streaming video as it provides the advantages of supporting multiple cameras, conifguring the resolution on-the-fly, and recording the livestreamed video to a file.
 
+#### Standalone
+
+Launch the RTSP stream server by going to the parent directory of the build directory. Camera configurations are loaded from the `config/` directory of the project folder.
+
+`./build/stream_server <interface>`
+
+The list of available network interfaces can be found by running `ifconfig`.
+
 ### RTSP Streaming
 
 #### APWeb
@@ -124,11 +130,3 @@ For example, this can be done in VLC by going to "Media > Open Network Stream" a
 `gst-launch-1.0 playbin uri=<RTSP-MOUNT-POINT> latency=100`
 
 An RTSP Mount Point looks like this: `rtsp://192.168.0.17:8554/cam0`. Refer to the APWeb page to see the mount points given for your camera.
-
-#### Standalone
-
-Launch the RTSP stream server by running:
-
-`./stream_server <interface>`
-
-The list of available network interfaces can be found by running `ifconfig`.
