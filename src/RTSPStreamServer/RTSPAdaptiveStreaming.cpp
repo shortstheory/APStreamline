@@ -259,7 +259,6 @@ int RTSPAdaptiveStreaming::get_quality()
     }
 }
 
-// TODO: Do the conversion of int -> quality here
 void RTSPAdaptiveStreaming::set_quality(int quality)
 {
     if (quality == AUTO_PRESET) {
