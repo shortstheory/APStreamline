@@ -141,12 +141,13 @@ An RTSP Mount Point looks like this: `rtsp://192.168.0.17:8554/cam0`. Refer to t
 
 APStreamline could use your help! Some of the tasks which I want to complete are:
 
-- [ ] Add support for the `tegra-video` driver back into the project. Currently this is only supported in [APStreamline v1.0](https://github.com/shortstheory/adaptive-streaming/releases/tag/v1.0), available from the Releases section of the repository.
+- [ ] Add support for the `tegra-video` driver back into the project. Currently this is only supported in [APStreamline v1.0](https://github.com/shortstheory/adaptive-streaming/releases/tag/v1.0), available from the Releases section of the repository
 - [ ] Update documentation and add more detailed steps for adding a new camera
 - [ ] Update the APWeb interface to list the actual available resolutions of the camera. Currently it just shows 320x240, 640x480, 1280x720 although the actual camera resolutions may be different
 - [ ] Switch the APWeb and APStreamline IPC mechanism to using ZeroMQ or rpcgen
 - [ ] Improve the installation flow. Currently the user needs to run APStreamline from the same directory as its config files for them to be loaded properly. Maybe the configuration files should be moved to `~/.config/?`
 - [ ] Improve the JavaScript in the APWeb interface
+- [ ] Document the code better!
 
 ## Bugs? Questions, Comments, Concerns?
 
