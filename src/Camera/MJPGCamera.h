@@ -9,8 +9,6 @@ class MJPGCamera : public Camera
 protected:
     GstElement *encoder;
     GstElement *capsfilter;
-    string encoder_name;
-    virtual bool read_configuration(Setting &camera_config, Setting &quality_config) override;
     bool get_supported_qualities();
 
 public:

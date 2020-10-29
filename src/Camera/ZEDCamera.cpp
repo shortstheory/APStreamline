@@ -23,7 +23,7 @@ ZEDCamera::ZEDCamera(string device, Quality q) : Camera(device, q), encoder(null
 
 bool ZEDCamera::set_element_references(GstElement *pipeline)
 {
-    encoder = gst_bin_get_by_name(GST_BIN(pipeline), encoder_name.c_str());
+    encoder = gst_bin_get_by_name(GST_BIN(pipeline), "encoder");
     capsfilter = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter");
     if (encoder && capsfilter) {
         return true;
@@ -57,12 +57,6 @@ bool ZEDCamera::set_quality(Quality q)
     return true;
 }
 
-bool ZEDCamera::read_configuration(Setting &camera_config, Setting &quality_config)
-{
-    encoder_name = static_cast<const char *>(camera_config.lookup("camera.properties.encoder_name"));
-    return Camera::read_configuration(camera_config, quality_config);
-}
-
 string ZEDCamera::generate_launch_string() const
 {
     string capsfilter_string;
@@ -81,12 +75,10 @@ string ZEDCamera::generate_launch_string() const
     capsfilter_string = generate_capsfilter();
     regex d("%device");
     regex cf("%capsfilter");
-    regex enc("%encoder");
     regex br("%bitrate");
     string result;
     result = regex_replace(launch_string, d, device_path);
     result = regex_replace(result, cf, capsfilter_string);
-    result = regex_replace(result, enc, encoder_name);
     result = regex_replace(result, br, to_string(launch_bitrate));
     return result;
 }

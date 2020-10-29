@@ -9,8 +9,6 @@ class ZEDCamera : public Camera
 protected:
     GstElement *encoder;
     GstElement *capsfilter;
-    string encoder_name;
-    virtual bool read_configuration(Setting &camera_config, Setting &quality_config) override;
 
 public:
     ZEDCamera(string device, Quality q);
