@@ -6,7 +6,7 @@
 
 Using video cameras for live-streaming the video feed from aerial robots and other unmanned vehicles is useful for a number of applications. Most video streaming solutions use RTP for streaming video over UDP. UDP is more efficient than TCP because it forgoes the overhead that comes with TCP's reliable delivery and congestion control mechanisms.
 
-However, this introduces new problems when streaming video from robots. In most cases, we use the Companion Computer (CC) in Wi-Fi hotspot mode for streaming the video. Due to the limited range of 2.4GHz Wi-Fi, the Quality-of-Service (QoS) progressively gets worse when the robot moves further away from the receiving computer.
+However, this introduces new problems when streaming video from robots. In most cases, we use the Companion Computer (CC) in Wi-Fi hotspot mode for streaming the video. Due to the limited range of 2.4GHz Wi-Fi, the streaming quality gets perceptibly worse when the robot moves further away from the receiving computer.
 
 The APStreamline project aims to fix this problem by dynamically adjusting the video quality. Over UDP we can obtain estimates of QoS using RTCP packets received from the receiver. These RTCP packets provide helpful QoS information (such as RTT and packet loss) which can be used for automatically changing the bitrate and resolution of the video delivered from the sender.
 
@@ -144,11 +144,11 @@ An RTSP Mount Point looks like this: `rtsp://192.168.0.17:8554/cam0`. Refer to t
 
 APStreamline could use your help! Some of the tasks which I want to complete are:
 
-- [ ] Add support for the `tegra-video` driver back into the project. Currently this is only supported in APStreamline v1, available from the Releases section of the repository.
+- [ ] Add support for the `tegra-video` driver back into the project. Currently this is only supported in [APStreamline v1.0](https://github.com/shortstheory/adaptive-streaming/releases/tag/v1.0), available from the Releases section of the repository.
 - [ ] Update documentation and add more detailed steps for adding a new camera
-- [ ] Update the APWeb interface to list the actual available resolutions of the camera. Currently it just shows 320x240, 640x480, 1280x720 although the actual camera resolutions are different
+- [ ] Update the APWeb interface to list the actual available resolutions of the camera. Currently it just shows 320x240, 640x480, 1280x720 although the actual camera resolutions may be different
 - [ ] Switch the APWeb and APStreamline IPC mechanism to using ZeroMQ or rpcgen
-- [ ] Improve the installation flow. Currently the user needs to run APStreamline from the same directory as its config files for them to be loaded properly.
+- [ ] Improve the installation flow. Currently the user needs to run APStreamline from the same directory as its config files for them to be loaded properly. Maybe the configuration files should be moved to `~/.config/?`
 
 ## Bugs? Questions, Comments, Concerns?
 
