@@ -15,7 +15,7 @@ RPiCamera::RPiCamera(string device, Quality q) : Camera(device, q), src(nullptr)
 
     // Read the file. If there is an error, report it and exit.
     try {
-        cout << "Reading config" << endl;
+        cout << "Reading RPi config" << endl;
         camera_config.readFile("config/RPiCamera.cfg");
         quality_config.readFile("config/settings.cfg");
         read_configuration(camera_config.getRoot(), quality_config.getRoot());

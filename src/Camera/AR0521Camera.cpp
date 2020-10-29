@@ -9,7 +9,7 @@ AR0521Camera::AR0521Camera(string device, Quality q) : Camera(device, q), encode
 
     // Read the file. If there is an error, report it and exit.
     try {
-        cout << "Reading config" << endl;
+        cout << "Reading AR0521 config" << endl;
         camera_config.readFile("config/AR0521Camera.cfg");
         quality_config.readFile("config/settings.cfg");
         read_configuration(camera_config.getRoot(), quality_config.getRoot());
