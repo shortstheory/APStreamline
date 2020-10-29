@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Using video cameras for live-streaming the video feed from aerial robots and other unmanned vehicles is becoming increasingly useful. Most video streaming solutions use RTP for streaming video over UDP. UDP is more efficient than TCP because it forgoes the overhead that comes with TCP's reliable delivery and congestion control mechanisms.
+Using video cameras for live-streaming the video feed from aerial robots and other unmanned vehicles is useful for a number of applications. Most video streaming solutions use RTP for streaming video over UDP. UDP is more efficient than TCP because it forgoes the overhead that comes with TCP's reliable delivery and congestion control mechanisms.
 
 However, this introduces new problems when streaming video from robots. In most cases, we use the Companion Computer (CC) in Wi-Fi hotspot mode for streaming the video. Due to the limited range of 2.4GHz Wi-Fi, the Quality-of-Service (QoS) progressively gets worse when the robot moves further away from the receiving computer.
 
@@ -152,3 +152,7 @@ APStreamline could use your help! Some of the tasks which I want to complete are
 - [ ] Update the APWeb interface to list the actual available resolutions of the camera. Currently it just shows 320x240, 640x480, 1280x720 although the actual camera resolutions are different
 - [ ] Switch the APWeb and APStreamline IPC mechanism to using ZeroMQ or rpcgen
 - [ ] Improve the installation flow. Currently the user needs to run APStreamline from the same directory as its config files for them to be loaded properly.
+
+## Bugs? Questions, Comments, Concerns?
+
+Feel free to make a GitHub issue in the repository to get in touch if you would like to chat about the project or file a bug report!
