@@ -74,8 +74,9 @@ pair<CameraType, string> RTSPStreamServer::get_camera_type(const string &device_
         camera_name = string(caps.card, caps.card + sizeof(caps.card)/sizeof(caps.card[0]));
         driver_name = string(caps.driver, caps.driver+sizeof(caps.driver)/sizeof(caps.card[0]));
 
-        // FIXME: add more camera IDs and close fd
+        // FIXME: add more camera IDs
         pair<CameraType, string> cameraPair;
+        cameraPair = make_pair(CameraType::NOT_SUPPORTED, "");
         if (camera_name.find("mmal service 16.1") != string::npos) {
             cameraPair = make_pair(CameraType::RPI_CAM, camera_name);
         } else if (camera_name.find("ar0521") != string::npos) {
