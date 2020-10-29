@@ -44,17 +44,18 @@ Do note that the Raspberry Pi 3 and 3B+ have **very** low power Wi-Fi antennae w
 
 ### Installing APStreamline
 
+The installation procedure is pretty much the same across all Debian-based Linux platforms, including but not limited to the Raspberry Pi, NVIDIA Jetson boards, or any x86 machine.
+
 Install the `gstreamer` dependencies:
 
 ```
 sudo apt-get install libgstreamer-plugins-base1.0* libgstreamer1.0-dev libgstrtspserver-1.0-dev gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly python3-pip python-pip gstreamer1.0-libav
 ```
 
-Install `meson` from `pip` and `ninja` for building the code:
+Install other dependencies for building the code:
 
 ```
-pip install meson
-sudo apt install ninja-build
+sudo apt install ninja-build cmake meson libconfig++-dev
 ```
 
 Navigate to the cloned folder folder and run:
@@ -62,7 +63,7 @@ Navigate to the cloned folder folder and run:
 ```
 meson build
 cd build
-ninja
+ninja # NOTE: on the Raspberry Pi, run ninja -j2 so the build completes without taking up all the available memory
 ```
 
 On the Raspberry Pi, use `sudo modprobe bcm2835-v4l2` to load the V4L2 driver for the Raspberry Pi camera. Add `bcm2835-v4l2` to `/etc/modules` for automatically loading this module on boot.
