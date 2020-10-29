@@ -9,8 +9,6 @@ class AR0521Camera : public Camera
 protected:
     GstElement *encoder;
     GstElement *capsfilter_element;
-    string encoder_name;
-    virtual bool read_configuration(Setting &camera_config, Setting &quality_config) override;
 
 public:
     AR0521Camera(string device, Quality q);

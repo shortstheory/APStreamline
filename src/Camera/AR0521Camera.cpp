@@ -23,7 +23,7 @@ AR0521Camera::AR0521Camera(string device, Quality q) : Camera(device, q), encode
 
 bool AR0521Camera::set_element_references(GstElement *pipeline)
 {
-    encoder = gst_bin_get_by_name(GST_BIN(pipeline), encoder_name.c_str());
+    encoder = gst_bin_get_by_name(GST_BIN(pipeline), "encoder");
     capsfilter_element = gst_bin_get_by_name(GST_BIN(pipeline), "capsfilter");
     if (encoder && capsfilter_element) {
         return true;
@@ -49,12 +49,6 @@ bool AR0521Camera::set_quality(Quality q)
 {
     // Changing quality isn't supported, but one can play with the bitrate
     return false;
-}
-
-bool AR0521Camera::read_configuration(Setting &camera_config, Setting &quality_config)
-{
-    encoder_name = static_cast<const char *>(camera_config.lookup("camera.properties.encoder_name"));
-    return Camera::read_configuration(camera_config, quality_config);
 }
 
 string AR0521Camera::generate_launch_string() const
