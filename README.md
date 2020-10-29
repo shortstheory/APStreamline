@@ -18,7 +18,7 @@ APStreamline was first released in a beta image of APSync in [September 2018](ht
 
 **v2 Features** *(Released in October 2020)*
 
-* Much easier to add new cameras and GStreamer pipelines
+* Made it much easier to add new cameras and GStreamer pipelines
 * Support for the ZED and e-Con AR0591 cameras
 
 **v1 Features** *(Released in September 2018)*
@@ -28,9 +28,6 @@ CSI cameras
 * **Automatic** quality selection based on **bandwidth** and
 **packet loss** estimates 
 * **Selection** of network interfaces to stream the video 
-* <s>Options to **record** the live-streamed video feed to
-the companion computer</s>. This had to be removed because of
-stability issues.
 * **Manual control** over resolution and framerates 
 * **Multiple** camera support using RTSP 
 * **Hardware-accelerated** encoding for the **Raspberry Pi**
@@ -149,6 +146,7 @@ APStreamline could use your help! Some of the tasks which I want to complete are
 - [ ] Update the APWeb interface to list the actual available resolutions of the camera. Currently it just shows 320x240, 640x480, 1280x720 although the actual camera resolutions may be different
 - [ ] Switch the APWeb and APStreamline IPC mechanism to using ZeroMQ or rpcgen
 - [ ] Improve the installation flow. Currently the user needs to run APStreamline from the same directory as its config files for them to be loaded properly. Maybe the configuration files should be moved to `~/.config/?`
+- [ ] Improve the JavaScript in the APWeb interface
 
 ## Bugs? Questions, Comments, Concerns?
 
