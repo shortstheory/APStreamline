@@ -16,28 +16,25 @@ The code makes use of GStreamer libraries for creating the streaming pipelines.
 
 APStreamline was first released in a beta image of APSync in [September 2018](https://discuss.ardupilot.org/t/apsync-with-apstreamline-beta/33247). The latest release supports the following features and needs to built from source:
 
-**v2 Features**
+**v2 Features** *(Released in October 2020)*
 
 * Much easier to add new cameras and GStreamer pipelines
-
 * Support for the ZED and e-Con AR0591 cameras
 
-**v1 Features**
+**v1 Features** *(Released in September 2018)*
 
-* Support for using the hardware encoder for Jetson TX1/TX2 CSI cameras
-
-* **Automatic** quality selection based on **bandwidth** and **packet loss** estimates 
-
+* Support for using the hardware encoder for Jetson TX1/TX2
+CSI cameras
+* **Automatic** quality selection based on **bandwidth** and
+**packet loss** estimates 
 * **Selection** of network interfaces to stream the video 
-
-* <s>Options to **record** the live-streamed video feed to the companion computer</s>. This had to be removed because of stability issues.
-
+* <s>Options to **record** the live-streamed video feed to
+the companion computer</s>. This had to be removed because of
+stability issues.
 * **Manual control** over resolution and framerates 
-
 * **Multiple** camera support using RTSP 
-
-* **Hardware-accelerated** encoding for the **Raspberry Pi** camera on the Raspberry Pi
-
+* **Hardware-accelerated** encoding for the **Raspberry Pi**
+camera on the Raspberry Pi
 * Camera settings **configurable** through the **APWeb GUI**
 
 ## Running the Code
@@ -147,7 +144,7 @@ An RTSP Mount Point looks like this: `rtsp://192.168.0.17:8554/cam0`. Refer to t
 
 APStreamline could use your help! Some of the tasks which I want to complete are:
 
-- [ ] Add support for the `tegra-video` driver back into the project
+- [ ] Add support for the `tegra-video` driver back into the project. Currently this is only supported in APStreamline v1, available from the Releases section of the repository.
 - [ ] Update documentation and add more detailed steps for adding a new camera
 - [ ] Update the APWeb interface to list the actual available resolutions of the camera. Currently it just shows 320x240, 640x480, 1280x720 although the actual camera resolutions are different
 - [ ] Switch the APWeb and APStreamline IPC mechanism to using ZeroMQ or rpcgen
