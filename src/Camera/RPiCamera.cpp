@@ -53,7 +53,18 @@ bool RPiCamera::set_bitrate(guint32 _bitrate)
         v4l2_control bitrate_ctrl;
         bitrate_ctrl.id = V4L2_CID_MPEG_VIDEO_BITRATE;
         bitrate_ctrl.value = bitrate*1000;
-        if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1) {
+
+        v4l2_control vertical_flip;
+        vertical_flip.id = V4L2_CID_VFLIP;
+        vertical_flip.value = TRUE;
+
+        v4l2_control horizontal_flip;
+        horizontal_flip.id = V4L2_CID_HFLIP;
+        horizontal_flip.value = TRUE;
+
+        if (ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &bitrate_ctrl) == -1 ||
+            ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &vertical_flip) == -1 ||
+            ioctl(v4l2_cam_fd, VIDIOC_S_CTRL, &horizontal_flip) == -1) {
             return false;
         }
     }
